@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+## ------ language="Python" file="doctest/pandoc-test"
+# vim: ft=python
+
+from panflute import *
+
+## ------ begin <<expand>>[0]
+from typing import (Dict, List)
+import re
+
+def replace_expr(expr, replace, text):
+    """Matches (fullmatch) `text` using the expression `expr`. If the expression
+    matches, then returns the result of passing named sub-matches as
+    keyword arguments to `replace`. Returns `text` otherwise."""
+    match = re.fullmatch(expr, text)
+    if match:
+        return replace(**match.groupdict())
+    else:
+        return text
+## ------ end
+## ------ begin <<expand>>[1]
+def expand(code: CodeBlock, code_map: Dict[str, List[CodeBlock]]) -> str:
+    pattern = "(?P<prefix>[ \t]*)<<(?P<name>[^ >]*)>>\\Z"
+    ## ------ begin <<define-look-up>>[0]
+    from textwrap import indent
+    
+    def look_up(*, name, prefix):
+        blocks = code_map[name]
+        if not blocks:
+            raise ValueError(f"No code with name `{name}` found.")
+        result = "\n".join(expand(code, code_map) for code in blocks)
+        return indent(result, prefix)
+    ## ------ end
+    return "\n".join(
+        replace_expr(pattern, look_up, line)
+        for line in code.text.splitlines())
+## ------ end
+## ------ begin <<session>>[0]
+class Session:
+    history: List[str]
+    input_queue: List[str]
+## ------ end
+
+## ------ begin <<prepare>>[0]
+from collections import defaultdict
+
+def prepare(doc):
+    doc.codes = defaultdict(list)
+## ------ end
+## ------ begin <<action>>[0]
+## ------ begin <<get-name>>[0]
+def get_name(elem):
+    if elem.identifier:
+        return elem.identifier
+
+    if "file" in elem.attributes:
+        return elem.attributes["file"]
+
+    return None
+## ------ end
+
+def action(elem, doc):
+    if isinstance(elem, CodeBlock):
+        name = get_name(elem)
+        if name:
+            doc.codes[name].append(elem)
+## ------ end
+## ------ begin <<finalize>>[0]
+import sys
+
+def finalize(doc):
+    for k, v in doc.codes.items():
+        print(k, "|", "\n".join(expand(c, doc.codes) for c in v), file=sys.stderr)
+## ------ end
+
+def main(doc=None):
+    return run_filter(
+        action, prepare=prepare, finalize=finalize, doc=doc)
+
+if __name__ == "__main__":
+    main()
+## ------ end
