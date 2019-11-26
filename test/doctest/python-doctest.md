@@ -16,7 +16,7 @@ def word_count(sentence):
 
 Import the function.
 
-``` {.python .doctest #test-word-count}
+``` {.python #test-word-count}
 from word_count import word_count
 ```
 
