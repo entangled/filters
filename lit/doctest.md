@@ -90,22 +90,26 @@ def finalize(doc):
 A session has a list of input blocks, a line to the REPL, and a method to add new code. Code is only passed to the actual REPL at the time a `.doctest` class code block is pushed.
 
 ``` {.python #doctest-session}
+class TestStatus(Enum):
+    PENDING = 0
+    SUCCESS = 1
+    FAIL = 2
+    ERROR = 3
+    UNKNOWN = 4
+
 @dataclass
 class Test:
-    __test__ = False
+    __test__ = False    # not a pytest class
     code: str
     expect: Optional[str]
+    result: Optional[str] = None
+    error: Optional[str] = None
+    status: TestStatus = TestStatus.PENDING
 
 @dataclass
 class Suite:
     code_blocks: List[Test]
     language: str
-
-@dataclass
-class ReplLog:
-    code_input: str
-    repl_output: str
-    expected: Optional[str]
 
 import jupyter_client
 
@@ -121,34 +125,48 @@ def run_suite(config, s: Suite):
     repl_log = []
     with jupyter_client.run_kernel(kernel_name=kernel_name) as kc:
         print(f"Kernel `{kernel_name}` running ...", file=sys.stderr)
-        def read_output(msg_id):
+        def jeval(test: Test):
+            msg_id = kc.execute(test.code)
             while True:
                 try:
-                    msg = kc.get_iopub_msg(timeout=1)
+                    msg = kc.get_iopub_msg(timeout=1000)
                     if msg["msg_type"] == "execute_result" and \
                             msg["parent_header"]["msg_id"] ==  msg_id:
                         data = msg["content"]["data"]
                         if "text/plain" in data:
-                            return data["text/plain"]
+                            test.result = data["text/plain"]
+                            if (test.expect is None) or test.result.strip() == test.expect.strip():
+                                test.status = TestStatus.SUCCESS
+                            else:
+                                test.status = TestStatus.FAIL
+                            return
                         else:
-                            raise ValueError(f"Unknown return value: `{data}`")
+                            test.status = TestStatus.UNKNOWN
+                            test.result = str(data)
+                            return
                     if msg["msg_type"] == "status" and \
                             msg["parent_header"]["msg_id"] == msg_id and \
                             msg["content"]["execution_state"] == "idle":
+                        if test.expect is None:
+                            test.status = TestStatus.SUCCESS
+                        else:
+                            test.status = TestStatus.FAIL
                         return
                     if msg["msg_type"] == "error":
-                        print("\n".join(msg["content"]["traceback"]), file=sys.stderr)
-                        raise RuntimeError("Error")
+                        test.error = "\n".join(msg["content"]["traceback"])
+                        test.status = TestStatus.ERROR 
+                        return
+                except queue.Empty:
+                    test.error = "Operation timed out."
+                    test.status = TestStatus.ERROR
+                    return
 
-                except:
-                    raise TimeoutError("Operation timed-out.");
+        for test in s.code_blocks:
+            jeval(test)
+            if test.status is TestStatus.ERROR:
+                break
 
-        for c in s.code_blocks:
-            msg_id = kc.execute(c.code)
-            result = read_output(msg_id)
-            repl_log.append(ReplLog(c.code, result, c.expect))
-
-    return repl_log
+    return s
 ```
 
 ## Bug in `panflute` or `jupyter_client`
@@ -162,6 +180,8 @@ from typing import (List, Dict, Union, Optional)
 from dataclasses import dataclass
 from .tangle import (get_code, get_name)
 import sys
+import queue
+from enum import Enum
 
 @dataclass
 class CodeBlock:
@@ -199,7 +219,7 @@ def main():
     output_json = applyJSONFilters([tangle_action(code_map)], json_data)
     suites = get_doc_tests(code_map)
     for name, s in suites.items():
-        log = run_suite(config, s)
-        print(log, file=sys.stderr)
+        run_suite(config, s)
+        print(s, file=sys.stderr)
     sys.stdout.write(output_json)
 ```
