@@ -1,5 +1,5 @@
 ## ------ language="Python" file="entangled/doctest.py"
-import panflute as pf
+from panflute import (CodeBlock, run_filter)
 from .tangle import get_code, get_name
 from . import tangle
 
@@ -31,7 +31,7 @@ def run_suite(config, s: Suite):
     kernel_name = info["jupyter"]
     if not kernel_name:
         raise RuntimeError(f"No Jupyter kernel known for the {s.language} language.")
-    spces = jupyter_client.kernelspec.find_kernel_specs()
+    specs = jupyter_client.kernelspec.find_kernel_specs()
     if kernel_name not in specs:
         raise RuntimeError(f"Jupyter kernel `{kernel_name}` not installed.")
 
@@ -67,32 +67,6 @@ def run_suite(config, s: Suite):
 import sys
 import json
 
-def get_language(c: pf.CodeBlock) -> str:
-    if not c.classes:
-        name = get_name(c)
-        raise ValueError(f"Code block `{name}` has no language specified.")
-    return c.classes[0]
-
-def get_doc_tests(code_map: Dict[str, List[pf.CodeBlock]]) -> Dict[str, Suite]:
-    def convert_code_block(c: pf.CodeBlock) -> Test:
-        if "doctest" in c.classes:
-            s = c.text.split("\n---\n")
-            name = get_name(c)
-            if len(s) != 2:
-                raise ValueError(f"Doc test `{name}` should have single `---` line.")
-            return Test(*s)
-        else:
-            return Test(c.text, None)
-
-    result = {}
-    for k, v in code_map.items():
-        if any("doctest" in c.classes for c in v):
-            result[k] = Suite(
-                code_blocks=[convert_code_block(c) for c in v],
-                language=get_language(v[0]))
-
-    return result
-
 def finalize(doc):
     tests = get_doc_tests(doc.code_map)
     for name, suite in tests.items():
@@ -103,22 +77,12 @@ def finalize(doc):
 ## ------ end
 import subprocess
 
-def read_config():
-    result = subprocess.run(
-        ["dhall-to-json", "--file", "entangled.dhall"],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8', check=True)
-    return json.loads(result.stdout)
-
-def get_language_info(config, identifier):
-    return next(lang for lang in config["languages"]
-                if identifier in lang["identifiers"])
-
 def prepare(doc=None):
     doc.config = read_config()
     tangle.prepare(doc)
 
 def main(doc=None):
-    return pf.run_filter(
+    return run_filter(
         tangle.action, prepare=prepare, finalize=finalize, doc=doc)
 
 if __name__ == "__main__":
