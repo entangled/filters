@@ -33,5 +33,5 @@ And a small sentence.
 ``` {.python .doctest #test-word-count}
 word_count("Hebban olla uogala nestas hagunnan hinase hic anda thu uuat unbidan uue nu")
 ---
-13
+14
 ```

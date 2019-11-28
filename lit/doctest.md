@@ -32,9 +32,16 @@ import subprocess
 import json
 
 def read_config():
-    result = subprocess.run(
-        ["dhall-to-json", "--file", "entangled.dhall"],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8', check=True)
+    try:
+        result = subprocess.run(
+            ["dhall-to-json", "--file", "entangled.dhall"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8', check=True)
+    except subprocess.CalledProcessError as e:
+        print("Error reading `entangled.dhall`:\n" + e.stderr, file=sys.stderr)
+    except FileNotFoundError as e:
+        print("Warning: could not find `dhall-to-json`, trying to read JSON instead.",
+              file=sys.stderr)
+        return json.load("entangled.json")
     return json.loads(result.stdout)
 
 def get_language_info(config, identifier):
@@ -47,17 +54,15 @@ def get_language_info(config, identifier):
 ``` {.python #get-doc-tests}
 def get_language(c: CodeBlock) -> str:
     if not c.classes:
-        name = get_name(c)
-        raise ValueError(f"Code block `{name}` has no language specified.")
+        raise ValueError(f"Code block `{c.name}` has no language specified.")
     return c.classes[0]
 
 def get_doc_tests(code_map: Dict[str, List[CodeBlock]]) -> Dict[str, Suite]:
     def convert_code_block(c: CodeBlock) -> Test:
         if "doctest" in c.classes:
             s = c.text.split("\n---\n")
-            name = get_name(c)
             if len(s) != 2:
-                raise ValueError(f"Doc test `{name}` should have single `---` line.")
+                raise ValueError(f"Doc test `{c.name}` should have single `---` line.")
             return Test(*s)
         else:
             return Test(c.text, None)
@@ -167,6 +172,31 @@ def run_suite(config, s: Suite):
                 break
 
     return s
+
+import pandocfilters as pandoc
+
+def generate_report(c: CodeBlock, t: Test) -> List [pandoc.CodeBlock]:
+    status_attr = [("status", t.status.name)]
+    input_code = pandoc.CodeBlock(
+        [c.identifier, c.classes, c.attribute_list + status_attr], t.code)
+    lang_class = c.classes[0]
+
+    if t.status is TestStatus.ERROR:
+        return [input_code, pandoc.CodeBlock(["", ["error"], status_attr], str(t.error))]
+    if t.status is TestStatus.FAIL:
+        return [ input_code
+               , pandoc.CodeBlock(["", [lang_class, "doctest", "result"], status_attr], str(t.result))
+               , pandoc.CodeBlock(["", [lang_class, "doctest", "expect"], status_attr], str(t.expect)) ]
+    if t.status is TestStatus.SUCCESS:
+        return [ input_code
+               , pandoc.CodeBlock(["", [lang_class, "doctest", "result"], status_attr], str(t.result)) ]
+    if t.status is TestStatus.PENDING:
+        return [ input_code ]
+    if t.status is TestStatus.UNKNOWN:
+        return [ input_code
+               , pandoc.CodeBlock(["", ["doctest", "unknown"], status_attr], str(t.result)) ]
+
+    return None
 ```
 
 ## Bug in `panflute` or `jupyter_client`
@@ -178,18 +208,12 @@ from pandocfilters import (applyJSONFilters)
 from collections import defaultdict
 from typing import (List, Dict, Union, Optional)
 from dataclasses import dataclass
-from .tangle import (get_code, get_name)
+from .tangle import (get_code)
+from .weave import annotate_action
 import sys
 import queue
 from enum import Enum
-
-@dataclass
-class CodeBlock:
-    """Mocks the `panflute.CodeBlock` class."""
-    text: str
-    identifier: str
-    classes: List[str]
-    attributes: Dict[str, str]
+from .codeblock import CodeBlock
 
 <<read-config>>
 <<doctest-session>>
@@ -205,21 +229,39 @@ class CodeBlock:
 def tangle_action(code_map):
     def action(key, value, fmt, meta):
         if key == "CodeBlock":
-            identifier, classes, attributes = value[0]
-            c = CodeBlock(value[1], identifier, classes, dict(attributes))
-            name = get_name(c)
-            code_map[name].append(c)
-        return []
+            c = CodeBlock.from_json(value)
+            code_map[c.name].append(c)
     return action
+
+def doctest_action(suites):
+    code_counter = defaultdict(lambda: 0)
+    def action(key, value, fmt, meta):
+        if key == "CodeBlock":
+            c = CodeBlock.from_json(value)
+
+            if "doctest" in c.classes:
+                suite = suites[c.name].code_blocks[code_counter[c.name]]
+                code_counter[c.name] += 1
+                return generate_report(c, suite)
+            code_counter[c.name] += 1
+        return None
+    return action
+
+from pprint import pprint
 
 def main():
     config = read_config()
     code_map = defaultdict(list)
     json_data = sys.stdin.read()
-    output_json = applyJSONFilters([tangle_action(code_map)], json_data)
+    print("tangling ...", file=sys.stderr)
+    applyJSONFilters([tangle_action(code_map)], json_data)
+    print("annotating ...", file=sys.stderr)
+    json_data = applyJSONFilters([annotate_action()], json_data)
     suites = get_doc_tests(code_map)
     for name, s in suites.items():
         run_suite(config, s)
-        print(s, file=sys.stderr)
-    sys.stdout.write(output_json)
+    print("inserting doctest report ...", file=sys.stderr)
+    json_data = applyJSONFilters([doctest_action(suites)], json_data)
+    # pprint(json.loads(json_data)['blocks'][1]['c'][1][0]['c'], stream=sys.stderr)
+    sys.stdout.write(json_data)
 ```

@@ -8,8 +8,33 @@ from .weave import annotate_action
 import sys
 import queue
 from enum import Enum
-from .codeblock import CodeBlock
 
+@dataclass
+class CodeBlock:
+    """Mocks the `panflute.CodeBlock` class, and adds some features."""
+    text: str
+    identifier: str
+    classes: List[str]
+    attributes: Dict[str, str]
+
+    @staticmethod
+    def from_json(value):
+        identifier, classes, attributes = value[0]
+        return CodeBlock(value[1], identifier, classes, dict(attributes))
+
+    @property
+    def name(self):
+        if self.identifier:
+            return self.identifier
+
+        if "file" in self.attributes:
+            return self.attributes["file"]
+
+        return None
+
+    @property
+    def attribute_list(self):
+        return list(self.attributes.items())
 ## ------ begin <<read-config>>[0]
 import subprocess
 import json
@@ -138,15 +163,17 @@ def generate_report(c: CodeBlock, t: Test) -> List [pandoc.CodeBlock]:
 ## ------ begin <<get-doc-tests>>[0]
 def get_language(c: CodeBlock) -> str:
     if not c.classes:
-        raise ValueError(f"Code block `{c.name}` has no language specified.")
+        name = get_name(c)
+        raise ValueError(f"Code block `{name}` has no language specified.")
     return c.classes[0]
 
 def get_doc_tests(code_map: Dict[str, List[CodeBlock]]) -> Dict[str, Suite]:
     def convert_code_block(c: CodeBlock) -> Test:
         if "doctest" in c.classes:
             s = c.text.split("\n---\n")
+            name = get_name(c)
             if len(s) != 2:
-                raise ValueError(f"Doc test `{c.name}` should have single `---` line.")
+                raise ValueError(f"Doc test `{name}` should have single `---` line.")
             return Test(*s)
         else:
             return Test(c.text, None)
@@ -172,32 +199,26 @@ def doctest_action(suites):
     code_counter = defaultdict(lambda: 0)
     def action(key, value, fmt, meta):
         if key == "CodeBlock":
-            c = CodeBlock.from_json(value)
+            c.from_json(value)
 
-            if "doctest" in c.classes:
+            if "doctest" in classes:
                 suite = suites[c.name].code_blocks[code_counter[c.name]]
                 code_counter[c.name] += 1
                 return generate_report(c, suite)
             code_counter[c.name] += 1
         return None
     return action
-
-from pprint import pprint
-
+ 
 def main():
     config = read_config()
     code_map = defaultdict(list)
     json_data = sys.stdin.read()
-    print("tangling ...", file=sys.stderr)
     applyJSONFilters([tangle_action(code_map)], json_data)
-    print("annotating ...", file=sys.stderr)
     json_data = applyJSONFilters([annotate_action()], json_data)
     suites = get_doc_tests(code_map)
     for name, s in suites.items():
         run_suite(config, s)
-    print("inserting doctest report ...", file=sys.stderr)
-    json_data = applyJSONFilters([doctest_action(suites)], json_data)
-    # pprint(json.loads(json_data)['blocks'][1]['c'][1][0]['c'], stream=sys.stderr)
-    sys.stdout.write(json_data)
+    output_json = applyJSONFilters([doctest_action(suites)], json_data)
+    sys.stdout.write(output_json)
 ## ------ end
 ## ------ end

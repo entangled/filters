@@ -4,25 +4,26 @@ from .tangle import get_code, get_name
 from . import tangle
 
 ## ------ begin <<doctest-session>>[0]
-from typing import (List, Dict, Union, Optional)
-from dataclasses import dataclass
+class TestStatus(Enum):
+    PENDING = 0
+    SUCCESS = 1
+    FAIL = 2
+    ERROR = 3
+    UNKNOWN = 4
 
 @dataclass
 class Test:
-    __test__ = False
+    __test__ = False    # not a pytest class
     code: str
     expect: Optional[str]
+    result: Optional[str] = None
+    error: Optional[str] = None
+    status: TestStatus = TestStatus.PENDING
 
 @dataclass
 class Suite:
     code_blocks: List[Test]
     language: str
-
-@dataclass
-class ReplLog:
-    code_input: str
-    repl_output: str
-    expected: Optional[str]
 
 import jupyter_client
 
@@ -36,32 +37,75 @@ def run_suite(config, s: Suite):
         raise RuntimeError(f"Jupyter kernel `{kernel_name}` not installed.")
 
     repl_log = []
-    with jupyter_client.run_kernel(kernel_name=info["jupyter"]) as kc:
-        print("Kernel running ...", file=sys.stderr)
-        def read_output(msg_id):
+    with jupyter_client.run_kernel(kernel_name=kernel_name) as kc:
+        print(f"Kernel `{kernel_name}` running ...", file=sys.stderr)
+        def jeval(test: Test):
+            msg_id = kc.execute(test.code)
             while True:
                 try:
-                    msg = kc.get_iopub_msg(timeout=1)
+                    msg = kc.get_iopub_msg(timeout=1000)
                     if msg["msg_type"] == "execute_result" and \
                             msg["parent_header"]["msg_id"] ==  msg_id:
                         data = msg["content"]["data"]
                         if "text/plain" in data:
-                            return data["text/plain"]
+                            test.result = data["text/plain"]
+                            if (test.expect is None) or test.result.strip() == test.expect.strip():
+                                test.status = TestStatus.SUCCESS
+                            else:
+                                test.status = TestStatus.FAIL
+                            return
                         else:
-                            raise ValueError(f"Unknown return value: `{data}`")
+                            test.status = TestStatus.UNKNOWN
+                            test.result = str(data)
+                            return
                     if msg["msg_type"] == "status" and \
                             msg["parent_header"]["msg_id"] == msg_id and \
                             msg["content"]["execution_state"] == "idle":
+                        if test.expect is None:
+                            test.status = TestStatus.SUCCESS
+                        else:
+                            test.status = TestStatus.FAIL
                         return
-                except:
-                    raise TimeoutError("Operation timed-out.");
+                    if msg["msg_type"] == "error":
+                        test.error = "\n".join(msg["content"]["traceback"])
+                        test.status = TestStatus.ERROR 
+                        return
+                except queue.Empty:
+                    test.error = "Operation timed out."
+                    test.status = TestStatus.ERROR
+                    return
 
-        for c in s.code_blocks:
-            msg_id = kc.execute(c.code)
-            result = read_output(msg_id)
-            repl_log.append(ReplLog(c.code, result, c.expect))
+        for test in s.code_blocks:
+            jeval(test)
+            if test.status is TestStatus.ERROR:
+                break
 
-    return repl_log
+    return s
+
+import pandocfilters as pandoc
+
+def generate_report(c: CodeBlock, t: Test) -> List [pandoc.CodeBlock]:
+    status_attr = [("status", t.status.name)]
+    input_code = pandoc.CodeBlock(
+        [c.identifier, c.classes, c.attribute_list + status_attr], t.code)
+    lang_class = c.classes[0]
+
+    if t.status is TestStatus.ERROR:
+        return [input_code, pandoc.CodeBlock(["", ["error"], status_attr], str(t.error))]
+    if t.status is TestStatus.FAIL:
+        return [ input_code
+               , pandoc.CodeBlock(["", [lang_class, "doctest", "result"], status_attr], str(t.result))
+               , pandoc.CodeBlock(["", [lang_class, "doctest", "expect"], status_attr], str(t.expect)) ]
+    if t.status is TestStatus.SUCCESS:
+        return [ input_code
+               , pandoc.CodeBlock(["", [lang_class, "doctest", "result"], status_attr], str(t.result)) ]
+    if t.status is TestStatus.PENDING:
+        return [ input_code ]
+    if t.status is TestStatus.UNKNOWN:
+        return [ input_code
+               , pandoc.CodeBlock(["", ["doctest", "unknown"], status_attr], str(t.result)) ]
+
+    return None
 ## ------ end
 ## ------ begin <<doctest-finalize>>[0]
 import sys
