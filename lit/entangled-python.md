@@ -469,6 +469,8 @@ def jupyter_eval(test: Test):
              return
 ```
 
+The `handle` function is a pattern matcher. Each pattern looks like a dictionary, but may contain one or more `_` symbols. The contents of the matching dictionary at the `_` symbols are passed to the function following the pattern.
+
 ``` {.python #jupyter-eval-test}
 def handle(test, msg_id, msg):
     from pampy import match, _
