@@ -1,6 +1,4 @@
-# Code block annotation
-
-``` {.python file=entangled/annotate.py}
+## ------ language="Python" file="entangled/annotate.py"
 from collections import defaultdict
 from .tangle import get_name
 from .codeblock import CodeBlock
@@ -18,4 +16,4 @@ def action(elem, doc):
         else:
             label = Span(Str(f"«{name}»+"))
         return Div(Para(label), elem, classes=["annotated-code"])
-```
+## ------ end

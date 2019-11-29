@@ -6,7 +6,6 @@ setup(
     name="entangled-filters",
     version="0.4",
     packages=find_packages(),
-    scripts=['bin/pandoc-tangle', 'bin/pandoc-test'],
 
     install_requires=[],
     # include_package_data=True,
@@ -24,9 +23,9 @@ setup(
     keywords="literate programming",
     url="https://entangled.github.io/",   # project home page, if any
     project_urls={
-        "Bug Tracker": "https://github.com/entangled/filters/issues/",
-        "Documentation": "https://entangled.github.io/filters/",
-        "Source Code": "https://github.com/entangled/filters/",
+          "Bug Tracker": "https://github.com/entangled/filters/issues/"
+        , "Documentation": "https://entangled.github.io/filters/"
+        , "Source Code": "https://github.com/entangled/filters/"
     },
     classifiers=[
           'License :: OSI Approved :: Apache Software License'
@@ -45,8 +44,14 @@ setup(
         , 'Topic :: Software Development :: Documentation'
         , 'Topic :: Software Development :: Testing'
         , 'Topic :: Text Processing :: Markup'
-    ]
+    ],
 
+    entry_points = {
+        'console_scripts': [
+              'pandoc-tangle=entangled.tangle:main'
+            , 'pandoc-test=entangled.doctest:main'
+        ]
+    }
     # could also include long_description, download_url, etc.
 )
 

@@ -1,3 +1,14 @@
+# Panflute
+
+``` {.python file=entangled/typing.py}
+from typing import (Union, List, Callable, Any)
+from panflute import (Element, Doc)
+
+ActionReturn = Union[Element, List[Element], None]
+Action = Callable[[Element, Doc], ActionReturn]
+JSONType = Any
+```
+
 # Doc-testing
 
 This Pandoc filter runs doc-tests from Python. All this requires is a REPL to be available: a REPL reads commands from standard input and gives output on standard output. Cells with the same identifier are passed through a REPL in a single session. If a cell is marked with a `.doctest` class, the output is checked against the given output.
@@ -5,21 +16,61 @@ This Pandoc filter runs doc-tests from Python. All this requires is a REPL to be
 This module reuses most of the tangle module.
 
 ``` {.python file=entangled/doctest.py}
-from panflute import (CodeBlock, run_filter)
-from .tangle import get_code, get_name
+import panflute
+from panflute import (CodeBlock, Element, Doc)
+
 from . import tangle
+from . import annotate
+from .tangle import get_code, get_name
 
-<<doctest-session>>
-<<doctest-finalize>>
-import subprocess
+from typing import (Dict, List)
+from .typing import (ActionReturn, JSONType)
 
-def prepare(doc=None):
+import io
+import sys
+import queue
+from collections import defaultdict
+
+<<read-config>>
+<<doctest-suite>>
+<<get-doc-tests>>
+
+<<doctest-run-suite>>
+<<doctest-report>>
+
+def prepare_report(doc: Doc) -> None:
+    doc.code_counter = defaultdict(lambda: 0)
+
+def action_report(elem: Element, doc: Doc) -> ActionReturn:
+    if isinstance(elem, CodeBlock):
+        name = get_name(elem)
+        if "doctest" in elem.classes:
+            suite = doc.suites[name].code_blocks[doc.code_counter[name]]
+            doc.code_counter[name] += 1
+            return generate_report(elem, suite)
+        doc.code_counter[name] += 1
+
+def prepare(doc: Doc) -> None:
     doc.config = read_config()
     tangle.prepare(doc)
 
-def main(doc=None):
-    return run_filter(
-        tangle.action, prepare=prepare, finalize=finalize, doc=doc)
+def main() -> None:
+    json_input = sys.stdin.read()
+    json_stream = io.StringIO(json_input)
+    doc = panflute.load(json_stream)
+
+    prepare(doc)
+    tangle.prepare(doc)
+    annotate.prepare(doc)
+    doc = doc.walk(tangle.action).walk(annotate.action)
+
+    doc.suites = get_doc_tests(doc.code_map)
+    for name, suite in doc.suites.items():
+        run_suite(doc.config, suite)
+
+    prepare_report(doc)
+    doc = doc.walk(action_report)
+    panflute.dump(doc)
 
 if __name__ == "__main__":
     main()
@@ -31,7 +82,7 @@ if __name__ == "__main__":
 import subprocess
 import json
 
-def read_config():
+def read_config() -> JSONType:
     try:
         result = subprocess.run(
             ["dhall-to-json", "--file", "entangled.dhall"],
@@ -44,7 +95,7 @@ def read_config():
         return json.load("entangled.json")
     return json.loads(result.stdout)
 
-def get_language_info(config, identifier):
+def get_language_info(config: JSONType, identifier: str) -> JSONType:
     return next(lang for lang in config["languages"]
                 if identifier in lang["identifiers"])
 ```
@@ -77,31 +128,26 @@ def get_doc_tests(code_map: Dict[str, List[CodeBlock]]) -> Dict[str, Suite]:
     return result
 ```
 
-``` {.python #doctest-finalize}
-import sys
-import json
+## Test Suite
 
-def finalize(doc):
-    tests = get_doc_tests(doc.code_map)
-    for name, suite in tests.items():
-        log = run_suite(doc.config, suite)
-        print(name, file=sys.stderr)
-        print(log, file=sys.stderr)
-    doc.content = []
-```
+Every code block that is part of a `.doctest` suite will be stored in a `Test` object, even if it is not a doc-test block itself. The default `status` of a test is `PENDING`.
 
-## Sessions
+A test may succeed, fail, throw an error or return an unknown result (other than `text/plain`).
 
-A session has a list of input blocks, a line to the REPL, and a method to add new code. Code is only passed to the actual REPL at the time a `.doctest` class code block is pushed.
+``` {.python #doctest-suite}
+from dataclasses import dataclass
+from typing import (Optional, List, Dict)
+from enum import Enum
 
-``` {.python #doctest-session}
 class TestStatus(Enum):
     PENDING = 0
     SUCCESS = 1
     FAIL = 2
     ERROR = 3
     UNKNOWN = 4
+```
 
+``` {.python #doctest-suite}
 @dataclass
 class Test:
     __test__ = False    # not a pytest class
@@ -110,92 +156,168 @@ class Test:
     result: Optional[str] = None
     error: Optional[str] = None
     status: TestStatus = TestStatus.PENDING
+```
 
+A suite is just a list of `Test`s with some meta-data attached.
+
+``` {.python #doctest-suite}
 @dataclass
 class Suite:
     code_blocks: List[Test]
     language: str
+```
 
+### Evaluation
+
+We use `jupyter_client` to communicate with the REPL in question.
+
+``` {.python #doctest-run-suite}
 import jupyter_client
 
-def run_suite(config, s: Suite):
-    info = get_language_info(config, s.language)
-    kernel_name = info["jupyter"]
-    if not kernel_name:
-        raise RuntimeError(f"No Jupyter kernel known for the {s.language} language.")
-    specs = jupyter_client.kernelspec.find_kernel_specs()
-    if kernel_name not in specs:
-        raise RuntimeError(f"Jupyter kernel `{kernel_name}` not installed.")
-
-    repl_log = []
+def run_suite(config: JSONType, s: Suite) -> None:
+    <<jupyter-get-kernel-name>>
     with jupyter_client.run_kernel(kernel_name=kernel_name) as kc:
         print(f"Kernel `{kernel_name}` running ...", file=sys.stderr)
-        def jeval(test: Test):
-            msg_id = kc.execute(test.code)
-            while True:
-                try:
-                    msg = kc.get_iopub_msg(timeout=1000)
-                    if msg["msg_type"] == "execute_result" and \
-                            msg["parent_header"]["msg_id"] ==  msg_id:
-                        data = msg["content"]["data"]
-                        if "text/plain" in data:
-                            test.result = data["text/plain"]
-                            if (test.expect is None) or test.result.strip() == test.expect.strip():
-                                test.status = TestStatus.SUCCESS
-                            else:
-                                test.status = TestStatus.FAIL
-                            return
-                        else:
-                            test.status = TestStatus.UNKNOWN
-                            test.result = str(data)
-                            return
-                    if msg["msg_type"] == "status" and \
-                            msg["parent_header"]["msg_id"] == msg_id and \
-                            msg["content"]["execution_state"] == "idle":
-                        if test.expect is None:
-                            test.status = TestStatus.SUCCESS
-                        else:
-                            test.status = TestStatus.FAIL
-                        return
-                    if msg["msg_type"] == "error":
-                        test.error = "\n".join(msg["content"]["traceback"])
-                        test.status = TestStatus.ERROR 
-                        return
-                except queue.Empty:
-                    test.error = "Operation timed out."
-                    test.status = TestStatus.ERROR
-                    return
+        <<jupyter-eval-test>>
 
         for test in s.code_blocks:
-            jeval(test)
+            jupyter_eval(test)
             if test.status is TestStatus.ERROR:
                 break
+```
 
-    return s
+### Jupyter
 
-import pandocfilters as pandoc
+The configuration should have a Jupyter kernel name stored for the language.
 
-def generate_report(c: CodeBlock, t: Test) -> List [pandoc.CodeBlock]:
-    status_attr = [("status", t.status.name)]
-    input_code = pandoc.CodeBlock(
-        [c.identifier, c.classes, c.attribute_list + status_attr], t.code)
-    lang_class = c.classes[0]
+``` {.python #jupyter-get-kernel-name}
+info = get_language_info(config, s.language)
+kernel_name = info["jupyter"]
+if not kernel_name:
+    raise RuntimeError(f"No Jupyter kernel known for the {s.language} language.")
+specs = jupyter_client.kernelspec.find_kernel_specs()
+if kernel_name not in specs:
+    raise RuntimeError(f"Jupyter kernel `{kernel_name}` not installed.")
+```
 
+After sending the test to the Jupyter kernel, we need to retrieve the result. To match the JSON records, we use `pampy`, making the following code a lot cleaner.
+
+``` {.python #jupyter-eval-test}
+def jupyter_eval(test: Test):
+     msg_id = kc.execute(test.code)
+     while True:
+         try:
+             msg = kc.get_iopub_msg(timeout=1000)
+             if handle(test, msg_id, msg):
+                return
+
+         except queue.Empty:
+             test.error = "Operation timed out."
+             test.status = TestStatus.ERROR
+             return
+```
+
+``` {.python #jupyter-eval-test}
+def handle(test, msg_id, msg):
+    from pampy import match, _
+    <<jupyter-handlers>>
+    return match(msg
+        <<jupyter-match>>
+        )
+```
+
+#### `execute_result`
+
+A result is tested for equality with the expected result.
+
+``` {.python #jupyter-match}
+, { "msg_type": "execute_result"
+  , "parent_header": { "msg_id" : msg_id }
+  , "content": { "data" : { "text/plain": _ } } }
+, execute_result_text
+```
+
+``` {.python #jupyter-handlers}
+def execute_result_text(data):
+    test.result = data
+    if (test.expect is None) or test.result.strip() == test.expect.strip():
+        test.status = TestStatus.SUCCESS
+    else:
+        test.status = TestStatus.FAIL
+    return True
+```
+
+#### `status`
+
+If status `idle` is given, the computation is done, and we don't need to wait for further messages.
+
+``` {.python #jupyter-match}
+, { "msg_type": "status"
+  , "parent_header": { "msg_id" : msg_id }
+  , "content": { "execution_state": "idle" } }
+, status_idle
+```
+
+``` {.python #jupyter-handlers}
+def status_idle(_):
+    if test.expect is None:
+        test.status = TestStatus.SUCCESS
+    else:
+        test.status = TestStatus.FAIL
+    return True
+```
+
+#### `error`
+If an error is given, we set the appropriate flags in `test` and stop further testing in this session.
+
+``` {.python #jupyter-match}
+, { "msg_type": "error"
+  , "parent_header": { "msg_id" : msg_id }
+  , "content": { "traceback": _ } }
+, error_traceback
+```
+
+``` {.python #jupyter-handlers}
+def error_traceback(tb):
+    test.error = "\n".join(msg["content"]["traceback"])
+    test.status = TestStatus.ERROR 
+    return True
+```
+
+#### otherwise
+Any other message we ignore and wait for further messages.
+
+``` {.python #jupyter-match}
+, _
+, lambda x: False
+```
+
+### Generate report
+
+``` {.python #doctest-report}
+def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
+    status_attr = {"status": t.status.name}
+    elem.attributes.update(status_attr)
+    lang_class = elem.classes[0]
     if t.status is TestStatus.ERROR:
-        return [input_code, pandoc.CodeBlock(["", ["error"], status_attr], str(t.error))]
+        return [ elem
+               , CodeBlock( str(t.error), classes=["error"], attributes=status_attr ) ]
     if t.status is TestStatus.FAIL:
-        return [ input_code
-               , pandoc.CodeBlock(["", [lang_class, "doctest", "result"], status_attr], str(t.result))
-               , pandoc.CodeBlock(["", [lang_class, "doctest", "expect"], status_attr], str(t.expect)) ]
+        return [ elem
+               , CodeBlock( str(t.result), classes=[lang_class, "doctest", "result"]
+                          , attributes=status_attr )
+               , CodeBlock( str(t.expect), classes=[lang_class, "doctest", "expect"]
+                          , attributes=status_attr ) ]
     if t.status is TestStatus.SUCCESS:
-        return [ input_code
-               , pandoc.CodeBlock(["", [lang_class, "doctest", "result"], status_attr], str(t.result)) ]
+        return [ elem
+               , CodeBlock( str(t.result), classes=[lang_class, "doctest", "result"]
+                          , attributes=status_attr ) ]
     if t.status is TestStatus.PENDING:
-        return [ input_code ]
+        return [ elem ]
     if t.status is TestStatus.UNKNOWN:
-        return [ input_code
-               , pandoc.CodeBlock(["", ["doctest", "unknown"], status_attr], str(t.result)) ]
-
+        return [ elem
+               , CodeBlock( str(t.result), classes=["doctest", "unknown"]
+                          , attributes=status_attr ) ]
     return None
 ```
 
@@ -203,65 +325,3 @@ def generate_report(c: CodeBlock, t: Test) -> List [pandoc.CodeBlock]:
 
 There is something in `panflute` that prevents `jupyter_client` from working properly. We're down to using the `pandocfilters` interface. We can reuse much of what we did before.
 
-``` {.python file=entangled/doctest2.py}
-from pandocfilters import (applyJSONFilters)
-from collections import defaultdict
-from typing import (List, Dict, Union, Optional)
-from dataclasses import dataclass
-from .tangle import (get_code)
-from .weave import annotate_action
-import sys
-import queue
-from enum import Enum
-from .codeblock import CodeBlock
-
-<<read-config>>
-<<doctest-session>>
-<<get-doc-tests>>
-<<doctest2-action>>
-```
-
-### Action
-
-`pandocfilters` is a bit more spartan interface. It uses functions `action(key, value, format, meta)`.
-
-``` {.python #doctest2-action}
-def tangle_action(code_map):
-    def action(key, value, fmt, meta):
-        if key == "CodeBlock":
-            c = CodeBlock.from_json(value)
-            code_map[c.name].append(c)
-    return action
-
-def doctest_action(suites):
-    code_counter = defaultdict(lambda: 0)
-    def action(key, value, fmt, meta):
-        if key == "CodeBlock":
-            c = CodeBlock.from_json(value)
-
-            if "doctest" in c.classes:
-                suite = suites[c.name].code_blocks[code_counter[c.name]]
-                code_counter[c.name] += 1
-                return generate_report(c, suite)
-            code_counter[c.name] += 1
-        return None
-    return action
-
-from pprint import pprint
-
-def main():
-    config = read_config()
-    code_map = defaultdict(list)
-    json_data = sys.stdin.read()
-    print("tangling ...", file=sys.stderr)
-    applyJSONFilters([tangle_action(code_map)], json_data)
-    print("annotating ...", file=sys.stderr)
-    json_data = applyJSONFilters([annotate_action()], json_data)
-    suites = get_doc_tests(code_map)
-    for name, s in suites.items():
-        run_suite(config, s)
-    print("inserting doctest report ...", file=sys.stderr)
-    json_data = applyJSONFilters([doctest_action(suites)], json_data)
-    # pprint(json.loads(json_data)['blocks'][1]['c'][1][0]['c'], stream=sys.stderr)
-    sys.stdout.write(json_data)
-```
