@@ -1,40 +1,12 @@
 ## ------ language="Python" file="entangled/doctest.py"
-import panflute
-from panflute import (CodeBlock, Element, Doc)
-
-from . import tangle
-from . import annotate
-from .tangle import get_code, get_name
-
-from typing import (Dict, List)
+from panflute import (Doc, Element, CodeBlock)
 from .typing import (ActionReturn, JSONType)
-
-import io
-import sys
-import queue
+from .tangle import (get_name)
+from .config import get_language_info
 from collections import defaultdict
 
-## ------ begin <<read-config>>[0]
-import subprocess
-import json
+import sys
 
-def read_config() -> JSONType:
-    try:
-        result = subprocess.run(
-            ["dhall-to-json", "--file", "entangled.dhall"],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8', check=True)
-    except subprocess.CalledProcessError as e:
-        print("Error reading `entangled.dhall`:\n" + e.stderr, file=sys.stderr)
-    except FileNotFoundError as e:
-        print("Warning: could not find `dhall-to-json`, trying to read JSON instead.",
-              file=sys.stderr)
-        return json.load("entangled.json")
-    return json.loads(result.stdout)
-
-def get_language_info(config: JSONType, identifier: str) -> JSONType:
-    return next(lang for lang in config["languages"]
-                if identifier in lang["identifiers"])
-## ------ end
 ## ------ begin <<doctest-suite>>[0]
 from dataclasses import dataclass
 from typing import (Optional, List, Dict)
@@ -88,9 +60,38 @@ def get_doc_tests(code_map: Dict[str, List[CodeBlock]]) -> Dict[str, Suite]:
 
     return result
 ## ------ end
-
+## ------ begin <<doctest-report>>[0]
+def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
+    status_attr = {"status": t.status.name}
+    input_code = CodeBlock(
+        t.code, identifier=elem.identifier,
+        classes=elem.classes, attributes=elem.attributes)
+    input_code.attributes.update(status_attr)
+    lang_class = elem.classes[0]
+    if t.status is TestStatus.ERROR:
+        return [ input_code
+               , CodeBlock( str(t.error), classes=["error"], attributes=status_attr ) ]
+    if t.status is TestStatus.FAIL:
+        return [ input_code
+               , CodeBlock( str(t.result), classes=[lang_class, "doctest", "result"]
+                          , attributes=status_attr )
+               , CodeBlock( str(t.expect), classes=[lang_class, "doctest", "expect"]
+                          , attributes=status_attr ) ]
+    if t.status is TestStatus.SUCCESS:
+        return [ input_code
+               , CodeBlock( str(t.result), classes=[lang_class, "doctest", "result"]
+                          , attributes=status_attr ) ]
+    if t.status is TestStatus.PENDING:
+        return [ input_code ]
+    if t.status is TestStatus.UNKNOWN:
+        return [ input_code
+               , CodeBlock( str(t.result), classes=["doctest", "unknown"]
+                          , attributes=status_attr ) ]
+    return None
+## ------ end
 ## ------ begin <<doctest-run-suite>>[0]
 import jupyter_client
+import queue
 
 def run_suite(config: JSONType, s: Suite) -> None:
     ## ------ begin <<jupyter-get-kernel-name>>[0]
@@ -175,37 +176,16 @@ def run_suite(config: JSONType, s: Suite) -> None:
             if test.status is TestStatus.ERROR:
                 break
 ## ------ end
-## ------ begin <<doctest-report>>[0]
-def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
-    status_attr = {"status": t.status.name}
-    elem.attributes.update(status_attr)
-    lang_class = elem.classes[0]
-    if t.status is TestStatus.ERROR:
-        return [ elem
-               , CodeBlock( str(t.error), classes=["error"], attributes=status_attr ) ]
-    if t.status is TestStatus.FAIL:
-        return [ elem
-               , CodeBlock( str(t.result), classes=[lang_class, "doctest", "result"]
-                          , attributes=status_attr )
-               , CodeBlock( str(t.expect), classes=[lang_class, "doctest", "expect"]
-                          , attributes=status_attr ) ]
-    if t.status is TestStatus.SUCCESS:
-        return [ elem
-               , CodeBlock( str(t.result), classes=[lang_class, "doctest", "result"]
-                          , attributes=status_attr ) ]
-    if t.status is TestStatus.PENDING:
-        return [ elem ]
-    if t.status is TestStatus.UNKNOWN:
-        return [ elem
-               , CodeBlock( str(t.result), classes=["doctest", "unknown"]
-                          , attributes=status_attr ) ]
-    return None
-## ------ end
 
-def prepare_report(doc: Doc) -> None:
+def prepare(doc: Doc) -> None:
+    assert hasattr(doc, "config"), "Need to read config first."
+    assert hasattr(doc, "code_map"), "Need to tangle first."
+    doc.suites = get_doc_tests(doc.code_map)
+    for name, suite in doc.suites.items():
+        run_suite(doc.config, suite)
     doc.code_counter = defaultdict(lambda: 0)
 
-def action_report(elem: Element, doc: Doc) -> ActionReturn:
+def action(elem: Element, doc: Doc) -> ActionReturn:
     if isinstance(elem, CodeBlock):
         name = get_name(elem)
         if "doctest" in elem.classes:
@@ -213,29 +193,4 @@ def action_report(elem: Element, doc: Doc) -> ActionReturn:
             doc.code_counter[name] += 1
             return generate_report(elem, suite)
         doc.code_counter[name] += 1
-
-def prepare(doc: Doc) -> None:
-    doc.config = read_config()
-    tangle.prepare(doc)
-
-def main() -> None:
-    json_input = sys.stdin.read()
-    json_stream = io.StringIO(json_input)
-    doc = panflute.load(json_stream)
-
-    prepare(doc)
-    tangle.prepare(doc)
-    annotate.prepare(doc)
-    doc = doc.walk(tangle.action).walk(annotate.action)
-
-    doc.suites = get_doc_tests(doc.code_map)
-    for name, suite in doc.suites.items():
-        run_suite(doc.config, suite)
-
-    prepare_report(doc)
-    doc = doc.walk(action_report)
-    panflute.dump(doc)
-
-if __name__ == "__main__":
-    main()
 ## ------ end

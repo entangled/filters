@@ -7,7 +7,11 @@ setup(
     version="0.4",
     packages=find_packages(),
 
-    install_requires=[],
+    install_requires=[
+          "jupyter_client>=5.3.4,<6"
+        , "pampy>=0.3.0,<0.4"
+        , "panflute>=1.11.2,<2"
+    ],
     # include_package_data=True,
     # package_data={
     #     # If any package contains *.txt or *.rst files, include them:
@@ -22,11 +26,13 @@ setup(
     description="Set of Pandoc filters to aid in literate programming",
     keywords="literate programming",
     url="https://entangled.github.io/",   # project home page, if any
+
     project_urls={
           "Bug Tracker": "https://github.com/entangled/filters/issues/"
         , "Documentation": "https://entangled.github.io/filters/"
         , "Source Code": "https://github.com/entangled/filters/"
     },
+
     classifiers=[
           'License :: OSI Approved :: Apache Software License'
         , 'Development Status :: 3 - Alpha'
@@ -49,7 +55,7 @@ setup(
     entry_points = {
         'console_scripts': [
               'pandoc-tangle=entangled.tangle:main'
-            , 'pandoc-test=entangled.doctest:main'
+            , 'pandoc-test=entangled.doctest_main:main'
         ]
     }
     # could also include long_description, download_url, etc.
