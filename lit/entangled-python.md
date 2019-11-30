@@ -81,8 +81,11 @@ def read_config() -> JSONType:
     return json.loads(result.stdout)
 
 def get_language_info(config: JSONType, identifier: str) -> JSONType:
-    return next(lang for lang in config["languages"]
-                if identifier in lang["identifiers"])
+    try:
+        return next(lang for lang in config["languages"]
+                    if identifier in lang["identifiers"])
+    except StopIteration:
+        raise ValueError(f"Language with identifier `{identifier}` not found in config.")
 ```
 
 # Panflute
@@ -124,9 +127,6 @@ import sys
 def main(doc: Optional[Doc] = None) -> None:
     run_filter(
         action, prepare=prepare, finalize=finalize, doc=doc)
-
-if __name__ == "__main__":
-    main()
 ```
 
 We prepare a global variable `doc.codes` with a `defaultdict` for empty lists.
@@ -329,10 +329,11 @@ def get_language(c: CodeBlock) -> str:
 
 def get_doc_tests(code_map: Dict[str, List[CodeBlock]]) -> Dict[str, Suite]:
     def convert_code_block(c: CodeBlock) -> Test:
+        name = get_name(c)
         if "doctest" in c.classes:
             s = c.text.split("\n---\n")
             if len(s) != 2:
-                raise ValueError(f"Doc test `{c.name}` should have single `---` line.")
+                raise ValueError(f"Doc test `{name}` should have single `---` line.")
             return Test(*s)
         else:
             return Test(c.text, None)
@@ -523,6 +524,7 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
         t.code, identifier=elem.identifier,
         classes=elem.classes, attributes=elem.attributes)
     input_code.attributes.update(status_attr)
+    input_code.classes.append("input")
     lang_class = elem.classes[0]
     if t.status is TestStatus.ERROR:
         return [ input_code

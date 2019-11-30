@@ -19,6 +19,9 @@ def read_config() -> JSONType:
     return json.loads(result.stdout)
 
 def get_language_info(config: JSONType, identifier: str) -> JSONType:
-    return next(lang for lang in config["languages"]
-                if identifier in lang["identifiers"])
+    try:
+        return next(lang for lang in config["languages"]
+                    if identifier in lang["identifiers"])
+    except StopIteration:
+        raise ValueError(f"Language with identifier `{identifier}` not found in config.")
 ## ------ end

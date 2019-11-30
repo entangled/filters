@@ -96,7 +96,4 @@ def finalize(doc: Doc) -> None:
 def main(doc: Optional[Doc] = None) -> None:
     run_filter(
         action, prepare=prepare, finalize=finalize, doc=doc)
-
-if __name__ == "__main__":
-    main()
 ## ------ end

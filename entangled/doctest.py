@@ -43,10 +43,11 @@ def get_language(c: CodeBlock) -> str:
 
 def get_doc_tests(code_map: Dict[str, List[CodeBlock]]) -> Dict[str, Suite]:
     def convert_code_block(c: CodeBlock) -> Test:
+        name = get_name(c)
         if "doctest" in c.classes:
             s = c.text.split("\n---\n")
             if len(s) != 2:
-                raise ValueError(f"Doc test `{c.name}` should have single `---` line.")
+                raise ValueError(f"Doc test `{name}` should have single `---` line.")
             return Test(*s)
         else:
             return Test(c.text, None)
@@ -67,6 +68,7 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
         t.code, identifier=elem.identifier,
         classes=elem.classes, attributes=elem.attributes)
     input_code.attributes.update(status_attr)
+    input_code.classes.append("input")
     lang_class = elem.classes[0]
     if t.status is TestStatus.ERROR:
         return [ input_code

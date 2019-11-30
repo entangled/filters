@@ -14,6 +14,8 @@ def word_count(sentence):
 
 ## Examples
 
+### Word count
+
 Import the function.
 
 ``` {.python #test-word-count}
@@ -35,3 +37,22 @@ word_count("Hebban olla uogala nestas hagunnan hinase hic anda thu uuat unbidan 
 ---
 14
 ```
+
+### Division by zero
+
+This one gives an error.
+
+``` {.python .doctest #test-division}
+1/0
+---
+42
+```
+
+So we never get to run this one.
+
+``` {.python .doctest #test-division}
+1/1
+---
+1
+```
+

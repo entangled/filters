@@ -38,3 +38,6 @@ return EXIT_SUCCESS;
 
 These blocks of code can be *tangled* into source files.
 
+```
+This should not be tangled.
+```
