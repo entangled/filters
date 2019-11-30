@@ -6,4 +6,5 @@
 .mypy_cache
 htmlcov
 .eggs
+coverage.xml
 
