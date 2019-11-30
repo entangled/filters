@@ -2,6 +2,12 @@
 
 from setuptools import setup, find_packages
 
+test_deps = [
+      "pytest>=5,<6"
+    , "pytest-cov>=2.8.1,<3"
+    , "pytest-mypy>=0.4.2,<1"
+    , "ipykernel>=5.1.3,<6" ]
+
 setup(
     name="entangled-filters",
     version="0.4",
@@ -12,11 +18,10 @@ setup(
         , "pampy>=0.3.0,<0.4"
         , "panflute>=1.11.2,<2"
     ],
-    tests_require=[
-          "pytest>=5,<6"
-        , "pytest-cov>=2.8.1,<3"
-        , "pytest-mypy>=0.4.2,<1"
-    ],
+    tests_require=test_deps,
+    extras_require={
+        "test": test_deps
+    },
     # include_package_data=True,
     # package_data={
     #     # If any package contains *.txt or *.rst files, include them:
