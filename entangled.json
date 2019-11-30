@@ -1,0 +1,28 @@
+{
+  "languages": [
+    {
+      "comment": {
+        "start": "#"
+      },
+      "identifiers": [
+        "py",
+        "python",
+        "python3"
+      ],
+      "jupyter": "python3",
+      "name": "Python"
+    },
+    {
+      "comment": {
+        "start": ";"
+      },
+      "identifiers": [
+        "scheme",
+        "r6rs",
+        "r7rs"
+      ],
+      "jupyter": "guile",
+      "name": "Scheme"
+    }
+  ]
+}

@@ -15,8 +15,8 @@ setup(
     tests_require=[
           "pytest>=5,<6"
         , "pytest-cov>=2.8.1,<3"
-        , "mypy>=0.750"
-    ]
+        , "pytest-mypy>=0.4.2,<1"
+    ],
     # include_package_data=True,
     # package_data={
     #     # If any package contains *.txt or *.rst files, include them:

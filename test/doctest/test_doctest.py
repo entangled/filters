@@ -58,6 +58,15 @@ def test_doctest(tmp_path):
 
     assert doc.report == {"SUCCESS": 1, "FAIL": 1, "ERROR": 1, "PENDING": 1}
 
+def test_doctest_json(tmp_path):
+    res = Path.resolve(Path(__file__)).parent
+    copyfile(res / "doctest-python.md", tmp_path / "doctest-python.md")
+    copyfile("entangled.json", tmp_path / "entangled.json")
+    run(["pandoc", "-t", "plain", "--filter", "pandoc-tangle", "doctest-python.md"],
+        cwd=tmp_path, check=True)
+    run(["pandoc", "-t", "plain", "--filter", "pandoc-test", "doctest-python.md"],
+        cwd=tmp_path, check=True)
+
 def test_doctest_main(tmp_path):
     res = Path.resolve(Path(__file__)).parent
     copyfile(res / "doctest-python.md", tmp_path / "doctest-python.md")
