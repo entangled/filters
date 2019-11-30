@@ -1,4 +1,5 @@
-![Test Badge](https://github.com/entangled/filters/workflows/Tests/badge.svg)
+[![Test Badge](https://github.com/entangled/filters/workflows/Tests/badge.svg)](https://github.com/entangled/filters/actions?query=workflow%3ATests)
+[![codecov](https://codecov.io/gh/entangled/filters/branch/master/graph/badge.svg)](https://codecov.io/gh/entangled/filters)
 
 # Entangled - Pandoc filters
 
