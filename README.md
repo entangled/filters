@@ -52,11 +52,13 @@ if __name__ == "__main__":
 
 ### Documentation tests
 
+~~~markdown
 ``` {.python .doctest #the-question}
 6*7
 ---
 42
 ```
+~~~
 
 ## `pandoc-tangle`
 
