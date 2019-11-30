@@ -49,6 +49,7 @@ def test_doctest(tmp_path):
     res = Path.resolve(Path(__file__)).parent
     copyfile(res / "doctest-python.md", tmp_path / "doctest-python.md")
     copyfile("entangled.dhall", tmp_path / "entangled.dhall")
+    copyfile("entangled.json", tmp_path / "entangled.json")
     run(["pandoc", "-t", "plain", "--filter", "pandoc-tangle", "doctest-python.md"],
         cwd=tmp_path, check=True)
 
@@ -71,6 +72,7 @@ def test_doctest_main(tmp_path):
     res = Path.resolve(Path(__file__)).parent
     copyfile(res / "doctest-python.md", tmp_path / "doctest-python.md")
     copyfile("entangled.dhall", tmp_path / "entangled.dhall")
+    copyfile("entangled.json", tmp_path / "entangled.json")
     run(["pandoc", "-t", "plain", "--filter", "pandoc-tangle", "doctest-python.md"],
         cwd=tmp_path, check=True)
     run(["pandoc", "-t", "plain", "--filter", "pandoc-test", "doctest-python.md"],
