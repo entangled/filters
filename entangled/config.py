@@ -2,6 +2,7 @@
 from .typing import (JSONType)
 import subprocess
 import json
+import sys
 
 def read_config() -> JSONType:
     """Reads config from `entangled.dhall` with fall-back to `entangled.json`."""
@@ -14,7 +15,7 @@ def read_config() -> JSONType:
     except FileNotFoundError as e:
         print("Warning: could not find `dhall-to-json`, trying to read JSON instead.",
               file=sys.stderr)
-        return json.load("entangled.json")
+        return json.load(open("entangled.json", "r"))
     return json.loads(result.stdout)
 
 def get_language_info(config: JSONType, identifier: str) -> JSONType:

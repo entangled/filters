@@ -5,7 +5,7 @@ author: Johan Hidding
 
 # Counting words
 
-``` {.python #test-word-count}
+``` {.python file=word_count.py}
 def word_count(sentence):
     words = sentence.split()
     count = len(words)
@@ -16,9 +16,9 @@ def word_count(sentence):
 
 Import the function.
 
-<!--``` {.python #test-word-count}
+``` {.python #test-word-count}
 from word_count import word_count
-``` -->
+```
 
 Test the zero-case,
 

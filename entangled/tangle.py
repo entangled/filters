@@ -1,12 +1,14 @@
 ## ------ language="Python" file="entangled/tangle.py"
-from panflute import *
+from panflute import (run_filter, Doc, Element, CodeBlock)
+from typing import (Optional, Dict, List, Callable)
+from .typing import (CodeMap, ActionReturn)
+import sys
 
 ## ------ begin <<get-code-block>>[0]
-from typing import (Dict, List)
 import re
 
 ## ------ begin <<replace-expr>>[0]
-def replace_expr(expr, replace, text):
+def replace_expr(expr: str, replace: Callable[..., str], text: str) -> str:
     """Matches (fullmatch) `text` using the expression `expr`. If the expression
     matches, then returns the result of passing named sub-matches as
     keyword arguments to `replace`. Returns `text` otherwise."""
@@ -41,12 +43,12 @@ def get_code(code_map: Dict[str, List[CodeBlock]], name: str) -> str:
 ## ------ begin <<tangle-prepare>>[0]
 from collections import defaultdict
 
-def prepare(doc):
+def prepare(doc: Doc) -> None:
     doc.code_map = defaultdict(list)
 ## ------ end
 ## ------ begin <<tangle-action>>[0]
 ## ------ begin <<get-name>>[0]
-def get_name(elem):
+def get_name(elem: Element) -> Optional[str]:
     if elem.identifier:
         return elem.identifier
 
@@ -56,23 +58,43 @@ def get_name(elem):
     return None
 ## ------ end
 
-def action(elem, doc):
+def action(elem: Element, doc: Doc) -> None:
     if isinstance(elem, CodeBlock):
         name = get_name(elem)
         if name:
             doc.code_map[name].append(elem)
 ## ------ end
 ## ------ begin <<tangle-finalize>>[0]
-import sys
+def get_file_map(code_map: CodeMap) -> Dict[str, str]:
+    """Extracts all file references from `code_map`."""
+    return { code[0].attributes["file"]: codename 
+             for codename, code in code_map.items()
+             if "file" in code[0].attributes }
+## ------ end
+## ------ begin <<tangle-finalize>>[1]
+def write_file(filename: str, text: str) -> None:
+    """Writes `text` to file `filename`, only if `text` is different
+    from contents of `filename`."""
+    try:
+        content = open(filename).read()
+        if content == text:
+            return
+    except FileNotFoundError:
+        pass
+    print(f"Writing `{filename}`.", file=sys.stderr)
+    open(filename, 'w').write(text)
 
-def finalize(doc):
-    for k in doc.code_map:
-        print(k, ':\n', get_code(doc.code_map, k), file=sys.stderr)
+def finalize(doc: Doc) -> None:
+    """Writes all file references found in `doc.code_map` to disk.
+    This only overwrites a file if the content is different."""
+    file_map = get_file_map(doc.code_map)
+    for filename, codename in file_map.items():
+        write_file(filename, get_code(doc.code_map, codename))
     doc.content = []
 ## ------ end
 
-def main(doc=None):
-    return run_filter(
+def main(doc: Optional[Doc] = None) -> None:
+    run_filter(
         action, prepare=prepare, finalize=finalize, doc=doc)
 
 if __name__ == "__main__":

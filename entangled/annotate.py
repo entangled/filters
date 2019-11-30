@@ -1,7 +1,6 @@
 ## ------ language="Python" file="entangled/annotate.py"
 from collections import defaultdict
 from .tangle import get_name
-from .codeblock import CodeBlock
 from panflute import (Span, Str, Para, CodeBlock, Div)
 
 def prepare(doc):

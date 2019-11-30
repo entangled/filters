@@ -64,6 +64,7 @@ let xmlStyleComment     : Comment = { start = "<!--", end = Some "-->" }
 from .typing import (JSONType)
 import subprocess
 import json
+import sys
 
 def read_config() -> JSONType:
     """Reads config from `entangled.dhall` with fall-back to `entangled.json`."""
@@ -76,7 +77,7 @@ def read_config() -> JSONType:
     except FileNotFoundError as e:
         print("Warning: could not find `dhall-to-json`, trying to read JSON instead.",
               file=sys.stderr)
-        return json.load("entangled.json")
+        return json.load(open("entangled.json", "r"))
     return json.loads(result.stdout)
 
 def get_language_info(config: JSONType, identifier: str) -> JSONType:
@@ -95,57 +96,13 @@ Panflute reads JSON from standard input, lets you apply filters to an intermedia
 These are some types that we can use for type annotations.
 
 ``` {.python file=entangled/typing.py}
-from typing import (Union, List, Callable, Any)
-from panflute import (Element, Doc)
+from typing import (Union, List, Dict, Callable, Any)
+from panflute import (Element, Doc, CodeBlock)
 
 ActionReturn = Union[Element, List[Element], None]
 Action = Callable[[Element, Doc], ActionReturn]
+CodeMap = Dict[str, List[CodeBlock]]
 JSONType = Any
-```
-
-# Doc-testing
-
-This Pandoc filter runs doc-tests from Python. If a cell is marked with a `.doctest` class, the output is checked against the given output. We use Jupyter kernels to evaluate the input.
-
-This module reuses most of the tangle module.
-
-``` {.python file=entangled/doctest_main.py}
-import panflute
-
-from . import tangle
-from . import annotate
-from . import doctest
-
-from .config import read_config
-
-
-def main() -> None:
-    <<load-document>>
-    doc.config = read_config()
-
-    tangle.prepare(doc)
-    doc = doc.walk(tangle.action)
-
-    annotate.prepare(doc)
-    doc = doc.walk(annotate.action)
-
-    doctest.prepare(doc)
-    doc = doc.walk(doctest.action)
-
-    panflute.dump(doc)
-```
-
-## Bug in `panflute` or `jupyter_client`
-
-There is a bug in `jupyter_client` that prevents it from working when either `stdin` or `stdout` is closed. This means that we have to read the input seperately.
-
-``` {.python #load-document}
-import io
-import sys
-
-json_input = sys.stdin.read()
-json_stream = io.StringIO(json_input)
-doc = panflute.load(json_stream)
 ```
 
 # Tangle
@@ -153,7 +110,10 @@ doc = panflute.load(json_stream)
 The global structure of a filter in `panflute` runs `run_filter` from a `main` function. We'll keep a global registry of all code-blocks entered. In `panflute` a global variable is passed on top of the `doc` parameter that is passed to all involved functions.
 
 ``` {.python file=entangled/tangle.py}
-from panflute import *
+from panflute import (run_filter, Doc, Element, CodeBlock)
+from typing import (Optional, Dict, List, Callable)
+from .typing import (CodeMap, ActionReturn)
+import sys
 
 <<get-code-block>>
 
@@ -161,8 +121,8 @@ from panflute import *
 <<tangle-action>>
 <<tangle-finalize>>
 
-def main(doc=None):
-    return run_filter(
+def main(doc: Optional[Doc] = None) -> None:
+    run_filter(
         action, prepare=prepare, finalize=finalize, doc=doc)
 
 if __name__ == "__main__":
@@ -174,7 +134,7 @@ We prepare a global variable `doc.codes` with a `defaultdict` for empty lists.
 ``` {.python #tangle-prepare}
 from collections import defaultdict
 
-def prepare(doc):
+def prepare(doc: Doc) -> None:
     doc.code_map = defaultdict(list)
 ```
 
@@ -183,7 +143,7 @@ In the action, we store whatever code block we can find a name for.
 ``` {.python #tangle-action}
 <<get-name>>
 
-def action(elem, doc):
+def action(elem: Element, doc: Doc) -> None:
     if isinstance(elem, CodeBlock):
         name = get_name(elem)
         if name:
@@ -197,7 +157,7 @@ In the finalisation we need to expand code blocks, and run those blocks that are
 If the code block contains an identifier, that is used as the name. Alternatively, if a the code-block has an attribute `file=...`, the given filename is used as a name.
 
 ``` {.python #get-name}
-def get_name(elem):
+def get_name(elem: Element) -> Optional[str]:
     if elem.identifier:
         return elem.identifier
 
@@ -212,7 +172,6 @@ def get_name(elem):
 To expand code references we match a regular expression with a reference line. Every reference is then replaced with the expanded code block matching it. This is implemented as a doubly recursive function.
 
 ``` {.python #get-code-block}
-from typing import (Dict, List)
 import re
 
 <<replace-expr>>
@@ -226,7 +185,7 @@ def get_code(code_map: Dict[str, List[CodeBlock]], name: str) -> str:
 The `replace_expr` function does one of two things. If the input is not a match, the input is returned unchanged. If it is a match, all named sub-matches are taken out and given as keyword argument to the given `replace` function, the result of which is returned. 
 
 ``` {.python #replace-expr}
-def replace_expr(expr, replace, text):
+def replace_expr(expr: str, replace: Callable[..., str], text: str) -> str:
     """Matches (fullmatch) `text` using the expression `expr`. If the expression
     matches, then returns the result of passing named sub-matches as
     keyword arguments to `replace`. Returns `text` otherwise."""
@@ -270,28 +229,35 @@ Together, `expand` and `look_up` form a doubly recursive pair of functions, eval
 
 To finalize, we write out all files that we can find.
 
-``` {.python #get-file-map}
-def get_file_map(code_map: Dict[str, List[CodeBlock]]) -> Dict[str, str]:
-    result = {}
-    for k, v in code_map.items():
-        if "file" in v.attributes:
-            result[v.attributes["file"]] = k
-
-    return result
+``` {.python #tangle-finalize}
+def get_file_map(code_map: CodeMap) -> Dict[str, str]:
+    """Extracts all file references from `code_map`."""
+    return { code[0].attributes["file"]: codename 
+             for codename, code in code_map.items()
+             if "file" in code[0].attributes }
 ```
 
 Only files that are different from those on disk should be overwritten.
 
-::: {.TODO}
-Complete this script.
-:::
-
 ``` {.python #tangle-finalize}
-import sys
+def write_file(filename: str, text: str) -> None:
+    """Writes `text` to file `filename`, only if `text` is different
+    from contents of `filename`."""
+    try:
+        content = open(filename).read()
+        if content == text:
+            return
+    except FileNotFoundError:
+        pass
+    print(f"Writing `{filename}`.", file=sys.stderr)
+    open(filename, 'w').write(text)
 
-def finalize(doc):
-    for k in doc.code_map:
-        print(k, ':\n', get_code(doc.code_map, k), file=sys.stderr)
+def finalize(doc: Doc) -> None:
+    """Writes all file references found in `doc.code_map` to disk.
+    This only overwrites a file if the content is different."""
+    file_map = get_file_map(doc.code_map)
+    for filename, codename in file_map.items():
+        write_file(filename, get_code(doc.code_map, codename))
     doc.content = []
 ```
 
@@ -300,7 +266,6 @@ def finalize(doc):
 ``` {.python file=entangled/annotate.py}
 from collections import defaultdict
 from .tangle import get_name
-from .codeblock import CodeBlock
 from panflute import (Span, Str, Para, CodeBlock, Div)
 
 def prepare(doc):
@@ -318,6 +283,8 @@ def action(elem, doc):
 ```
 
 # Doctesting
+
+This Pandoc filter runs doc-tests from Python. If a cell is marked with a `.doctest` class, the output is checked against the given output. We use Jupyter kernels to evaluate the input.
 
 ``` {.python file=entangled/doctest.py}
 from panflute import (Doc, Element, CodeBlock)
@@ -349,6 +316,7 @@ def action(elem: Element, doc: Doc) -> ActionReturn:
             doc.code_counter[name] += 1
             return generate_report(elem, suite)
         doc.code_counter[name] += 1
+    return None
 ```
 
 ## Get doc tests from code map
@@ -456,17 +424,17 @@ After sending the test to the Jupyter kernel, we need to retrieve the result. To
 
 ``` {.python #jupyter-eval-test}
 def jupyter_eval(test: Test):
-     msg_id = kc.execute(test.code)
-     while True:
-         try:
-             msg = kc.get_iopub_msg(timeout=1000)
-             if handle(test, msg_id, msg):
-                return
+    msg_id = kc.execute(test.code)
+    while True:
+        try:
+            msg = kc.get_iopub_msg(timeout=1000)
+            if handle(test, msg_id, msg):
+               return
 
-         except queue.Empty:
-             test.error = "Operation timed out."
-             test.status = TestStatus.ERROR
-             return
+        except queue.Empty:
+            test.error = "Operation timed out."
+            test.status = TestStatus.ERROR
+            return
 ```
 
 The `handle` function is a pattern matcher. Each pattern looks like a dictionary, but may contain one or more `_` symbols. The contents of the matching dictionary at the `_` symbols are passed to the function following the pattern.
@@ -576,5 +544,48 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
                , CodeBlock( str(t.result), classes=["doctest", "unknown"]
                           , attributes=status_attr ) ]
     return None
+```
+
+## Main
+
+This module reuses most of the tangle module.
+
+``` {.python file=entangled/doctest_main.py}
+import panflute
+
+from . import tangle
+from . import annotate
+from . import doctest
+
+from .config import read_config
+
+
+def main() -> None:
+    <<load-document>>
+    doc.config = read_config()
+
+    tangle.prepare(doc)
+    doc = doc.walk(tangle.action)
+
+    annotate.prepare(doc)
+    doc = doc.walk(annotate.action)
+
+    doctest.prepare(doc)
+    doc = doc.walk(doctest.action)
+
+    panflute.dump(doc)
+```
+
+## Bug in `panflute` or `jupyter_client`
+
+There is a bug in `jupyter_client` that prevents it from working when either `stdin` or `stdout` is closed. This means that we have to read the input seperately.
+
+``` {.python #load-document}
+import io
+import sys
+
+json_input = sys.stdin.read()
+json_stream = io.StringIO(json_input)
+doc = panflute.load(json_stream)
 ```
 

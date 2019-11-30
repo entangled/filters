@@ -12,6 +12,11 @@ setup(
         , "pampy>=0.3.0,<0.4"
         , "panflute>=1.11.2,<2"
     ],
+    tests_require=[
+          "pytest>=5,<6"
+        , "pytest-cov>=2.8.1,<3"
+        , "mypy>=0.750"
+    ]
     # include_package_data=True,
     # package_data={
     #     # If any package contains *.txt or *.rst files, include them:

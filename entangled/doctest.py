@@ -107,17 +107,17 @@ def run_suite(config: JSONType, s: Suite) -> None:
         print(f"Kernel `{kernel_name}` running ...", file=sys.stderr)
         ## ------ begin <<jupyter-eval-test>>[0]
         def jupyter_eval(test: Test):
-             msg_id = kc.execute(test.code)
-             while True:
-                 try:
-                     msg = kc.get_iopub_msg(timeout=1000)
-                     if handle(test, msg_id, msg):
-                        return
+            msg_id = kc.execute(test.code)
+            while True:
+                try:
+                    msg = kc.get_iopub_msg(timeout=1000)
+                    if handle(test, msg_id, msg):
+                       return
         
-                 except queue.Empty:
-                     test.error = "Operation timed out."
-                     test.status = TestStatus.ERROR
-                     return
+                except queue.Empty:
+                    test.error = "Operation timed out."
+                    test.status = TestStatus.ERROR
+                    return
         ## ------ end
         ## ------ begin <<jupyter-eval-test>>[1]
         def handle(test, msg_id, msg):
@@ -193,4 +193,5 @@ def action(elem: Element, doc: Doc) -> ActionReturn:
             doc.code_counter[name] += 1
             return generate_report(elem, suite)
         doc.code_counter[name] += 1
+    return None
 ## ------ end
