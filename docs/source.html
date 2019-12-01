@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Johan Hidding" />
+  <title>Entangled Python module</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #eeeeee; background-color: #303030; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #aadfff; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #aaffdf; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #aaffdf; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #aaccef; font-weight: bold; } /* Keyword */
+code span.op { color: #cceeff; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #aaffdf; font-style: italic; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="dark.css" />
+</head>
+ <div id="title-block-header">
+<h1 class="title">Entangled Python module</h1>
+</div> 
+<div id="topbar">
+<p>&nbsp;</p>
+</div>
+ <div id="toc">
+<ul>
+<li><a href="#config">Config</a></li>
+<li><a href="#panflute">Panflute</a></li>
+<li><a href="#tangle">Tangle</a>
+<ul>
+<li><a href="#getting-a-name">Getting a name</a></li>
+<li><a href="#expand-code-references">Expand code references</a></li>
+<li><a href="#finalize">Finalize</a></li>
+</ul></li>
+<li><a href="#code-block-annotation">Code block annotation</a></li>
+<li><a href="#doctesting">Doctesting</a>
+<ul>
+<li><a href="#get-doc-tests-from-code-map">Get doc tests from code map</a></li>
+<li><a href="#test-suite">Test Suite</a></li>
+<li><a href="#evaluation">Evaluation</a>
+<ul>
+<li><a href="#jupyter">Jupyter</a></li>
+</ul></li>
+<li><a href="#generate-report">Generate report</a></li>
+<li><a href="#main">Main</a></li>
+<li><a href="#bug-in-panflute-or-jupyter_client">Bug in <code>panflute</code> or <code>jupyter_client</code></a></li>
+</ul></li>
+</ul>
+</div> 
+<div id="content">
+<p>This is a set of Pandoc filters for literate programming written in Python. These filters are part of Entangled. They constitute a complete workflow for literate programming on them selves, but it is advised to use them in conjunction with Entangled.</p>
+<p>In particular, while you can tangle source files with the <code>entangled.tangle</code> Python module, it is much more convenient to use the <code>entangled</code> executable, which automatically tangles files upon saving the Markdown files, and more importantly, also does the reverse, keeping your files continuously in sync.</p>
+<p>This module also acts as a test-bed and environment for rapid prototyping of features that may end up in the main (Haskell based part of) Entangled distribution. Currently we have:</p>
+<ul>
+<li><code>tangle</code>, extract source files from embedded code blocks in Markdown.</li>
+<li><code>annotate</code>, add name tags to code blocks.</li>
+<li><code>doctest</code>, run documentation tests through Jupyter.</li>
+</ul>
+<div class="annotated-code">
+<p><span><em>«entangled/__init__.py»=</em></span></p>
+<div class="sourceCode" id="cb1" data-file="entangled/__init__.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a>__version__ <span class="op">=</span> <span class="st">&quot;0.4.0&quot;</span></span></code></pre></div>
+</div>
+<h1 id="config">Config</h1>
+<p>Configuration of the <code>entangled</code> module is done through a file that should sit in the current directory.</p>
+<div class="future">
+<p>As a planned feature. Config files may sit in several places.</p>
+<ul>
+<li><code>${ENTANGLED_PREFIX}/share/entangled</code></li>
+<li><code>${XDG_CONFIG_HOME}/entangled</code></li>
+<li>Find first parent of current working directory</li>
+</ul>
+</div>
+<p>As a configuration format we use <a href="https://dhall-lang.org/"><strong>Dhall</strong></a>, with a fall-back to JSON. The file should be named either <code>entangled.dhall</code> or <code>entangled.json</code>. For the Dhall based configuration to work, you need to have the <code>dhall-to-json</code> executable installed.</p>
+<p>The schema is as follows:</p>
+<div class="annotated-code">
+<p><span><em>«dhall-config-schema»=</em></span></p>
+<pre id="dhall-config-schema" class="dhall"><code>let Comment : Type =
+    { start : Text
+    , end : Optional Text }
+
+let Language : Type =
+    { name : Text
+    , identifiers : List Text
+    , comment : Comment
+    , jupyter : Optional Text }
+
+let Config : Type =
+    { languages : List Language }</code></pre>
+</div>
+<p>A number of comment styles can be defined.</p>
+<div class="annotated-code">
+<p><span><em>«config-comment-styles»=</em></span></p>
+<pre id="config-comment-styles" class="dhall"><code>let hashComment         : Comment = { start = &quot;#&quot;, end = None Text }
+let lispStyleComment    : Comment = { start = &quot;;&quot;, end = None Text }
+let cStyleComment       : Comment = { start = &quot;/*&quot;, end = Some &quot;*/&quot; }
+let cppStyleComment     : Comment = { start = &quot;//&quot;, end = None Text }
+let haskellStyleComment : Comment = { start = &quot;--&quot;, end = None Text }
+let mlStyleComment      : Comment = { start = &quot;(*&quot;, end = Some &quot;*)&quot; }
+let xmlStyleComment     : Comment = { start = &quot;&lt;!--&quot;, end = Some &quot;--&gt;&quot; }</code></pre>
+</div>
+<div class="annotated-code">
+<p><span><em>«entangled/config.py»=</em></span></p>
+<div class="sourceCode" id="cb2" data-file="entangled/config.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">from</span> .typing <span class="im">import</span> (JSONType)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="im">import</span> subprocess</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="im">import</span> json</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="im">import</span> sys</span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="kw">def</span> read_config() <span class="op">-&gt;</span> JSONType:</span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="co">&quot;&quot;&quot;Reads config from `entangled.dhall` with fall-back to `entangled.json`.&quot;&quot;&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>    <span class="cf">try</span>:</span>
+<span id="cb2-9"><a href="#cb2-9"></a>        result <span class="op">=</span> subprocess.run(</span>
+<span id="cb2-10"><a href="#cb2-10"></a>            [<span class="st">&quot;dhall-to-json&quot;</span>, <span class="st">&quot;--file&quot;</span>, <span class="st">&quot;entangled.dhall&quot;</span>],</span>
+<span id="cb2-11"><a href="#cb2-11"></a>            stdout<span class="op">=</span>subprocess.PIPE, stderr<span class="op">=</span>subprocess.PIPE, encoding<span class="op">=</span><span class="st">&#39;utf-8&#39;</span>, check<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-12"><a href="#cb2-12"></a>        <span class="cf">return</span> json.loads(result.stdout)</span>
+<span id="cb2-13"><a href="#cb2-13"></a>    <span class="cf">except</span> subprocess.CalledProcessError <span class="im">as</span> e:</span>
+<span id="cb2-14"><a href="#cb2-14"></a>        <span class="bu">print</span>(<span class="st">&quot;Error reading `entangled.dhall`:</span><span class="ch">\n</span><span class="st">&quot;</span> <span class="op">+</span> e.stderr, <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
+<span id="cb2-15"><a href="#cb2-15"></a>    <span class="cf">except</span> <span class="pp">FileNotFoundError</span> <span class="im">as</span> e:</span>
+<span id="cb2-16"><a href="#cb2-16"></a>        <span class="bu">print</span>(<span class="st">&quot;Warning: could not find `dhall-to-json`, trying to read JSON instead.&quot;</span>,</span>
+<span id="cb2-17"><a href="#cb2-17"></a>              <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
+<span id="cb2-18"><a href="#cb2-18"></a>    <span class="cf">return</span> json.load(<span class="bu">open</span>(<span class="st">&quot;entangled.json&quot;</span>, <span class="st">&quot;r&quot;</span>))</span>
+<span id="cb2-19"><a href="#cb2-19"></a></span>
+<span id="cb2-20"><a href="#cb2-20"></a><span class="kw">def</span> get_language_info(config: JSONType, identifier: <span class="bu">str</span>) <span class="op">-&gt;</span> JSONType:</span>
+<span id="cb2-21"><a href="#cb2-21"></a>    <span class="cf">try</span>:</span>
+<span id="cb2-22"><a href="#cb2-22"></a>        <span class="cf">return</span> <span class="bu">next</span>(lang <span class="cf">for</span> lang <span class="kw">in</span> config[<span class="st">&quot;languages&quot;</span>]</span>
+<span id="cb2-23"><a href="#cb2-23"></a>                    <span class="cf">if</span> identifier <span class="kw">in</span> lang[<span class="st">&quot;identifiers&quot;</span>])</span>
+<span id="cb2-24"><a href="#cb2-24"></a>    <span class="cf">except</span> <span class="pp">StopIteration</span>:</span>
+<span id="cb2-25"><a href="#cb2-25"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;Language with identifier `</span><span class="sc">{</span>identifier<span class="sc">}</span><span class="ss">` not found in config.&quot;</span>)</span></code></pre></div>
+</div>
+<h1 id="panflute">Panflute</h1>
+<p>Panflute reads JSON from standard input, lets you apply filters to an intermediate object based representation and writes back to JSON. The actual filtering is done by a Panflute <code>Action</code>. The action takes an <code>Element</code> and a <code>Document</code> as argument and can return one of three things:</p>
+<ul>
+<li><code>None</code>, leaves the element unchanged</li>
+<li><code>Element</code>, replaces the element</li>
+<li><code>List[Element]</code>, splices the list into list that contained the element</li>
+</ul>
+<p>These are some types that we can use for type annotations.</p>
+<div class="annotated-code">
+<p><span><em>«entangled/typing.py»=</em></span></p>
+<div class="sourceCode" id="cb3" data-file="entangled/typing.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">from</span> typing <span class="im">import</span> (Union, List, Dict, Callable, Any)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="im">from</span> panflute <span class="im">import</span> (Element, Doc, CodeBlock)</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a>ActionReturn <span class="op">=</span> Union[Element, List[Element], <span class="va">None</span>]</span>
+<span id="cb3-5"><a href="#cb3-5"></a>Action <span class="op">=</span> Callable[[Element, Doc], ActionReturn]</span>
+<span id="cb3-6"><a href="#cb3-6"></a>CodeMap <span class="op">=</span> Dict[<span class="bu">str</span>, List[CodeBlock]]</span>
+<span id="cb3-7"><a href="#cb3-7"></a>JSONType <span class="op">=</span> Any</span></code></pre></div>
+</div>
+<h1 id="tangle">Tangle</h1>
+<p>The global structure of a filter in <code>panflute</code> runs <code>run_filter</code> from a <code>main</code> function. We’ll keep a global registry of all code-blocks entered. In <code>panflute</code> a global variable is passed on top of the <code>doc</code> parameter that is passed to all involved functions.</p>
+<div class="annotated-code">
+<p><span><em>«entangled/tangle.py»=</em></span></p>
+<div class="sourceCode" id="cb4" data-file="entangled/tangle.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="im">from</span> panflute <span class="im">import</span> (run_filter, Doc, Element, CodeBlock)</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="im">from</span> typing <span class="im">import</span> (Optional, Dict, List, Callable)</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="im">from</span> .typing <span class="im">import</span> (CodeMap, ActionReturn)</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="im">import</span> sys</span>
+<span id="cb4-5"><a href="#cb4-5"></a></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="op">&lt;&lt;</span>get<span class="op">-</span>code<span class="op">-</span>block<span class="op">&gt;&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="op">&lt;&lt;</span>tangle<span class="op">-</span>prepare<span class="op">&gt;&gt;</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="op">&lt;&lt;</span>tangle<span class="op">-</span>action<span class="op">&gt;&gt;</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="op">&lt;&lt;</span>tangle<span class="op">-</span>finalize<span class="op">&gt;&gt;</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb4-13"><a href="#cb4-13"></a>    run_filter(</span>
+<span id="cb4-14"><a href="#cb4-14"></a>        action, prepare<span class="op">=</span>prepare, finalize<span class="op">=</span>finalize, doc<span class="op">=</span>doc)</span></code></pre></div>
+</div>
+<p>We prepare a global variable <code>doc.codes</code> with a <code>defaultdict</code> for empty lists.</p>
+<div class="annotated-code">
+<p><span><em>«tangle-prepare»=</em></span></p>
+<div class="sourceCode" id="tangle-prepare"><pre class="sourceCode python"><code class="sourceCode python"><span id="tangle-prepare-1"><a href="#tangle-prepare-1"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
+<span id="tangle-prepare-2"><a href="#tangle-prepare-2"></a></span>
+<span id="tangle-prepare-3"><a href="#tangle-prepare-3"></a><span class="kw">def</span> prepare(doc: Doc) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="tangle-prepare-4"><a href="#tangle-prepare-4"></a>    doc.code_map <span class="op">=</span> defaultdict(<span class="bu">list</span>)</span></code></pre></div>
+</div>
+<p>In the action, we store whatever code block we can find a name for.</p>
+<div class="annotated-code">
+<p><span><em>«tangle-action»=</em></span></p>
+<div class="sourceCode" id="tangle-action"><pre class="sourceCode python"><code class="sourceCode python"><span id="tangle-action-1"><a href="#tangle-action-1"></a><span class="op">&lt;&lt;</span>get<span class="op">-</span>name<span class="op">&gt;&gt;</span></span>
+<span id="tangle-action-2"><a href="#tangle-action-2"></a></span>
+<span id="tangle-action-3"><a href="#tangle-action-3"></a><span class="kw">def</span> action(elem: Element, doc: Doc) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="tangle-action-4"><a href="#tangle-action-4"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(elem, CodeBlock):</span>
+<span id="tangle-action-5"><a href="#tangle-action-5"></a>        name <span class="op">=</span> get_name(elem)</span>
+<span id="tangle-action-6"><a href="#tangle-action-6"></a>        <span class="cf">if</span> name:</span>
+<span id="tangle-action-7"><a href="#tangle-action-7"></a>            doc.code_map[name].append(elem)</span></code></pre></div>
+</div>
+<p>In the finalisation we need to expand code blocks, and run those blocks that are marked as <code>.doctest</code>.</p>
+<h3 id="getting-a-name">Getting a name</h3>
+<p>If the code block contains an identifier, that is used as the name. Alternatively, if a the code-block has an attribute <code>file=...</code>, the given filename is used as a name.</p>
+<div class="annotated-code">
+<p><span><em>«get-name»=</em></span></p>
+<div class="sourceCode" id="get-name"><pre class="sourceCode python"><code class="sourceCode python"><span id="get-name-1"><a href="#get-name-1"></a><span class="kw">def</span> get_name(elem: Element) <span class="op">-&gt;</span> Optional[<span class="bu">str</span>]:</span>
+<span id="get-name-2"><a href="#get-name-2"></a>    <span class="cf">if</span> elem.identifier:</span>
+<span id="get-name-3"><a href="#get-name-3"></a>        <span class="cf">return</span> elem.identifier</span>
+<span id="get-name-4"><a href="#get-name-4"></a></span>
+<span id="get-name-5"><a href="#get-name-5"></a>    <span class="cf">if</span> <span class="st">&quot;file&quot;</span> <span class="kw">in</span> elem.attributes:</span>
+<span id="get-name-6"><a href="#get-name-6"></a>        <span class="cf">return</span> elem.attributes[<span class="st">&quot;file&quot;</span>]</span>
+<span id="get-name-7"><a href="#get-name-7"></a></span>
+<span id="get-name-8"><a href="#get-name-8"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+</div>
+<h2 id="expand-code-references">Expand code references</h2>
+<p>To expand code references we match a regular expression with a reference line. Every reference is then replaced with the expanded code block matching it. This is implemented as a doubly recursive function.</p>
+<div class="annotated-code">
+<p><span><em>«get-code-block»=</em></span></p>
+<div class="sourceCode" id="get-code-block"><pre class="sourceCode python"><code class="sourceCode python"><span id="get-code-block-1"><a href="#get-code-block-1"></a><span class="im">import</span> re</span>
+<span id="get-code-block-2"><a href="#get-code-block-2"></a></span>
+<span id="get-code-block-3"><a href="#get-code-block-3"></a><span class="op">&lt;&lt;</span>replace<span class="op">-</span>expr<span class="op">&gt;&gt;</span></span>
+<span id="get-code-block-4"><a href="#get-code-block-4"></a></span>
+<span id="get-code-block-5"><a href="#get-code-block-5"></a><span class="kw">def</span> get_code(code_map: Dict[<span class="bu">str</span>, List[CodeBlock]], name: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="get-code-block-6"><a href="#get-code-block-6"></a>    <span class="op">&lt;&lt;</span>expand<span class="op">&gt;&gt;</span></span>
+<span id="get-code-block-7"><a href="#get-code-block-7"></a>    <span class="op">&lt;&lt;</span>look<span class="op">-</span>up<span class="op">&gt;&gt;</span></span>
+<span id="get-code-block-8"><a href="#get-code-block-8"></a>    <span class="cf">return</span> look_up(name<span class="op">=</span>name, prefix<span class="op">=</span><span class="st">&quot;&quot;</span>)</span></code></pre></div>
+</div>
+<p>The <code>replace_expr</code> function does one of two things. If the input is not a match, the input is returned unchanged. If it is a match, all named sub-matches are taken out and given as keyword argument to the given <code>replace</code> function, the result of which is returned.</p>
+<div class="annotated-code">
+<p><span><em>«replace-expr»=</em></span></p>
+<div class="sourceCode" id="replace-expr"><pre class="sourceCode python"><code class="sourceCode python"><span id="replace-expr-1"><a href="#replace-expr-1"></a><span class="kw">def</span> replace_expr(expr: <span class="bu">str</span>, replace: Callable[..., <span class="bu">str</span>], text: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="replace-expr-2"><a href="#replace-expr-2"></a>    <span class="co">&quot;&quot;&quot;Matches (fullmatch) `text` using the expression `expr`. If the expression</span></span>
+<span id="replace-expr-3"><a href="#replace-expr-3"></a><span class="co">    matches, then returns the result of passing named sub-matches as</span></span>
+<span id="replace-expr-4"><a href="#replace-expr-4"></a><span class="co">    keyword arguments to `replace`. Returns `text` otherwise.&quot;&quot;&quot;</span></span>
+<span id="replace-expr-5"><a href="#replace-expr-5"></a>    match <span class="op">=</span> re.fullmatch(expr, text)</span>
+<span id="replace-expr-6"><a href="#replace-expr-6"></a>    <span class="cf">if</span> match:</span>
+<span id="replace-expr-7"><a href="#replace-expr-7"></a>        <span class="cf">return</span> replace(<span class="op">**</span>match.groupdict())</span>
+<span id="replace-expr-8"><a href="#replace-expr-8"></a>    <span class="cf">else</span>:</span>
+<span id="replace-expr-9"><a href="#replace-expr-9"></a>        <span class="cf">return</span> text</span></code></pre></div>
+</div>
+<p>In our case the <code>replace</code> function is called <code>look_up</code>; it looks up the given name and indents the result with a given prefix.</p>
+<div class="annotated-code">
+<p><span><em>«look-up»=</em></span></p>
+<div class="sourceCode" id="look-up"><pre class="sourceCode python"><code class="sourceCode python"><span id="look-up-1"><a href="#look-up-1"></a><span class="im">from</span> textwrap <span class="im">import</span> indent</span>
+<span id="look-up-2"><a href="#look-up-2"></a></span>
+<span id="look-up-3"><a href="#look-up-3"></a><span class="kw">def</span> look_up(<span class="op">*</span>, name: <span class="bu">str</span>, prefix: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="look-up-4"><a href="#look-up-4"></a>    blocks <span class="op">=</span> code_map[name]</span>
+<span id="look-up-5"><a href="#look-up-5"></a>    <span class="cf">if</span> <span class="kw">not</span> blocks:</span>
+<span id="look-up-6"><a href="#look-up-6"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;No code with name `</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">` found.&quot;</span>)</span>
+<span id="look-up-7"><a href="#look-up-7"></a>    result <span class="op">=</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>.join(expand(code) <span class="cf">for</span> code <span class="kw">in</span> blocks)</span>
+<span id="look-up-8"><a href="#look-up-8"></a>    <span class="cf">return</span> indent(result, prefix)</span></code></pre></div>
+</div>
+<p>The function <code>expand</code> takes a <code>CodeBlock</code> object and expands all references using the given regex. Decomposing this particular regex:</p>
+<ul>
+<li><code>(?P&lt;prefix&gt;[ \t]*)</code> matches the indentation, either tabs or spaces.</li>
+<li><code>&lt;&lt;(?P&lt;name&gt;[^ &gt;]*)&gt;&gt;</code> matches the named reference, surrounded by <code>&lt;&lt;...&gt;&gt;</code>.</li>
+<li><code>\Z</code> matches the end of input.</li>
+</ul>
+<div class="annotated-code">
+<p><span><em>«expand»=</em></span></p>
+<div class="sourceCode" id="expand"><pre class="sourceCode python"><code class="sourceCode python"><span id="expand-1"><a href="#expand-1"></a><span class="kw">def</span> expand(code: CodeBlock) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="expand-2"><a href="#expand-2"></a>    pattern <span class="op">=</span> <span class="st">&quot;(?P&lt;prefix&gt;[ </span><span class="ch">\t</span><span class="st">]*)&lt;&lt;(?P&lt;name&gt;[^ &gt;]*)&gt;&gt;</span><span class="ch">\\</span><span class="st">Z&quot;</span></span>
+<span id="expand-3"><a href="#expand-3"></a>    <span class="cf">return</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>.join(</span>
+<span id="expand-4"><a href="#expand-4"></a>        replace_expr(pattern, look_up, line)</span>
+<span id="expand-5"><a href="#expand-5"></a>        <span class="cf">for</span> line <span class="kw">in</span> code.text.splitlines())</span></code></pre></div>
+</div>
+<p>Together, <code>expand</code> and <code>look_up</code> form a doubly recursive pair of functions, evaluating the contents of any code block found in the input.</p>
+<h2 id="finalize">Finalize</h2>
+<p>To finalize, we write out all files that we can find.</p>
+<div class="annotated-code">
+<p><span><em>«tangle-finalize»=</em></span></p>
+<div class="sourceCode" id="tangle-finalize"><pre class="sourceCode python"><code class="sourceCode python"><span id="tangle-finalize-1"><a href="#tangle-finalize-1"></a><span class="kw">def</span> get_file_map(code_map: CodeMap) <span class="op">-&gt;</span> Dict[<span class="bu">str</span>, <span class="bu">str</span>]:</span>
+<span id="tangle-finalize-2"><a href="#tangle-finalize-2"></a>    <span class="co">&quot;&quot;&quot;Extracts all file references from `code_map`.&quot;&quot;&quot;</span></span>
+<span id="tangle-finalize-3"><a href="#tangle-finalize-3"></a>    <span class="cf">return</span> { code[<span class="dv">0</span>].attributes[<span class="st">&quot;file&quot;</span>]: codename </span>
+<span id="tangle-finalize-4"><a href="#tangle-finalize-4"></a>             <span class="cf">for</span> codename, code <span class="kw">in</span> code_map.items()</span>
+<span id="tangle-finalize-5"><a href="#tangle-finalize-5"></a>             <span class="cf">if</span> <span class="st">&quot;file&quot;</span> <span class="kw">in</span> code[<span class="dv">0</span>].attributes }</span></code></pre></div>
+</div>
+<p>Only files that are different from those on disk should be overwritten.</p>
+<div class="annotated-code">
+<p><span><em>«tangle-finalize»+</em></span></p>
+<div class="sourceCode" id="tangle-finalize"><pre class="sourceCode python"><code class="sourceCode python"><span id="tangle-finalize-1"><a href="#tangle-finalize-1"></a><span class="kw">def</span> write_file(filename: <span class="bu">str</span>, text: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="tangle-finalize-2"><a href="#tangle-finalize-2"></a>    <span class="co">&quot;&quot;&quot;Writes `text` to file `filename`, only if `text` is different</span></span>
+<span id="tangle-finalize-3"><a href="#tangle-finalize-3"></a><span class="co">    from contents of `filename`.&quot;&quot;&quot;</span></span>
+<span id="tangle-finalize-4"><a href="#tangle-finalize-4"></a>    <span class="cf">try</span>:</span>
+<span id="tangle-finalize-5"><a href="#tangle-finalize-5"></a>        content <span class="op">=</span> <span class="bu">open</span>(filename).read()</span>
+<span id="tangle-finalize-6"><a href="#tangle-finalize-6"></a>        <span class="cf">if</span> content <span class="op">==</span> text:</span>
+<span id="tangle-finalize-7"><a href="#tangle-finalize-7"></a>            <span class="cf">return</span></span>
+<span id="tangle-finalize-8"><a href="#tangle-finalize-8"></a>    <span class="cf">except</span> <span class="pp">FileNotFoundError</span>:</span>
+<span id="tangle-finalize-9"><a href="#tangle-finalize-9"></a>        <span class="cf">pass</span></span>
+<span id="tangle-finalize-10"><a href="#tangle-finalize-10"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Writing `</span><span class="sc">{</span>filename<span class="sc">}</span><span class="ss">`.&quot;</span>, <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
+<span id="tangle-finalize-11"><a href="#tangle-finalize-11"></a>    <span class="bu">open</span>(filename, <span class="st">&#39;w&#39;</span>).write(text)</span>
+<span id="tangle-finalize-12"><a href="#tangle-finalize-12"></a></span>
+<span id="tangle-finalize-13"><a href="#tangle-finalize-13"></a><span class="kw">def</span> finalize(doc: Doc) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="tangle-finalize-14"><a href="#tangle-finalize-14"></a>    <span class="co">&quot;&quot;&quot;Writes all file references found in `doc.code_map` to disk.</span></span>
+<span id="tangle-finalize-15"><a href="#tangle-finalize-15"></a><span class="co">    This only overwrites a file if the content is different.&quot;&quot;&quot;</span></span>
+<span id="tangle-finalize-16"><a href="#tangle-finalize-16"></a>    file_map <span class="op">=</span> get_file_map(doc.code_map)</span>
+<span id="tangle-finalize-17"><a href="#tangle-finalize-17"></a>    <span class="cf">for</span> filename, codename <span class="kw">in</span> file_map.items():</span>
+<span id="tangle-finalize-18"><a href="#tangle-finalize-18"></a>        write_file(filename, get_code(doc.code_map, codename))</span>
+<span id="tangle-finalize-19"><a href="#tangle-finalize-19"></a>    doc.content <span class="op">=</span> []</span></code></pre></div>
+</div>
+<h1 id="code-block-annotation">Code block annotation</h1>
+<div class="annotated-code">
+<p><span><em>«entangled/annotate.py»=</em></span></p>
+<div class="sourceCode" id="cb5" data-file="entangled/annotate.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="im">from</span> .tangle <span class="im">import</span> get_name</span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="im">from</span> panflute <span class="im">import</span> (Span, Str, Para, CodeBlock, Div, Emph)</span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="kw">def</span> prepare(doc):</span>
+<span id="cb5-6"><a href="#cb5-6"></a>    doc.code_count <span class="op">=</span> defaultdict(<span class="kw">lambda</span>: <span class="dv">0</span>)</span>
+<span id="cb5-7"><a href="#cb5-7"></a></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="kw">def</span> action(elem, doc):</span>
+<span id="cb5-9"><a href="#cb5-9"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(elem, CodeBlock):</span>
+<span id="cb5-10"><a href="#cb5-10"></a>        name <span class="op">=</span> get_name(elem)</span>
+<span id="cb5-11"><a href="#cb5-11"></a>        <span class="cf">if</span> doc.code_count[name] <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb5-12"><a href="#cb5-12"></a>            label <span class="op">=</span> Span(Emph(Str(<span class="ss">f&quot;«</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">»=&quot;</span>)))</span>
+<span id="cb5-13"><a href="#cb5-13"></a>            doc.code_count[name] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a>        <span class="cf">else</span>:</span>
+<span id="cb5-15"><a href="#cb5-15"></a>            label <span class="op">=</span> Span(Emph(Str(<span class="ss">f&quot;«</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">»+&quot;</span>)))</span>
+<span id="cb5-16"><a href="#cb5-16"></a>        <span class="cf">return</span> Div(Para(label), elem, classes<span class="op">=</span>[<span class="st">&quot;annotated-code&quot;</span>])</span></code></pre></div>
+</div>
+<h1 id="doctesting">Doctesting</h1>
+<p>This Pandoc filter runs doc-tests from Python. If a cell is marked with a <code>.doctest</code> class, the output is checked against the given output. We use Jupyter kernels to evaluate the input.</p>
+<div class="annotated-code">
+<p><span><em>«entangled/doctest.py»=</em></span></p>
+<div class="sourceCode" id="cb6" data-file="entangled/doctest.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="im">from</span> panflute <span class="im">import</span> (Doc, Element, CodeBlock)</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="im">from</span> .typing <span class="im">import</span> (ActionReturn, JSONType)</span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="im">from</span> .tangle <span class="im">import</span> (get_name)</span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="im">from</span> .config <span class="im">import</span> get_language_info</span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
+<span id="cb6-6"><a href="#cb6-6"></a></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="im">import</span> sys</span>
+<span id="cb6-8"><a href="#cb6-8"></a></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="op">&lt;&lt;</span>doctest<span class="op">-</span>suite<span class="op">&gt;&gt;</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="op">&lt;&lt;</span>get<span class="op">-</span>doc<span class="op">-</span>tests<span class="op">&gt;&gt;</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="op">&lt;&lt;</span>doctest<span class="op">-</span>report<span class="op">&gt;&gt;</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="op">&lt;&lt;</span>doctest<span class="op">-</span>run<span class="op">-</span>suite<span class="op">&gt;&gt;</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="kw">def</span> prepare(doc: Doc) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb6-15"><a href="#cb6-15"></a>    <span class="cf">assert</span> <span class="bu">hasattr</span>(doc, <span class="st">&quot;config&quot;</span>), <span class="st">&quot;Need to read config first.&quot;</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a>    <span class="cf">assert</span> <span class="bu">hasattr</span>(doc, <span class="st">&quot;code_map&quot;</span>), <span class="st">&quot;Need to tangle first.&quot;</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a>    doc.suites <span class="op">=</span> get_doc_tests(doc.code_map)</span>
+<span id="cb6-18"><a href="#cb6-18"></a>    <span class="cf">for</span> name, suite <span class="kw">in</span> doc.suites.items():</span>
+<span id="cb6-19"><a href="#cb6-19"></a>        run_suite(doc.config, suite)</span>
+<span id="cb6-20"><a href="#cb6-20"></a>    doc.code_counter <span class="op">=</span> defaultdict(<span class="kw">lambda</span>: <span class="dv">0</span>)</span>
+<span id="cb6-21"><a href="#cb6-21"></a></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="kw">def</span> action(elem: Element, doc: Doc) <span class="op">-&gt;</span> ActionReturn:</span>
+<span id="cb6-23"><a href="#cb6-23"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(elem, CodeBlock):</span>
+<span id="cb6-24"><a href="#cb6-24"></a>        name <span class="op">=</span> get_name(elem)</span>
+<span id="cb6-25"><a href="#cb6-25"></a>        <span class="cf">if</span> <span class="st">&quot;doctest&quot;</span> <span class="kw">in</span> elem.classes:</span>
+<span id="cb6-26"><a href="#cb6-26"></a>            suite <span class="op">=</span> doc.suites[name].code_blocks[doc.code_counter[name]]</span>
+<span id="cb6-27"><a href="#cb6-27"></a>            doc.code_counter[name] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a>            <span class="cf">return</span> generate_report(elem, suite)</span>
+<span id="cb6-29"><a href="#cb6-29"></a>        doc.code_counter[name] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb6-30"><a href="#cb6-30"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+</div>
+<h2 id="get-doc-tests-from-code-map">Get doc tests from code map</h2>
+<div class="annotated-code">
+<p><span><em>«get-doc-tests»=</em></span></p>
+<div class="sourceCode" id="get-doc-tests"><pre class="sourceCode python"><code class="sourceCode python"><span id="get-doc-tests-1"><a href="#get-doc-tests-1"></a><span class="kw">def</span> get_language(c: CodeBlock) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="get-doc-tests-2"><a href="#get-doc-tests-2"></a>    <span class="cf">if</span> <span class="kw">not</span> c.classes:</span>
+<span id="get-doc-tests-3"><a href="#get-doc-tests-3"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;Code block `</span><span class="sc">{c.</span>name<span class="sc">}</span><span class="ss">` has no language specified.&quot;</span>)</span>
+<span id="get-doc-tests-4"><a href="#get-doc-tests-4"></a>    <span class="cf">return</span> c.classes[<span class="dv">0</span>]</span>
+<span id="get-doc-tests-5"><a href="#get-doc-tests-5"></a></span>
+<span id="get-doc-tests-6"><a href="#get-doc-tests-6"></a><span class="kw">def</span> get_doc_tests(code_map: Dict[<span class="bu">str</span>, List[CodeBlock]]) <span class="op">-&gt;</span> Dict[<span class="bu">str</span>, Suite]:</span>
+<span id="get-doc-tests-7"><a href="#get-doc-tests-7"></a>    <span class="kw">def</span> convert_code_block(c: CodeBlock) <span class="op">-&gt;</span> Test:</span>
+<span id="get-doc-tests-8"><a href="#get-doc-tests-8"></a>        name <span class="op">=</span> get_name(c)</span>
+<span id="get-doc-tests-9"><a href="#get-doc-tests-9"></a>        <span class="cf">if</span> <span class="st">&quot;doctest&quot;</span> <span class="kw">in</span> c.classes:</span>
+<span id="get-doc-tests-10"><a href="#get-doc-tests-10"></a>            s <span class="op">=</span> c.text.split(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">---</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="get-doc-tests-11"><a href="#get-doc-tests-11"></a>            <span class="cf">if</span> <span class="bu">len</span>(s) <span class="op">!=</span> <span class="dv">2</span>:</span>
+<span id="get-doc-tests-12"><a href="#get-doc-tests-12"></a>                <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;Doc test `</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">` should have single `---` line.&quot;</span>)</span>
+<span id="get-doc-tests-13"><a href="#get-doc-tests-13"></a>            <span class="cf">return</span> Test(<span class="op">*</span>s)</span>
+<span id="get-doc-tests-14"><a href="#get-doc-tests-14"></a>        <span class="cf">else</span>:</span>
+<span id="get-doc-tests-15"><a href="#get-doc-tests-15"></a>            <span class="cf">return</span> Test(c.text, <span class="va">None</span>)</span>
+<span id="get-doc-tests-16"><a href="#get-doc-tests-16"></a></span>
+<span id="get-doc-tests-17"><a href="#get-doc-tests-17"></a>    result <span class="op">=</span> {}</span>
+<span id="get-doc-tests-18"><a href="#get-doc-tests-18"></a>    <span class="cf">for</span> k, v <span class="kw">in</span> code_map.items():</span>
+<span id="get-doc-tests-19"><a href="#get-doc-tests-19"></a>        <span class="cf">if</span> <span class="bu">any</span>(<span class="st">&quot;doctest&quot;</span> <span class="kw">in</span> c.classes <span class="cf">for</span> c <span class="kw">in</span> v):</span>
+<span id="get-doc-tests-20"><a href="#get-doc-tests-20"></a>            result[k] <span class="op">=</span> Suite(</span>
+<span id="get-doc-tests-21"><a href="#get-doc-tests-21"></a>                code_blocks<span class="op">=</span>[convert_code_block(c) <span class="cf">for</span> c <span class="kw">in</span> v],</span>
+<span id="get-doc-tests-22"><a href="#get-doc-tests-22"></a>                language<span class="op">=</span>get_language(v[<span class="dv">0</span>]))</span>
+<span id="get-doc-tests-23"><a href="#get-doc-tests-23"></a></span>
+<span id="get-doc-tests-24"><a href="#get-doc-tests-24"></a>    <span class="cf">return</span> result</span></code></pre></div>
+</div>
+<h2 id="test-suite">Test Suite</h2>
+<p>Every code block that is part of a <code>.doctest</code> suite will be stored in a <code>Test</code> object, even if it is not a doc-test block itself. The default <code>status</code> of a test is <code>PENDING</code>.</p>
+<p>A test may succeed, fail, throw an error or return an unknown result (other than <code>text/plain</code>).</p>
+<div class="annotated-code">
+<p><span><em>«doctest-suite»=</em></span></p>
+<div class="sourceCode" id="doctest-suite"><pre class="sourceCode python"><code class="sourceCode python"><span id="doctest-suite-1"><a href="#doctest-suite-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
+<span id="doctest-suite-2"><a href="#doctest-suite-2"></a><span class="im">from</span> typing <span class="im">import</span> (Optional, List, Dict)</span>
+<span id="doctest-suite-3"><a href="#doctest-suite-3"></a><span class="im">from</span> enum <span class="im">import</span> Enum</span>
+<span id="doctest-suite-4"><a href="#doctest-suite-4"></a></span>
+<span id="doctest-suite-5"><a href="#doctest-suite-5"></a><span class="kw">class</span> TestStatus(Enum):</span>
+<span id="doctest-suite-6"><a href="#doctest-suite-6"></a>    PENDING <span class="op">=</span> <span class="dv">0</span></span>
+<span id="doctest-suite-7"><a href="#doctest-suite-7"></a>    SUCCESS <span class="op">=</span> <span class="dv">1</span></span>
+<span id="doctest-suite-8"><a href="#doctest-suite-8"></a>    FAIL <span class="op">=</span> <span class="dv">2</span></span>
+<span id="doctest-suite-9"><a href="#doctest-suite-9"></a>    ERROR <span class="op">=</span> <span class="dv">3</span></span>
+<span id="doctest-suite-10"><a href="#doctest-suite-10"></a>    UNKNOWN <span class="op">=</span> <span class="dv">4</span></span></code></pre></div>
+</div>
+<div class="annotated-code">
+<p><span><em>«doctest-suite»+</em></span></p>
+<div class="sourceCode" id="doctest-suite"><pre class="sourceCode python"><code class="sourceCode python"><span id="doctest-suite-1"><a href="#doctest-suite-1"></a><span class="at">@dataclass</span></span>
+<span id="doctest-suite-2"><a href="#doctest-suite-2"></a><span class="kw">class</span> Test:</span>
+<span id="doctest-suite-3"><a href="#doctest-suite-3"></a>    __test__ <span class="op">=</span> <span class="va">False</span>    <span class="co"># not a pytest class</span></span>
+<span id="doctest-suite-4"><a href="#doctest-suite-4"></a>    code: <span class="bu">str</span></span>
+<span id="doctest-suite-5"><a href="#doctest-suite-5"></a>    expect: Optional[<span class="bu">str</span>]</span>
+<span id="doctest-suite-6"><a href="#doctest-suite-6"></a>    result: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="doctest-suite-7"><a href="#doctest-suite-7"></a>    error: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="doctest-suite-8"><a href="#doctest-suite-8"></a>    status: TestStatus <span class="op">=</span> TestStatus.PENDING</span></code></pre></div>
+</div>
+<p>A suite is just a list of <code>Test</code>s with some meta-data attached.</p>
+<div class="annotated-code">
+<p><span><em>«doctest-suite»+</em></span></p>
+<div class="sourceCode" id="doctest-suite"><pre class="sourceCode python"><code class="sourceCode python"><span id="doctest-suite-1"><a href="#doctest-suite-1"></a><span class="at">@dataclass</span></span>
+<span id="doctest-suite-2"><a href="#doctest-suite-2"></a><span class="kw">class</span> Suite:</span>
+<span id="doctest-suite-3"><a href="#doctest-suite-3"></a>    code_blocks: List[Test]</span>
+<span id="doctest-suite-4"><a href="#doctest-suite-4"></a>    language: <span class="bu">str</span></span></code></pre></div>
+</div>
+<h2 id="evaluation">Evaluation</h2>
+<p>We use <code>jupyter_client</code> to communicate with the REPL in question.</p>
+<div class="annotated-code">
+<p><span><em>«doctest-run-suite»=</em></span></p>
+<div class="sourceCode" id="doctest-run-suite"><pre class="sourceCode python"><code class="sourceCode python"><span id="doctest-run-suite-1"><a href="#doctest-run-suite-1"></a><span class="im">import</span> jupyter_client</span>
+<span id="doctest-run-suite-2"><a href="#doctest-run-suite-2"></a><span class="im">import</span> queue</span>
+<span id="doctest-run-suite-3"><a href="#doctest-run-suite-3"></a></span>
+<span id="doctest-run-suite-4"><a href="#doctest-run-suite-4"></a><span class="kw">def</span> run_suite(config: JSONType, s: Suite) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="doctest-run-suite-5"><a href="#doctest-run-suite-5"></a>    <span class="op">&lt;&lt;</span>jupyter<span class="op">-</span>get<span class="op">-</span>kernel<span class="op">-</span>name<span class="op">&gt;&gt;</span></span>
+<span id="doctest-run-suite-6"><a href="#doctest-run-suite-6"></a>    <span class="cf">with</span> jupyter_client.run_kernel(kernel_name<span class="op">=</span>kernel_name) <span class="im">as</span> kc:</span>
+<span id="doctest-run-suite-7"><a href="#doctest-run-suite-7"></a>        <span class="bu">print</span>(<span class="ss">f&quot;Kernel `</span><span class="sc">{</span>kernel_name<span class="sc">}</span><span class="ss">` running ...&quot;</span>, <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
+<span id="doctest-run-suite-8"><a href="#doctest-run-suite-8"></a>        <span class="op">&lt;&lt;</span>jupyter<span class="op">-</span><span class="bu">eval</span><span class="op">-</span>test<span class="op">&gt;&gt;</span></span>
+<span id="doctest-run-suite-9"><a href="#doctest-run-suite-9"></a></span>
+<span id="doctest-run-suite-10"><a href="#doctest-run-suite-10"></a>        <span class="cf">for</span> test <span class="kw">in</span> s.code_blocks:</span>
+<span id="doctest-run-suite-11"><a href="#doctest-run-suite-11"></a>            jupyter_eval(test)</span>
+<span id="doctest-run-suite-12"><a href="#doctest-run-suite-12"></a>            <span class="cf">if</span> test.status <span class="kw">is</span> TestStatus.ERROR:</span>
+<span id="doctest-run-suite-13"><a href="#doctest-run-suite-13"></a>                <span class="cf">break</span></span></code></pre></div>
+</div>
+<h3 id="jupyter">Jupyter</h3>
+<p>The configuration should have a Jupyter kernel name stored for the language.</p>
+<div class="annotated-code">
+<p><span><em>«jupyter-get-kernel-name»=</em></span></p>
+<div class="sourceCode" id="jupyter-get-kernel-name"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-get-kernel-name-1"><a href="#jupyter-get-kernel-name-1"></a>info <span class="op">=</span> get_language_info(config, s.language)</span>
+<span id="jupyter-get-kernel-name-2"><a href="#jupyter-get-kernel-name-2"></a>kernel_name <span class="op">=</span> info[<span class="st">&quot;jupyter&quot;</span>]</span>
+<span id="jupyter-get-kernel-name-3"><a href="#jupyter-get-kernel-name-3"></a><span class="cf">if</span> <span class="kw">not</span> kernel_name:</span>
+<span id="jupyter-get-kernel-name-4"><a href="#jupyter-get-kernel-name-4"></a>    <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="ss">f&quot;No Jupyter kernel known for the </span><span class="sc">{s.</span>language<span class="sc">}</span><span class="ss"> language.&quot;</span>)</span>
+<span id="jupyter-get-kernel-name-5"><a href="#jupyter-get-kernel-name-5"></a>specs <span class="op">=</span> jupyter_client.kernelspec.find_kernel_specs()</span>
+<span id="jupyter-get-kernel-name-6"><a href="#jupyter-get-kernel-name-6"></a><span class="cf">if</span> kernel_name <span class="kw">not</span> <span class="kw">in</span> specs:</span>
+<span id="jupyter-get-kernel-name-7"><a href="#jupyter-get-kernel-name-7"></a>    <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="ss">f&quot;Jupyter kernel `</span><span class="sc">{</span>kernel_name<span class="sc">}</span><span class="ss">` not installed.&quot;</span>)</span></code></pre></div>
+</div>
+<p>After sending the test to the Jupyter kernel, we need to retrieve the result. To match the JSON records, we use <code>pampy</code>, making the following code a lot cleaner.</p>
+<div class="annotated-code">
+<p><span><em>«jupyter-eval-test»=</em></span></p>
+<div class="sourceCode" id="jupyter-eval-test"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-eval-test-1"><a href="#jupyter-eval-test-1"></a><span class="kw">def</span> jupyter_eval(test: Test):</span>
+<span id="jupyter-eval-test-2"><a href="#jupyter-eval-test-2"></a>    msg_id <span class="op">=</span> kc.execute(test.code)</span>
+<span id="jupyter-eval-test-3"><a href="#jupyter-eval-test-3"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="jupyter-eval-test-4"><a href="#jupyter-eval-test-4"></a>        <span class="cf">try</span>:</span>
+<span id="jupyter-eval-test-5"><a href="#jupyter-eval-test-5"></a>            msg <span class="op">=</span> kc.get_iopub_msg(timeout<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="jupyter-eval-test-6"><a href="#jupyter-eval-test-6"></a>            <span class="cf">if</span> handle(test, msg_id, msg):</span>
+<span id="jupyter-eval-test-7"><a href="#jupyter-eval-test-7"></a>               <span class="cf">return</span></span>
+<span id="jupyter-eval-test-8"><a href="#jupyter-eval-test-8"></a></span>
+<span id="jupyter-eval-test-9"><a href="#jupyter-eval-test-9"></a>        <span class="cf">except</span> queue.Empty:</span>
+<span id="jupyter-eval-test-10"><a href="#jupyter-eval-test-10"></a>            test.error <span class="op">=</span> <span class="st">&quot;Operation timed out.&quot;</span></span>
+<span id="jupyter-eval-test-11"><a href="#jupyter-eval-test-11"></a>            test.status <span class="op">=</span> TestStatus.ERROR</span>
+<span id="jupyter-eval-test-12"><a href="#jupyter-eval-test-12"></a>            <span class="cf">return</span></span></code></pre></div>
+</div>
+<p>The <code>handle</code> function is a pattern matcher. Each pattern looks like a dictionary, but may contain one or more <code>_</code> symbols. The contents of the matching dictionary at the <code>_</code> symbols are passed to the function following the pattern.</p>
+<div class="annotated-code">
+<p><span><em>«jupyter-eval-test»+</em></span></p>
+<div class="sourceCode" id="jupyter-eval-test"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-eval-test-1"><a href="#jupyter-eval-test-1"></a><span class="kw">def</span> handle(test, msg_id, msg):</span>
+<span id="jupyter-eval-test-2"><a href="#jupyter-eval-test-2"></a>    <span class="im">from</span> pampy <span class="im">import</span> match, _</span>
+<span id="jupyter-eval-test-3"><a href="#jupyter-eval-test-3"></a>    <span class="op">&lt;&lt;</span>jupyter<span class="op">-</span>handlers<span class="op">&gt;&gt;</span></span>
+<span id="jupyter-eval-test-4"><a href="#jupyter-eval-test-4"></a>    <span class="cf">return</span> match(msg</span>
+<span id="jupyter-eval-test-5"><a href="#jupyter-eval-test-5"></a>        <span class="op">&lt;&lt;</span>jupyter<span class="op">-</span>match<span class="op">&gt;&gt;</span></span>
+<span id="jupyter-eval-test-6"><a href="#jupyter-eval-test-6"></a>        )</span></code></pre></div>
+</div>
+<h4 id="execute_result"><code>execute_result</code></h4>
+<p>A result is tested for equality with the expected result.</p>
+<div class="annotated-code">
+<p><span><em>«jupyter-match»=</em></span></p>
+<div class="sourceCode" id="jupyter-match"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-match-1"><a href="#jupyter-match-1"></a>, { <span class="st">&quot;msg_type&quot;</span>: <span class="st">&quot;execute_result&quot;</span></span>
+<span id="jupyter-match-2"><a href="#jupyter-match-2"></a>  , <span class="st">&quot;parent_header&quot;</span>: { <span class="st">&quot;msg_id&quot;</span> : msg_id }</span>
+<span id="jupyter-match-3"><a href="#jupyter-match-3"></a>  , <span class="st">&quot;content&quot;</span>: { <span class="st">&quot;data&quot;</span> : { <span class="st">&quot;text/plain&quot;</span>: _ } } }</span>
+<span id="jupyter-match-4"><a href="#jupyter-match-4"></a>, execute_result_text</span></code></pre></div>
+</div>
+<div class="annotated-code">
+<p><span><em>«jupyter-handlers»=</em></span></p>
+<div class="sourceCode" id="jupyter-handlers"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-handlers-1"><a href="#jupyter-handlers-1"></a><span class="kw">def</span> execute_result_text(data):</span>
+<span id="jupyter-handlers-2"><a href="#jupyter-handlers-2"></a>    test.result <span class="op">=</span> data</span>
+<span id="jupyter-handlers-3"><a href="#jupyter-handlers-3"></a>    <span class="cf">if</span> (test.expect <span class="kw">is</span> <span class="va">None</span>) <span class="kw">or</span> test.result.strip() <span class="op">==</span> test.expect.strip():</span>
+<span id="jupyter-handlers-4"><a href="#jupyter-handlers-4"></a>        test.status <span class="op">=</span> TestStatus.SUCCESS</span>
+<span id="jupyter-handlers-5"><a href="#jupyter-handlers-5"></a>    <span class="cf">else</span>:</span>
+<span id="jupyter-handlers-6"><a href="#jupyter-handlers-6"></a>        test.status <span class="op">=</span> TestStatus.FAIL</span>
+<span id="jupyter-handlers-7"><a href="#jupyter-handlers-7"></a>    <span class="cf">return</span> <span class="va">True</span></span></code></pre></div>
+</div>
+<h4 id="status"><code>status</code></h4>
+<p>If status <code>idle</code> is given, the computation is done, and we don’t need to wait for further messages.</p>
+<div class="annotated-code">
+<p><span><em>«jupyter-match»+</em></span></p>
+<div class="sourceCode" id="jupyter-match"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-match-1"><a href="#jupyter-match-1"></a>, { <span class="st">&quot;msg_type&quot;</span>: <span class="st">&quot;status&quot;</span></span>
+<span id="jupyter-match-2"><a href="#jupyter-match-2"></a>  , <span class="st">&quot;parent_header&quot;</span>: { <span class="st">&quot;msg_id&quot;</span> : msg_id }</span>
+<span id="jupyter-match-3"><a href="#jupyter-match-3"></a>  , <span class="st">&quot;content&quot;</span>: { <span class="st">&quot;execution_state&quot;</span>: <span class="st">&quot;idle&quot;</span> } }</span>
+<span id="jupyter-match-4"><a href="#jupyter-match-4"></a>, status_idle</span></code></pre></div>
+</div>
+<div class="annotated-code">
+<p><span><em>«jupyter-handlers»+</em></span></p>
+<div class="sourceCode" id="jupyter-handlers"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-handlers-1"><a href="#jupyter-handlers-1"></a><span class="kw">def</span> status_idle(_):</span>
+<span id="jupyter-handlers-2"><a href="#jupyter-handlers-2"></a>    <span class="cf">if</span> test.expect <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="jupyter-handlers-3"><a href="#jupyter-handlers-3"></a>        test.status <span class="op">=</span> TestStatus.SUCCESS</span>
+<span id="jupyter-handlers-4"><a href="#jupyter-handlers-4"></a>    <span class="cf">else</span>:</span>
+<span id="jupyter-handlers-5"><a href="#jupyter-handlers-5"></a>        test.status <span class="op">=</span> TestStatus.FAIL</span>
+<span id="jupyter-handlers-6"><a href="#jupyter-handlers-6"></a>    <span class="cf">return</span> <span class="va">True</span></span></code></pre></div>
+</div>
+<h4 id="error"><code>error</code></h4>
+<p>If an error is given, we set the appropriate flags in <code>test</code> and stop further testing in this session.</p>
+<div class="annotated-code">
+<p><span><em>«jupyter-match»+</em></span></p>
+<div class="sourceCode" id="jupyter-match"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-match-1"><a href="#jupyter-match-1"></a>, { <span class="st">&quot;msg_type&quot;</span>: <span class="st">&quot;error&quot;</span></span>
+<span id="jupyter-match-2"><a href="#jupyter-match-2"></a>  , <span class="st">&quot;parent_header&quot;</span>: { <span class="st">&quot;msg_id&quot;</span> : msg_id }</span>
+<span id="jupyter-match-3"><a href="#jupyter-match-3"></a>  , <span class="st">&quot;content&quot;</span>: { <span class="st">&quot;traceback&quot;</span>: _ } }</span>
+<span id="jupyter-match-4"><a href="#jupyter-match-4"></a>, error_traceback</span></code></pre></div>
+</div>
+<div class="annotated-code">
+<p><span><em>«jupyter-handlers»+</em></span></p>
+<div class="sourceCode" id="jupyter-handlers"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-handlers-1"><a href="#jupyter-handlers-1"></a><span class="kw">def</span> error_traceback(tb):</span>
+<span id="jupyter-handlers-2"><a href="#jupyter-handlers-2"></a>    test.error <span class="op">=</span> <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>.join(msg[<span class="st">&quot;content&quot;</span>][<span class="st">&quot;traceback&quot;</span>])</span>
+<span id="jupyter-handlers-3"><a href="#jupyter-handlers-3"></a>    test.status <span class="op">=</span> TestStatus.ERROR </span>
+<span id="jupyter-handlers-4"><a href="#jupyter-handlers-4"></a>    <span class="cf">return</span> <span class="va">True</span></span></code></pre></div>
+</div>
+<h4 id="otherwise">otherwise</h4>
+<p>Any other message we ignore and wait for further messages.</p>
+<div class="annotated-code">
+<p><span><em>«jupyter-match»+</em></span></p>
+<div class="sourceCode" id="jupyter-match"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-match-1"><a href="#jupyter-match-1"></a>, _</span>
+<span id="jupyter-match-2"><a href="#jupyter-match-2"></a>, <span class="kw">lambda</span> x: <span class="va">False</span></span></code></pre></div>
+</div>
+<h2 id="generate-report">Generate report</h2>
+<div class="annotated-code">
+<p><span><em>«doctest-report»=</em></span></p>
+<div class="sourceCode" id="doctest-report"><pre class="sourceCode python"><code class="sourceCode python"><span id="doctest-report-1"><a href="#doctest-report-1"></a><span class="kw">def</span> generate_report(elem: CodeBlock, t: Test) <span class="op">-&gt;</span> ActionReturn:</span>
+<span id="doctest-report-2"><a href="#doctest-report-2"></a>    status_attr <span class="op">=</span> {<span class="st">&quot;status&quot;</span>: t.status.name}</span>
+<span id="doctest-report-3"><a href="#doctest-report-3"></a>    input_code <span class="op">=</span> CodeBlock(</span>
+<span id="doctest-report-4"><a href="#doctest-report-4"></a>        t.code, identifier<span class="op">=</span>elem.identifier,</span>
+<span id="doctest-report-5"><a href="#doctest-report-5"></a>        classes<span class="op">=</span>elem.classes, attributes<span class="op">=</span>elem.attributes)</span>
+<span id="doctest-report-6"><a href="#doctest-report-6"></a>    input_code.attributes.update(status_attr)</span>
+<span id="doctest-report-7"><a href="#doctest-report-7"></a>    input_code.classes.append(<span class="st">&quot;input&quot;</span>)</span>
+<span id="doctest-report-8"><a href="#doctest-report-8"></a>    lang_class <span class="op">=</span> elem.classes[<span class="dv">0</span>]</span>
+<span id="doctest-report-9"><a href="#doctest-report-9"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.ERROR:</span>
+<span id="doctest-report-10"><a href="#doctest-report-10"></a>        <span class="cf">return</span> [ input_code</span>
+<span id="doctest-report-11"><a href="#doctest-report-11"></a>               , CodeBlock( <span class="bu">str</span>(t.error), classes<span class="op">=</span>[<span class="st">&quot;error&quot;</span>], attributes<span class="op">=</span>status_attr ) ]</span>
+<span id="doctest-report-12"><a href="#doctest-report-12"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.FAIL:</span>
+<span id="doctest-report-13"><a href="#doctest-report-13"></a>        <span class="cf">return</span> [ input_code</span>
+<span id="doctest-report-14"><a href="#doctest-report-14"></a>               , CodeBlock( <span class="bu">str</span>(t.result), classes<span class="op">=</span>[lang_class, <span class="st">&quot;doctest&quot;</span>, <span class="st">&quot;result&quot;</span>]</span>
+<span id="doctest-report-15"><a href="#doctest-report-15"></a>                          , attributes<span class="op">=</span>status_attr )</span>
+<span id="doctest-report-16"><a href="#doctest-report-16"></a>               , CodeBlock( <span class="bu">str</span>(t.expect), classes<span class="op">=</span>[lang_class, <span class="st">&quot;doctest&quot;</span>, <span class="st">&quot;expect&quot;</span>]</span>
+<span id="doctest-report-17"><a href="#doctest-report-17"></a>                          , attributes<span class="op">=</span>status_attr ) ]</span>
+<span id="doctest-report-18"><a href="#doctest-report-18"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.SUCCESS:</span>
+<span id="doctest-report-19"><a href="#doctest-report-19"></a>        <span class="cf">return</span> [ input_code</span>
+<span id="doctest-report-20"><a href="#doctest-report-20"></a>               , CodeBlock( <span class="bu">str</span>(t.result), classes<span class="op">=</span>[lang_class, <span class="st">&quot;doctest&quot;</span>, <span class="st">&quot;result&quot;</span>]</span>
+<span id="doctest-report-21"><a href="#doctest-report-21"></a>                          , attributes<span class="op">=</span>status_attr ) ]</span>
+<span id="doctest-report-22"><a href="#doctest-report-22"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.PENDING:</span>
+<span id="doctest-report-23"><a href="#doctest-report-23"></a>        <span class="cf">return</span> [ input_code ]</span>
+<span id="doctest-report-24"><a href="#doctest-report-24"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.UNKNOWN:</span>
+<span id="doctest-report-25"><a href="#doctest-report-25"></a>        <span class="cf">return</span> [ input_code</span>
+<span id="doctest-report-26"><a href="#doctest-report-26"></a>               , CodeBlock( <span class="bu">str</span>(t.result), classes<span class="op">=</span>[<span class="st">&quot;doctest&quot;</span>, <span class="st">&quot;unknown&quot;</span>]</span>
+<span id="doctest-report-27"><a href="#doctest-report-27"></a>                          , attributes<span class="op">=</span>status_attr ) ]</span>
+<span id="doctest-report-28"><a href="#doctest-report-28"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+</div>
+<h2 id="main">Main</h2>
+<p>This module reuses most of the tangle module.</p>
+<div class="annotated-code">
+<p><span><em>«entangled/doctest_main.py»=</em></span></p>
+<div class="sourceCode" id="cb7" data-file="entangled/doctest_main.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="im">import</span> panflute</span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="im">from</span> . <span class="im">import</span> tangle</span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="im">from</span> . <span class="im">import</span> annotate</span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="im">from</span> . <span class="im">import</span> doctest</span>
+<span id="cb7-6"><a href="#cb7-6"></a></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="im">from</span> .config <span class="im">import</span> read_config</span>
+<span id="cb7-8"><a href="#cb7-8"></a></span>
+<span id="cb7-9"><a href="#cb7-9"></a></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="kw">def</span> main() <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb7-11"><a href="#cb7-11"></a>    <span class="op">&lt;&lt;</span>load<span class="op">-</span>document<span class="op">&gt;&gt;</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a>    doc.config <span class="op">=</span> read_config()</span>
+<span id="cb7-13"><a href="#cb7-13"></a></span>
+<span id="cb7-14"><a href="#cb7-14"></a>    tangle.prepare(doc)</span>
+<span id="cb7-15"><a href="#cb7-15"></a>    doc <span class="op">=</span> doc.walk(tangle.action)</span>
+<span id="cb7-16"><a href="#cb7-16"></a></span>
+<span id="cb7-17"><a href="#cb7-17"></a>    annotate.prepare(doc)</span>
+<span id="cb7-18"><a href="#cb7-18"></a>    doc <span class="op">=</span> doc.walk(annotate.action)</span>
+<span id="cb7-19"><a href="#cb7-19"></a></span>
+<span id="cb7-20"><a href="#cb7-20"></a>    doctest.prepare(doc)</span>
+<span id="cb7-21"><a href="#cb7-21"></a>    doc <span class="op">=</span> doc.walk(doctest.action)</span>
+<span id="cb7-22"><a href="#cb7-22"></a></span>
+<span id="cb7-23"><a href="#cb7-23"></a>    panflute.dump(doc)</span></code></pre></div>
+</div>
+<h2 id="bug-in-panflute-or-jupyter_client">Bug in <code>panflute</code> or <code>jupyter_client</code></h2>
+<p>There is a bug in <code>jupyter_client</code> that prevents it from working when either <code>stdin</code> or <code>stdout</code> is closed. This means that we have to read the input seperately.</p>
+<div class="annotated-code">
+<p><span><em>«load-document»=</em></span></p>
+<div class="sourceCode" id="load-document"><pre class="sourceCode python"><code class="sourceCode python"><span id="load-document-1"><a href="#load-document-1"></a><span class="im">import</span> io</span>
+<span id="load-document-2"><a href="#load-document-2"></a><span class="im">import</span> sys</span>
+<span id="load-document-3"><a href="#load-document-3"></a></span>
+<span id="load-document-4"><a href="#load-document-4"></a>json_input <span class="op">=</span> sys.stdin.read()</span>
+<span id="load-document-5"><a href="#load-document-5"></a>json_stream <span class="op">=</span> io.StringIO(json_input)</span>
+<span id="load-document-6"><a href="#load-document-6"></a>doc <span class="op">=</span> panflute.load(json_stream)</span></code></pre></div>
+</div>
+</div>
+</html>

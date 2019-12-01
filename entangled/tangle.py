@@ -19,7 +19,7 @@ def replace_expr(expr: str, replace: Callable[..., str], text: str) -> str:
         return text
 ## ------ end
 
-def get_code(code_map: Dict[str, List[CodeBlock]], name: str) -> str:
+def get_code(code_map: CodeMap, name: str) -> str:
     ## ------ begin <<expand>>[0]
     def expand(code: CodeBlock) -> str:
         pattern = "(?P<prefix>[ \t]*)<<(?P<name>[^ >]*)>>\\Z"
@@ -38,6 +38,26 @@ def get_code(code_map: Dict[str, List[CodeBlock]], name: str) -> str:
         return indent(result, prefix)
     ## ------ end
     return look_up(name=name, prefix="")
+
+def expand_code_block(code_map: CodeMap, code_block: CodeBlock) -> str:
+    ## ------ begin <<expand>>[0]
+    def expand(code: CodeBlock) -> str:
+        pattern = "(?P<prefix>[ \t]*)<<(?P<name>[^ >]*)>>\\Z"
+        return "\n".join(
+            replace_expr(pattern, look_up, line)
+            for line in code.text.splitlines())
+    ## ------ end
+    ## ------ begin <<look-up>>[0]
+    from textwrap import indent
+    
+    def look_up(*, name: str, prefix: str) -> str:
+        blocks = code_map[name]
+        if not blocks:
+            raise ValueError(f"No code with name `{name}` found.")
+        result = "\n".join(expand(code) for code in blocks)
+        return indent(result, prefix)
+    ## ------ end
+    return expand(code_block)
 ## ------ end
 
 ## ------ begin <<tangle-prepare>>[0]

@@ -1,7 +1,7 @@
 ## ------ language="Python" file="entangled/doctest.py"
 from panflute import (Doc, Element, CodeBlock)
-from .typing import (ActionReturn, JSONType)
-from .tangle import (get_name)
+from .typing import (ActionReturn, JSONType, CodeMap)
+from .tangle import (get_name, expand_code_block)
 from .config import get_language_info
 from collections import defaultdict
 
@@ -41,16 +41,17 @@ def get_language(c: CodeBlock) -> str:
         raise ValueError(f"Code block `{c.name}` has no language specified.")
     return c.classes[0]
 
-def get_doc_tests(code_map: Dict[str, List[CodeBlock]]) -> Dict[str, Suite]:
+def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
     def convert_code_block(c: CodeBlock) -> Test:
         name = get_name(c)
+        code = expand_code_block(code_map, c)
         if "doctest" in c.classes:
-            s = c.text.split("\n---\n")
+            s = code.split("\n---\n")
             if len(s) != 2:
                 raise ValueError(f"Doc test `{name}` should have single `---` line.")
             return Test(*s)
         else:
-            return Test(c.text, None)
+            return Test(code, None)
 
     result = {}
     for k, v in code_map.items():
@@ -62,6 +63,8 @@ def get_doc_tests(code_map: Dict[str, List[CodeBlock]]) -> Dict[str, Suite]:
     return result
 ## ------ end
 ## ------ begin <<doctest-report>>[0]
+from panflute import Div, Para, Str
+
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
     status_attr = {"status": t.status.name}
     input_code = CodeBlock(
@@ -80,9 +83,9 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
                , CodeBlock( str(t.expect), classes=[lang_class, "doctest", "expect"]
                           , attributes=status_attr ) ]
     if t.status is TestStatus.SUCCESS:
-        return [ input_code
-               , CodeBlock( str(t.result), classes=[lang_class, "doctest", "result"]
-                          , attributes=status_attr ) ]
+        return Div( Div(input_code, classes=["doctestInput"])
+                  , Div(CodeBlock(str(t.result), classes=[lang_class]), classes=["doctestOutput"])
+                  , Div(classes=["icon"]), classes=["doctest"], attributes=status_attr)
     if t.status is TestStatus.PENDING:
         return [ input_code ]
     if t.status is TestStatus.UNKNOWN:

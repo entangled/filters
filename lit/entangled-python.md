@@ -176,10 +176,15 @@ import re
 
 <<replace-expr>>
 
-def get_code(code_map: Dict[str, List[CodeBlock]], name: str) -> str:
+def get_code(code_map: CodeMap, name: str) -> str:
     <<expand>>
     <<look-up>>
     return look_up(name=name, prefix="")
+
+def expand_code_block(code_map: CodeMap, code_block: CodeBlock) -> str:
+    <<expand>>
+    <<look-up>>
+    return expand(code_block)
 ```
 
 The `replace_expr` function does one of two things. If the input is not a match, the input is returned unchanged. If it is a match, all named sub-matches are taken out and given as keyword argument to the given `replace` function, the result of which is returned. 
@@ -266,7 +271,7 @@ def finalize(doc: Doc) -> None:
 ``` {.python file=entangled/annotate.py}
 from collections import defaultdict
 from .tangle import get_name
-from panflute import (Span, Str, Para, CodeBlock, Div)
+from panflute import (Span, Str, Para, CodeBlock, Div, Emph)
 
 def prepare(doc):
     doc.code_count = defaultdict(lambda: 0)
@@ -274,11 +279,13 @@ def prepare(doc):
 def action(elem, doc):
     if isinstance(elem, CodeBlock):
         name = get_name(elem)
+        if name is None:
+            return
         if doc.code_count[name] == 0:
-            label = Span(Str(f"«{name}»="))
+            label = Span(Emph(Str(f"«{name}»=")))
             doc.code_count[name] += 1
         else:
-            label = Span(Str(f"«{name}»+"))
+            label = Span(Emph(Str(f"«{name}»+")))
         return Div(Para(label), elem, classes=["annotated-code"])
 ```
 
@@ -288,8 +295,8 @@ This Pandoc filter runs doc-tests from Python. If a cell is marked with a `.doct
 
 ``` {.python file=entangled/doctest.py}
 from panflute import (Doc, Element, CodeBlock)
-from .typing import (ActionReturn, JSONType)
-from .tangle import (get_name)
+from .typing import (ActionReturn, JSONType, CodeMap)
+from .tangle import (get_name, expand_code_block)
 from .config import get_language_info
 from collections import defaultdict
 
@@ -327,16 +334,17 @@ def get_language(c: CodeBlock) -> str:
         raise ValueError(f"Code block `{c.name}` has no language specified.")
     return c.classes[0]
 
-def get_doc_tests(code_map: Dict[str, List[CodeBlock]]) -> Dict[str, Suite]:
+def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
     def convert_code_block(c: CodeBlock) -> Test:
         name = get_name(c)
+        code = expand_code_block(code_map, c)
         if "doctest" in c.classes:
-            s = c.text.split("\n---\n")
+            s = code.split("\n---\n")
             if len(s) != 2:
                 raise ValueError(f"Doc test `{name}` should have single `---` line.")
             return Test(*s)
         else:
-            return Test(c.text, None)
+            return Test(code, None)
 
     result = {}
     for k, v in code_map.items():
@@ -518,6 +526,8 @@ Any other message we ignore and wait for further messages.
 ## Generate report
 
 ``` {.python #doctest-report}
+from panflute import Div, Para, Str
+
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
     status_attr = {"status": t.status.name}
     input_code = CodeBlock(
@@ -536,9 +546,9 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
                , CodeBlock( str(t.expect), classes=[lang_class, "doctest", "expect"]
                           , attributes=status_attr ) ]
     if t.status is TestStatus.SUCCESS:
-        return [ input_code
-               , CodeBlock( str(t.result), classes=[lang_class, "doctest", "result"]
-                          , attributes=status_attr ) ]
+        return Div( Div(input_code, classes=["doctestInput"])
+                  , Div(CodeBlock(str(t.result), classes=[lang_class]), classes=["doctestOutput"])
+                  , Div(classes=["icon"]), classes=["doctest"], attributes=status_attr)
     if t.status is TestStatus.PENDING:
         return [ input_code ]
     if t.status is TestStatus.UNKNOWN:
