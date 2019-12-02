@@ -17,7 +17,7 @@ setup(
     install_requires=[
           "jupyter_client>=5.3.4,<6"
         , "pampy>=0.3.0,<0.4"
-        , "panflute>=1.11.2,<2"
+        , "panflute>=1.11.2,<1.12"
     ],
     tests_require=test_deps,
     extras_require={
