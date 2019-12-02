@@ -56,3 +56,23 @@ So we never get to run this one.
 1
 ```
 
+### Use of noweb references
+
+``` {.python #square}
+def square(x):
+    return x*x
+```
+
+``` {.python .doctest #test-square}
+<<square>>
+square(10)
+---
+100
+```
+
+### No name no test
+
+```shell
+echo "Hello, World!"
+```
+

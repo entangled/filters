@@ -6,6 +6,7 @@ test_deps = [
       "pytest>=5,<6"
     , "pytest-cov>=2.8.1,<3"
     , "pytest-mypy>=0.4.2,<1"
+    , "flake8>=3,<4"
     , "ipykernel>=5.1.3,<6" ]
 
 setup(

@@ -23,6 +23,16 @@
       ],
       "jupyter": "guile",
       "name": "Scheme"
+    },
+    {
+      "comment": {
+        "start": "//"
+      },
+      "identifiers": [
+        "cpp",
+        "c++"
+      ],
+      "name": "C++"
     }
   ]
 }

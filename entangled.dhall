@@ -21,5 +21,11 @@ in { languages =
     , { name = "Scheme"
       , identifiers = ["scheme", "r6rs", "r7rs"]
       , comment = lispStyleComment
-      , jupyter = Some "guile" } ]
+      , jupyter = Some "guile" } 
+
+    , { name = "C++"
+      , identifiers = ["cpp", "c++"]
+      , comment = cppStyleComment
+      , jupyter = None Text }
+    ]
    } : Config

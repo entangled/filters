@@ -1,7 +1,7 @@
 ## ------ language="Python" file="entangled/tangle.py"
 from panflute import (run_filter, Doc, Element, CodeBlock)
-from typing import (Optional, Dict, List, Callable)
-from .typing import (CodeMap, ActionReturn)
+from typing import (Optional, Dict, Callable)
+from .typing import (CodeMap)
 import sys
 
 ## ------ begin <<get-code-block>>[0]

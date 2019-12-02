@@ -63,35 +63,35 @@ def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
     return result
 ## ------ end
 ## ------ begin <<doctest-report>>[0]
-from panflute import Div, Para, Str
+from panflute import Div
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
-    status_attr = {"status": t.status.name}
-    input_code = CodeBlock(
-        t.code, identifier=elem.identifier,
-        classes=elem.classes, attributes=elem.attributes)
-    input_code.attributes.update(status_attr)
-    input_code.classes.append("input")
     lang_class = elem.classes[0]
+
+    ## ------ begin <<doctest-content-div>>[0]
+    def content_div(*output):
+        status_attr = {"status": t.status.name}
+        input_code = Div(CodeBlock(
+            t.code, identifier=elem.identifier,
+            classes=elem.classes), classes=["doctestInput"])
+        return Div(input_code, *output, classes=["doctest"], attributes=status_attr)
+    ## ------ end
     if t.status is TestStatus.ERROR:
-        return [ input_code
-               , CodeBlock( str(t.error), classes=["error"], attributes=status_attr ) ]
+        return content_div( Div( CodeBlock(str(t.error))
+                               , classes=["doctestError"] ) )
     if t.status is TestStatus.FAIL:
-        return [ input_code
-               , CodeBlock( str(t.result), classes=[lang_class, "doctest", "result"]
-                          , attributes=status_attr )
-               , CodeBlock( str(t.expect), classes=[lang_class, "doctest", "expect"]
-                          , attributes=status_attr ) ]
+        return content_div( Div( CodeBlock(str(t.result), classes=[lang_class])
+                               , classes=["doctestResult"] )
+                          , Div( CodeBlock(str(t.expect), classes=[lang_class])
+                               , classes=["doctestExpect"] ) )
     if t.status is TestStatus.SUCCESS:
-        return Div( Div(input_code, classes=["doctestInput"])
-                  , Div(CodeBlock(str(t.result), classes=[lang_class]), classes=["doctestOutput"])
-                  , Div(classes=["icon"]), classes=["doctest"], attributes=status_attr)
+        return content_div( Div( CodeBlock(str(t.result), classes=[lang_class])
+                               , classes=["doctestResult"] ) )
     if t.status is TestStatus.PENDING:
-        return [ input_code ]
+        return content_div()
     if t.status is TestStatus.UNKNOWN:
-        return [ input_code
-               , CodeBlock( str(t.result), classes=["doctest", "unknown"]
-                          , attributes=status_attr ) ]
+        return content_div( Div( CodeBlock(str(t.result))
+                               , classes=["doctestUnknown"] ) )
     return None
 ## ------ end
 ## ------ begin <<doctest-run-suite>>[0]
@@ -101,7 +101,7 @@ import queue
 def run_suite(config: JSONType, s: Suite) -> None:
     ## ------ begin <<jupyter-get-kernel-name>>[0]
     info = get_language_info(config, s.language)
-    kernel_name = info["jupyter"]
+    kernel_name = info["jupyter"] if "jupyter" in info else None
     if not kernel_name:
         raise RuntimeError(f"No Jupyter kernel known for the {s.language} language.")
     specs = jupyter_client.kernelspec.find_kernel_specs()

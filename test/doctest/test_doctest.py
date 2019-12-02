@@ -1,7 +1,7 @@
 from entangled.doctest import (Suite, Test, run_suite)
 from entangled.config import (read_config)
 from entangled import (doctest, tangle)
-from panflute import (convert_text, CodeBlock)
+from panflute import (convert_text, Div)
 from pathlib import (Path)
 from shutil import (copyfile)
 from subprocess import (run)
@@ -21,8 +21,8 @@ def count_status_prepare(doc):
     doc.report = defaultdict(lambda: 0)
 
 def count_status_action(elem, doc):
-    if isinstance(elem, CodeBlock):
-        if "doctest" in elem.classes and "input" in elem.classes:
+    if isinstance(elem, Div):
+        if "doctest" in elem.classes:
             assert "status" in elem.attributes
             doc.report[elem.attributes["status"]] += 1
 
@@ -57,7 +57,7 @@ def test_doctest(tmp_path):
         doc = convert_text(Path("doctest-python.md").read_text(), standalone=True)
         run_doctest(doc)
 
-    assert doc.report == {"SUCCESS": 1, "FAIL": 1, "ERROR": 1, "PENDING": 1}
+    assert doc.report == {"SUCCESS": 2, "FAIL": 1, "ERROR": 1, "PENDING": 1}
 
 def test_doctest_json(tmp_path):
     res = Path.resolve(Path(__file__)).parent
@@ -90,3 +90,20 @@ def test_doctest_no_sep(tmp_path):
     with pytest.raises(ValueError):
         run_doctest(doc)
 
+def test_doctest_missing_ref(tmp_path):
+    res = Path.resolve(Path(__file__)).parent
+    doc = convert_text(Path(res / "missing_ref.md").read_text(), standalone=True)
+    with pytest.raises(ValueError):
+        run_doctest(doc)
+
+def test_doctest_no_kernel(tmp_path):
+    res = Path.resolve(Path(__file__)).parent
+    doc = convert_text(Path(res / "nokernel.md").read_text(), standalone=True)
+    with pytest.raises(RuntimeError):
+        run_doctest(doc)
+
+def test_doctest_no_kernel_configured(tmp_path):
+    res = Path.resolve(Path(__file__)).parent
+    doc = convert_text(Path(res / "no_kernel_configured.md").read_text(), standalone=True)
+    with pytest.raises(RuntimeError):
+        run_doctest(doc)

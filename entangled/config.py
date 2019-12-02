@@ -13,7 +13,7 @@ def read_config() -> JSONType:
         return json.loads(result.stdout)
     except subprocess.CalledProcessError as e:
         print("Error reading `entangled.dhall`:\n" + e.stderr, file=sys.stderr)
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         print("Warning: could not find `dhall-to-json`, trying to read JSON instead.",
               file=sys.stderr)
     return json.load(open("entangled.json", "r"))

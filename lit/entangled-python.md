@@ -75,7 +75,7 @@ def read_config() -> JSONType:
         return json.loads(result.stdout)
     except subprocess.CalledProcessError as e:
         print("Error reading `entangled.dhall`:\n" + e.stderr, file=sys.stderr)
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         print("Warning: could not find `dhall-to-json`, trying to read JSON instead.",
               file=sys.stderr)
     return json.load(open("entangled.json", "r"))
@@ -114,8 +114,8 @@ The global structure of a filter in `panflute` runs `run_filter` from a `main` f
 
 ``` {.python file=entangled/tangle.py}
 from panflute import (run_filter, Doc, Element, CodeBlock)
-from typing import (Optional, Dict, List, Callable)
-from .typing import (CodeMap, ActionReturn)
+from typing import (Optional, Dict, Callable)
+from .typing import (CodeMap)
 import sys
 
 <<get-code-block>>
@@ -421,7 +421,7 @@ The configuration should have a Jupyter kernel name stored for the language.
 
 ``` {.python #jupyter-get-kernel-name}
 info = get_language_info(config, s.language)
-kernel_name = info["jupyter"]
+kernel_name = info["jupyter"] if "jupyter" in info else None
 if not kernel_name:
     raise RuntimeError(f"No Jupyter kernel known for the {s.language} language.")
 specs = jupyter_client.kernelspec.find_kernel_specs()
@@ -525,36 +525,51 @@ Any other message we ignore and wait for further messages.
 
 ## Generate report
 
+The generic output of a documentation test, in HTML, should look something like:
+
+``` {.html}
+<div class="doctest" data-status="STATUS">
+    <div class="doctestInput"><...></div>
+    <div class="doctestResult"><...></div>
+</div>
+```
+
+To create the outer `div` we have a helper function.
+
+``` {.python #doctest-content-div}
+def content_div(*output):
+    status_attr = {"status": t.status.name}
+    input_code = Div(CodeBlock(
+        t.code, identifier=elem.identifier,
+        classes=elem.classes), classes=["doctestInput"])
+    return Div(input_code, *output, classes=["doctest"], attributes=status_attr)
+```
+
+Then the `generate_report` function transforms a `CodeBlock` as follows.
+
 ``` {.python #doctest-report}
-from panflute import Div, Para, Str
+from panflute import Div
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
-    status_attr = {"status": t.status.name}
-    input_code = CodeBlock(
-        t.code, identifier=elem.identifier,
-        classes=elem.classes, attributes=elem.attributes)
-    input_code.attributes.update(status_attr)
-    input_code.classes.append("input")
     lang_class = elem.classes[0]
+
+    <<doctest-content-div>>
     if t.status is TestStatus.ERROR:
-        return [ input_code
-               , CodeBlock( str(t.error), classes=["error"], attributes=status_attr ) ]
+        return content_div( Div( CodeBlock(str(t.error))
+                               , classes=["doctestError"] ) )
     if t.status is TestStatus.FAIL:
-        return [ input_code
-               , CodeBlock( str(t.result), classes=[lang_class, "doctest", "result"]
-                          , attributes=status_attr )
-               , CodeBlock( str(t.expect), classes=[lang_class, "doctest", "expect"]
-                          , attributes=status_attr ) ]
+        return content_div( Div( CodeBlock(str(t.result), classes=[lang_class])
+                               , classes=["doctestResult"] )
+                          , Div( CodeBlock(str(t.expect), classes=[lang_class])
+                               , classes=["doctestExpect"] ) )
     if t.status is TestStatus.SUCCESS:
-        return Div( Div(input_code, classes=["doctestInput"])
-                  , Div(CodeBlock(str(t.result), classes=[lang_class]), classes=["doctestOutput"])
-                  , Div(classes=["icon"]), classes=["doctest"], attributes=status_attr)
+        return content_div( Div( CodeBlock(str(t.result), classes=[lang_class])
+                               , classes=["doctestResult"] ) )
     if t.status is TestStatus.PENDING:
-        return [ input_code ]
+        return content_div()
     if t.status is TestStatus.UNKNOWN:
-        return [ input_code
-               , CodeBlock( str(t.result), classes=["doctest", "unknown"]
-                          , attributes=status_attr ) ]
+        return content_div( Div( CodeBlock(str(t.result))
+                               , classes=["doctestUnknown"] ) )
     return None
 ```
 
