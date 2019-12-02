@@ -35,6 +35,8 @@ setup(
     author="Johan Hidding",
     author_email="j.hidding@esciencecenter.nl",
     description="Set of Pandoc filters to aid in literate programming",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
     keywords="literate programming",
     url="https://entangled.github.io/",   # project home page, if any
 

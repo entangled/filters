@@ -7,4 +7,5 @@
 htmlcov
 .eggs
 coverage.xml
+dist
 
