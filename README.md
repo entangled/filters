@@ -8,10 +8,12 @@ This contains several Pandoc filters and scripts for literate programming in Mar
 ## Install
 
 ```shell
-pip install .
+pip install entangled-filters
 ```
 
-### Testing
+## For development
+
+To run tests
 
 ```shell
 pip install -e .[test]
@@ -76,3 +78,22 @@ Runs doctests, and include results into output.
 pandoc -t html5 -s --filter pandoc-test hello.md
 ```
 
+## Docker
+
+The Entangled pandoc filters is available as a [Docker image](https://hub.docker.com/repository/docker/nlesc/pandoc-tangle).
+
+### Run
+
+In your current working directory with a README.md file run 
+
+```
+docker run --rm -ti --user $UID -v $PWD:/data nlesc/pandoc-tangle README.md
+```
+
+This will extracts code blocks and writes them to files.
+
+### Build
+
+```shell
+docker build -t nlesc/pandoc-tangle .
+```
