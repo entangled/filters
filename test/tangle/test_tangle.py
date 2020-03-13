@@ -32,3 +32,12 @@ def test_missing(tmp_path):
         run(["pandoc", "-t", "plain", "--filter", "pandoc-tangle", "missing_ref.md"],
             cwd=tmp_path, check=True)
 
+
+def test_makefile(tmp_path):
+    md = tmp_path / "makefile.md"
+    md.write_text("```{.makefile file=Makefile}\nall:\n\techo 1\n```\n")
+    run(["pandoc", "-t", "plain", "--filter", "pandoc-tangle", "makefile.md"],
+        cwd=str(tmp_path), check=True)
+    result = tmp_path / "Makefile"
+    expected = "all:\n\techo 1\n"
+    assert repr(result.read_text()) == repr(expected)
