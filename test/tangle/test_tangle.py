@@ -36,8 +36,8 @@ def test_missing(tmp_path):
 def test_makefile(tmp_path):
     md = tmp_path / "makefile.md"
     md.write_text("```{.makefile file=Makefile}\nall:\n\techo 1\n```\n")
-    run(["pandoc", "-t", "plain", "--filter", "pandoc-tangle", "makefile.md"],
+    run(["pandoc", "--preserve-tabs", "-t", "plain", "--filter", "pandoc-tangle", "makefile.md"],
         cwd=str(tmp_path), check=True)
     result = tmp_path / "Makefile"
-    expected = "all:\n\techo 1\n"
+    expected = "all:\n\techo 1"
     assert repr(result.read_text()) == repr(expected)
