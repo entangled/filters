@@ -84,9 +84,9 @@ The Entangled pandoc filters is available as a [Docker image](https://hub.docker
 
 ### Run
 
-In your current working directory with a README.md file run 
+In your current working directory with a README.md file run.
 
-```
+```shell
 docker run --rm -ti --user $UID -v $PWD:/data nlesc/pandoc-tangle README.md
 ```
 
