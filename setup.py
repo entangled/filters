@@ -69,8 +69,10 @@ setup(
         'console_scripts': [
               'pandoc-tangle=entangled.tangle:main'
             , 'pandoc-test=entangled.doctest_main:main'
+            , 'pandoc-bootstrap=entangled.bootstrap:main'
         ]
-    }
+    },
+    include_package_data=True
     # could also include long_description, download_url, etc.
 )
 

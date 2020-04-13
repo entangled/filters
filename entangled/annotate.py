@@ -1,4 +1,4 @@
-## ------ language="Python" file="entangled/annotate.py"
+## ------ language="Python" file="entangled/annotate.py" project://lit/entangled-python.md#272
 from collections import defaultdict
 from .tangle import get_name
 from panflute import (Span, Str, Para, CodeBlock, Div, Emph)

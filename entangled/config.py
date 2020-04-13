@@ -1,4 +1,4 @@
-## ------ language="Python" file="entangled/config.py"
+## ------ language="Python" file="entangled/config.py" project://lit/entangled-python.md#64
 from .typing import (JSONType)
 import subprocess
 import json

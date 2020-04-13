@@ -1,4 +1,4 @@
-## ------ language="Python" file="entangled/doctest_main.py"
+## ------ language="Python" file="entangled/doctest_main.py" project://lit/entangled-python.md#583
 import panflute
 
 from . import tangle
@@ -9,7 +9,7 @@ from .config import read_config
 
 
 def main() -> None:
-    ## ------ begin <<load-document>>[0]
+    ## ------ begin <<load-document>>[0] project://lit/entangled-python.md#613
     import io
     import sys
     

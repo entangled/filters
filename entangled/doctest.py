@@ -1,4 +1,4 @@
-## ------ language="Python" file="entangled/doctest.py"
+## ------ language="Python" file="entangled/doctest.py" project://lit/entangled-python.md#297
 from panflute import (Doc, Element, CodeBlock)
 from .typing import (ActionReturn, JSONType, CodeMap)
 from .tangle import (get_name, expand_code_block)
@@ -7,7 +7,7 @@ from collections import defaultdict
 
 import sys
 
-## ------ begin <<doctest-suite>>[0]
+## ------ begin <<doctest-suite>>[0] project://lit/entangled-python.md#367
 from dataclasses import dataclass
 from typing import (Optional, List, Dict)
 from enum import Enum
@@ -19,7 +19,7 @@ class TestStatus(Enum):
     ERROR = 3
     UNKNOWN = 4
 ## ------ end
-## ------ begin <<doctest-suite>>[1]
+## ------ begin <<doctest-suite>>[1] project://lit/entangled-python.md#380
 @dataclass
 class Test:
     __test__ = False    # not a pytest class
@@ -29,13 +29,13 @@ class Test:
     error: Optional[str] = None
     status: TestStatus = TestStatus.PENDING
 ## ------ end
-## ------ begin <<doctest-suite>>[2]
+## ------ begin <<doctest-suite>>[2] project://lit/entangled-python.md#393
 @dataclass
 class Suite:
     code_blocks: List[Test]
     language: str
 ## ------ end
-## ------ begin <<get-doc-tests>>[0]
+## ------ begin <<get-doc-tests>>[0] project://lit/entangled-python.md#333
 def get_language(c: CodeBlock) -> str:
     if not c.classes:
         raise ValueError(f"Code block `{c.name}` has no language specified.")
@@ -55,24 +55,25 @@ def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
 
     result = {}
     for k, v in code_map.items():
-        if any("doctest" in c.classes for c in v):
+        if any("doctest" in c.classes or "eval" in c.classes for c in v):
             result[k] = Suite(
                 code_blocks=[convert_code_block(c) for c in v],
                 language=get_language(v[0]))
 
     return result
 ## ------ end
-## ------ begin <<doctest-report>>[0]
+## ------ begin <<doctest-report>>[0] project://lit/entangled-python.md#553
 from panflute import Div
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
     lang_class = elem.classes[0]
 
-    ## ------ begin <<doctest-content-div>>[0]
+    ## ------ begin <<doctest-content-div>>[0] project://lit/entangled-python.md#541
     def content_div(*output):
         status_attr = {"status": t.status.name}
+        code = elem.text.split("\n---\n")
         input_code = Div(CodeBlock(
-            t.code, identifier=elem.identifier,
+            code[0], identifier=elem.identifier,
             classes=elem.classes), classes=["doctestInput"])
         return Div(input_code, *output, classes=["doctest"], attributes=status_attr)
     ## ------ end
@@ -94,12 +95,12 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
                                , classes=["doctestUnknown"] ) )
     return None
 ## ------ end
-## ------ begin <<doctest-run-suite>>[0]
+## ------ begin <<doctest-run-suite>>[0] project://lit/entangled-python.md#404
 import jupyter_client
 import queue
 
 def run_suite(config: JSONType, s: Suite) -> None:
-    ## ------ begin <<jupyter-get-kernel-name>>[0]
+    ## ------ begin <<jupyter-get-kernel-name>>[0] project://lit/entangled-python.md#424
     info = get_language_info(config, s.language)
     kernel_name = info["jupyter"] if "jupyter" in info else None
     if not kernel_name:
@@ -110,7 +111,7 @@ def run_suite(config: JSONType, s: Suite) -> None:
     ## ------ end
     with jupyter_client.run_kernel(kernel_name=kernel_name) as kc:
         print(f"Kernel `{kernel_name}` running ...", file=sys.stderr)
-        ## ------ begin <<jupyter-eval-test>>[0]
+        ## ------ begin <<jupyter-eval-test>>[0] project://lit/entangled-python.md#436
         def jupyter_eval(test: Test):
             msg_id = kc.execute(test.code)
             while True:
@@ -124,10 +125,10 @@ def run_suite(config: JSONType, s: Suite) -> None:
                     test.status = TestStatus.ERROR
                     return
         ## ------ end
-        ## ------ begin <<jupyter-eval-test>>[1]
+        ## ------ begin <<jupyter-eval-test>>[1] project://lit/entangled-python.md#453
         def handle(test, msg_id, msg):
             from pampy import match, _
-            ## ------ begin <<jupyter-handlers>>[0]
+            ## ------ begin <<jupyter-handlers>>[0] project://lit/entangled-python.md#473
             def execute_result_text(data):
                 test.result = data
                 if (test.expect is None) or test.result.strip() == test.expect.strip():
@@ -136,7 +137,7 @@ def run_suite(config: JSONType, s: Suite) -> None:
                     test.status = TestStatus.FAIL
                 return True
             ## ------ end
-            ## ------ begin <<jupyter-handlers>>[1]
+            ## ------ begin <<jupyter-handlers>>[1] project://lit/entangled-python.md#494
             def status_idle(_):
                 if test.expect is None:
                     test.status = TestStatus.SUCCESS
@@ -144,32 +145,32 @@ def run_suite(config: JSONType, s: Suite) -> None:
                     test.status = TestStatus.FAIL
                 return True
             ## ------ end
-            ## ------ begin <<jupyter-handlers>>[2]
+            ## ------ begin <<jupyter-handlers>>[2] project://lit/entangled-python.md#513
             def error_traceback(tb):
                 test.error = "\n".join(msg["content"]["traceback"])
                 test.status = TestStatus.ERROR 
                 return True
             ## ------ end
             return match(msg
-                ## ------ begin <<jupyter-match>>[0]
+                ## ------ begin <<jupyter-match>>[0] project://lit/entangled-python.md#466
                 , { "msg_type": "execute_result"
                   , "parent_header": { "msg_id" : msg_id }
                   , "content": { "data" : { "text/plain": _ } } }
                 , execute_result_text
                 ## ------ end
-                ## ------ begin <<jupyter-match>>[1]
+                ## ------ begin <<jupyter-match>>[1] project://lit/entangled-python.md#487
                 , { "msg_type": "status"
                   , "parent_header": { "msg_id" : msg_id }
                   , "content": { "execution_state": "idle" } }
                 , status_idle
                 ## ------ end
-                ## ------ begin <<jupyter-match>>[2]
+                ## ------ begin <<jupyter-match>>[2] project://lit/entangled-python.md#506
                 , { "msg_type": "error"
                   , "parent_header": { "msg_id" : msg_id }
                   , "content": { "traceback": _ } }
                 , error_traceback
                 ## ------ end
-                ## ------ begin <<jupyter-match>>[3]
+                ## ------ begin <<jupyter-match>>[3] project://lit/entangled-python.md#523
                 , _
                 , lambda x: False
                 ## ------ end
@@ -193,10 +194,11 @@ def prepare(doc: Doc) -> None:
 def action(elem: Element, doc: Doc) -> ActionReturn:
     if isinstance(elem, CodeBlock):
         name = get_name(elem)
-        if "doctest" in elem.classes:
-            suite = doc.suites[name].code_blocks[doc.code_counter[name]]
+        if "doctest" in elem.classes or "eval" in elem.classes:
+            test = doc.suites[name].code_blocks[doc.code_counter[name]]
             doc.code_counter[name] += 1
-            return generate_report(elem, suite)
+            return generate_report(elem, test)
+            
         doc.code_counter[name] += 1
     return None
 ## ------ end

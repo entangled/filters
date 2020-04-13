@@ -1,4 +1,4 @@
-## ------ language="Python" file="entangled/typing.py"
+## ------ language="Python" file="entangled/typing.py" project://lit/entangled-python.md#102
 from typing import (Union, List, Dict, Callable, Any)
 from panflute import (Element, Doc, CodeBlock)
 

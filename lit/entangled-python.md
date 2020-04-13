@@ -318,10 +318,11 @@ def prepare(doc: Doc) -> None:
 def action(elem: Element, doc: Doc) -> ActionReturn:
     if isinstance(elem, CodeBlock):
         name = get_name(elem)
-        if "doctest" in elem.classes:
-            suite = doc.suites[name].code_blocks[doc.code_counter[name]]
+        if "doctest" in elem.classes or "eval" in elem.classes:
+            test = doc.suites[name].code_blocks[doc.code_counter[name]]
             doc.code_counter[name] += 1
-            return generate_report(elem, suite)
+            return generate_report(elem, test)
+            
         doc.code_counter[name] += 1
     return None
 ```
@@ -348,7 +349,7 @@ def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
 
     result = {}
     for k, v in code_map.items():
-        if any("doctest" in c.classes for c in v):
+        if any("doctest" in c.classes or "eval" in c.classes for c in v):
             result[k] = Suite(
                 code_blocks=[convert_code_block(c) for c in v],
                 language=get_language(v[0]))
@@ -539,8 +540,9 @@ To create the outer `div` we have a helper function.
 ``` {.python #doctest-content-div}
 def content_div(*output):
     status_attr = {"status": t.status.name}
+    code = elem.text.split("\n---\n")
     input_code = Div(CodeBlock(
-        t.code, identifier=elem.identifier,
+        code[0], identifier=elem.identifier,
         classes=elem.classes), classes=["doctestInput"])
     return Div(input_code, *output, classes=["doctest"], attributes=status_attr)
 ```
@@ -616,3 +618,119 @@ json_stream = io.StringIO(json_input)
 doc = panflute.load(json_stream)
 ```
 
+# Bootstrap
+
+The `pandoc-bootstrap` filter enables content generation for Bootstrap 4. This has the following features:
+
+- Generate a *card deck* from a Yaml description in a code block.
+- Create collapsible code cells to hide boilerplate or othewise boring code.
+
+## Card deck
+
+``` {.dhall file=entangled/schema/Card.dhall}
+let Link =
+    { href : Text
+    , content : Text
+    }
+
+in let Card =
+    { Type =
+        { image : Optional Text
+        , title : Text
+        , text : Text
+        , link : Optional Link }
+    , default =
+        { image = None Text
+        , link = None Link }
+    }
+
+in Card
+```
+
+``` {.dhall file=test/card-deck-example.dhall}
+let Card = ./schema/Card.dhall
+
+in [ Card :: { title = "Literate Programming"
+             , text =
+                 ''
+                 Write prose and code intermixed. Not just some choice snippets: **all code is included!**
+                 This document is a rendering of a completely **self-contained Markdown** file.
+                 ''
+             , link = Some { href = "http://entangled.github.io/"
+                           , content = "About Entangled" } } ]
+```
+
+Should generate something like:
+
+``` {.html}
+<div class="container-fluid"><div class="row">
+    <div class="col"><div class="card h-100">
+    <div class="card-body">
+    <h3 class="card-title">Literate Programming</h3>
+    <p class="card-text">Write prose and code intermixed. Not just some choice snippets: **all code is included!**
+    This document is a rendering of a completely **self-contained Markdown** file.</p>
+    </div>
+    <a href="https://entangled.github.io/" class="btn btn-primary mt-auto mx-4">About Entangled</a>
+    </div></div>
+...
+</div></div>
+```
+
+``` {.python file=entangled/bootstrap.py}
+from panflute import (Element, Doc, Plain, CodeBlock, Div, Para, Str, Image, Header, Link, convert_text, run_filter)
+from typing import (Optional, Any)
+from pathlib import (Path)
+
+import subprocess
+import pkg_resources
+import json
+import sys
+
+from .typing import (JSONType)
+
+data_path = Path(pkg_resources.resource_filename(__name__, "."))
+
+def parse_dhall(content: str, cwd: Optional[Path] = None) -> JSONType:
+    """Takes Dhall content and parses it to JSON compatible data."""
+    cwd = cwd or Path(".")
+    result = subprocess.run(
+        ["dhall-to-json"], cwd=cwd,
+        input=content, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE, encoding="utf-8", check=True)
+    return json.loads(result.stdout)
+
+<<bootstrap-action>>
+
+def main(doc: Optional[Doc] = None) -> None:
+    run_filter(bootstrap_card_deck, doc=doc)
+```
+
+``` {.python #bootstrap-action}
+def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
+    def outer_container(*elements: Element):
+        return Div(Div(*elements, classes=["row"]), classes=["container-fluid"])
+
+    def card(card_data: JSONType) -> Element:
+        assert "title" in card_data and "text" in card_data
+        title = card_data["title"]
+        text = convert_text(card_data["text"])
+
+        content = []
+        if "image" in card_data:
+            content.append(Image(url=card_data["image"], title=title, classes=["card-image"]))
+        content.append(Header(Str(title), level=3, classes=["card-title"]))
+        content.append(Div(*text, classes=["card-text"]))
+
+        content = [Div(*content, classes=["card-body"])]
+
+        if "link" in card_data:
+            content.append(Plain(Link(Str(card_data["link"]["content"]),
+                                url=card_data["link"]["href"],
+                                classes=["btn", "btn-primary", "mt-auto", "mx-4"])))
+        content = Div(Div(*content, classes=["card", "h-100"]), classes=["col"])
+        return content
+
+    if isinstance(elem, CodeBlock) and "bootstrap-card-deck" in elem.classes:
+        content = map(card, parse_dhall(elem.text, cwd=data_path))
+        return outer_container(*content)
+```
