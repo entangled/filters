@@ -1,9 +1,4 @@
----
-title: Testing Bootstrap Functionality
-author: Johan Hidding
----
-
-``` {.dhall .bootstrap-card-deck}
+card_deck_sample = """
 let Card = ./schema/Card.dhall
 
 in [ Card :: { title = "Literate Programming"
@@ -25,5 +20,24 @@ in [ Card :: { title = "Literate Programming"
              , link = Some { href = "https://dhall-lang.org/"
                            , content = "About Dhall" } }
    ]
-```
+"""
 
+
+def test_dhall_parser():
+    from entangled.bootstrap import parse_dhall, data_path
+    x = parse_dhall(card_deck_sample, cwd=data_path)
+    assert isinstance(x, list)
+    assert all(isinstance(i, dict) for i in x)
+    assert x[0]["title"] == "Literate Programming"
+    assert x[1]["link"]["href"] == "https://dhall-lang.org/"
+
+
+def test_bootstrap_filter(tmp_path):
+    from subprocess import run
+    from shutil import copyfile
+    from pathlib import Path
+
+    res = Path.resolve(Path(__file__)).parent
+    copyfile(res / "some_blog.md", tmp_path / "some_blog.md")
+    run(["pandoc", "-t", "html5", "--filter", "pandoc-bootstrap",
+         "./some_blog.md"], cwd=tmp_path, check=True)

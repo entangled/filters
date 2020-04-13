@@ -717,7 +717,7 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
 
         content = []
         if "image" in card_data:
-            content.append(Image(url=card_data["image"], title=title, classes=["card-image"]))
+            content.append(Plain(Image(url=card_data["image"], title=title, classes=["card-image"])))
         content.append(Header(Str(title), level=3, classes=["card-title"]))
         content.append(Div(*text, classes=["card-text"]))
 
