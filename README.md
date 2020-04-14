@@ -5,6 +5,20 @@
 
 This contains several Pandoc filters and scripts for literate programming in Markdown. These filters are enough to get you going with literate programming.
 
+## The filters
+
+### `pandoc-test`
+
+Runs doc-tests by passing the content of code blocks through Jupyter.
+
+### `pandoc-tangle`
+
+Generate source files from the content of code blocks.
+
+### `pandoc-bootstrap`
+
+Expand some elements specifically targeting a Bootstrap page.
+
 ## Install
 
 ```shell

@@ -68,8 +68,9 @@ setup(
     entry_points = {
         'console_scripts': [
               'pandoc-tangle=entangled.tangle:main'
-            , 'pandoc-test=entangled.doctest_main:main'
+            , 'pandoc-doctest=entangled.doctest_main:main'
             , 'pandoc-bootstrap=entangled.bootstrap:main'
+            , 'pandoc-annotate-codeblocks=entangled.annotate:main'
         ]
     },
     include_package_data=True

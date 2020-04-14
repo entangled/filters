@@ -45,6 +45,12 @@ def run_doctest(doc):
     count_status_prepare(doc)
     doc = doc.walk(count_status_action)
 
+def test_annotate(tmp_path):
+    res = Path.resolve(Path(__file__)).parent
+    copyfile(res / "doctest-python.md", tmp_path / "doctest-python.md")
+    run(["pandoc", "-t", "plain", "--filter", "pandoc-annotate-codeblocks", "doctest-python.md"],
+        cwd=tmp_path, check=True)
+
 def test_doctest(tmp_path): 
     res = Path.resolve(Path(__file__)).parent
     copyfile(res / "doctest-python.md", tmp_path / "doctest-python.md")
@@ -65,7 +71,7 @@ def test_doctest_json(tmp_path):
     copyfile("entangled.json", tmp_path / "entangled.json")
     run(["pandoc", "-t", "plain", "--filter", "pandoc-tangle", "doctest-python.md"],
         cwd=tmp_path, check=True)
-    run(["pandoc", "-t", "plain", "--filter", "pandoc-test", "doctest-python.md"],
+    run(["pandoc", "-t", "plain", "--filter", "pandoc-doctest", "doctest-python.md"],
         cwd=tmp_path, check=True)
 
 def test_doctest_main(tmp_path):
@@ -75,7 +81,7 @@ def test_doctest_main(tmp_path):
     copyfile("entangled.json", tmp_path / "entangled.json")
     run(["pandoc", "-t", "plain", "--filter", "pandoc-tangle", "doctest-python.md"],
         cwd=tmp_path, check=True)
-    run(["pandoc", "-t", "plain", "--filter", "pandoc-test", "doctest-python.md"],
+    run(["pandoc", "-t", "plain", "--filter", "pandoc-doctest", "doctest-python.md"],
         cwd=tmp_path, check=True)
 
 def test_doctest_no_lang(tmp_path):
