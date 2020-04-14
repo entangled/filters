@@ -22,6 +22,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        wget https://github.com/dhall-lang/dhall-haskell/releases/download/1.31.1/dhall-json-1.6.3-x86_64-linux.tar.bz2
+        tar xvf dhall-json-1.6.3-x86_64-linux.tar.bz2 -C /usr
         python -m pip install --upgrade pip
         pip install -e .[test]
     - name: Lint with Flake8
