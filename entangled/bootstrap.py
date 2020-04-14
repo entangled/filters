@@ -1,12 +1,12 @@
 ## ------ language="Python" file="entangled/bootstrap.py" project://lit/entangled-python.md#680
-from panflute import (Element, Doc, Plain, CodeBlock, Div, Para, Str, Image, Header, Link, convert_text, run_filter)
-from typing import (Optional, Any)
+from panflute import (Element, Doc, Plain, CodeBlock, Div, Str, Image, Header,
+                      Link, convert_text, run_filter)
+from typing import (Optional)
 from pathlib import (Path)
 
 import subprocess
 import pkg_resources
 import json
-import sys
 
 from .typing import (JSONType)
 
@@ -49,6 +49,8 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
     if isinstance(elem, CodeBlock) and "bootstrap-card-deck" in elem.classes:
         content = map(card, parse_dhall(elem.text, cwd=data_path))
         return outer_container(*content)
+
+    return None
 ## ------ end
 
 def main(doc: Optional[Doc] = None) -> None:
