@@ -27,3 +27,12 @@ in [ Card :: { title = "Literate Programming"
    ]
 ```
 
+
+``` {.python .bootstrap-fold #folded}
+"This code ends up being folded away under a button."
+```
+
+``` {.python #not-folded}
+"While this code is just annotated as normal."
+```
+

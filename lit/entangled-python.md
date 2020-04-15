@@ -14,7 +14,7 @@ This module also acts as a test-bed and environment for rapid prototyping of fea
 - `doctest`, run documentation tests through Jupyter.
 
 ``` {.python file=entangled/__init__.py}
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 ```
 
 # Config
@@ -271,7 +271,8 @@ def finalize(doc: Doc) -> None:
 ``` {.python file=entangled/annotate.py}
 from collections import defaultdict
 from .tangle import get_name
-from panflute import (Span, Str, Para, CodeBlock, Div, Emph)
+from panflute import (Span, Str, Para, CodeBlock, Div, Emph, Doc, run_filter)
+from typing import (Optional)
 
 def prepare(doc):
     doc.code_count = defaultdict(lambda: 0)
@@ -287,6 +288,9 @@ def action(elem, doc):
         else:
             label = Span(Emph(Str(f"«{name}»+")))
         return Div(Para(label), elem, classes=["annotated-code"])
+
+def main(doc: Optional[Doc] = None) -> None:
+    return run_filter(action, prepare=prepare)
 ```
 
 # Doctesting
@@ -677,16 +681,19 @@ Should generate something like:
 ```
 
 ``` {.python file=entangled/bootstrap.py}
-from panflute import (Element, Doc, Plain, CodeBlock, Div, Para, Str, Image, Header, Link, convert_text, run_filter)
-from typing import (Optional, Any)
+from panflute import (Element, Doc, Plain, CodeBlock, Div, Str, Image, Header,
+                      Link, convert_text, run_filters, RawBlock)
+from typing import (Optional)
 from pathlib import (Path)
 
 import subprocess
 import pkg_resources
 import json
-import sys
 
 from .typing import (JSONType)
+from .tangle import get_name
+from .annotate import action as annotate_action
+from .annotate import prepare
 
 data_path = Path(pkg_resources.resource_filename(__name__, "."))
 
@@ -699,13 +706,14 @@ def parse_dhall(content: str, cwd: Optional[Path] = None) -> JSONType:
         stderr=subprocess.PIPE, encoding="utf-8", check=True)
     return json.loads(result.stdout)
 
-<<bootstrap-action>>
+<<bootstrap-card-deck>>
+<<bootstrap-fold-code-block>>
 
 def main(doc: Optional[Doc] = None) -> None:
-    run_filter(bootstrap_card_deck, doc=doc)
+    run_filters([bootstrap_card_deck, bootstrap_fold_code], prepare=prepare, doc=doc)
 ```
 
-``` {.python #bootstrap-action}
+``` {.python #bootstrap-card-deck}
 def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
     def outer_container(*elements: Element):
         return Div(Div(*elements, classes=["row"]), classes=["container-fluid"])
@@ -733,4 +741,38 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
     if isinstance(elem, CodeBlock) and "bootstrap-card-deck" in elem.classes:
         content = map(card, parse_dhall(elem.text, cwd=data_path))
         return outer_container(*content)
+
+    return None
 ```
+
+## Foldable code blocks
+
+``` {.python #bootstrap-fold-code-block}
+def fix_name(name: str) -> str:
+    return name.replace(".", "-dot-").replace("/", "-slash-")
+
+
+def bootstrap_fold_code(elem: Element, doc: Doc) -> Optional[Element]:
+    if isinstance(elem, CodeBlock):
+        name = get_name(elem)
+        if "bootstrap-fold" in elem.classes and name is not None:
+            fixed_name = fix_name(name)
+            button_attrs = {
+                "class": "btn btn-primary",
+                "type": "button",
+                "data-toggle": "collapse",
+                "data-target": "#" + fixed_name + "-container",
+                "aria-controls": fixed_name + "-container"
+            }
+            attr_str = " ".join(f"{k}=\"{v}\"" for k, v in button_attrs.items())
+            button = RawBlock(f"<button {attr_str}>&lt;&lt;{name}&gt;&gt;=</button>")
+            elem.classes.append("overflow-auto")
+            elem.attributes["style"] = "max-height: 50vh"
+            return Div(button, Div(elem, classes=["collapse"], identifier=fixed_name + "-container"))
+
+        else:
+            return annotate_action(elem, doc)
+
+    return None
+```
+

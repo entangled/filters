@@ -1,6 +1,6 @@
-## ------ language="Python" file="entangled/bootstrap.py" project://lit/entangled-python.md#680
+## ------ language="Python" file="entangled/bootstrap.py" project://lit/entangled-python.md#684
 from panflute import (Element, Doc, Plain, CodeBlock, Div, Str, Image, Header,
-                      Link, convert_text, run_filter)
+                      Link, convert_text, run_filters, RawBlock)
 from typing import (Optional)
 from pathlib import (Path)
 
@@ -9,6 +9,9 @@ import pkg_resources
 import json
 
 from .typing import (JSONType)
+from .tangle import get_name
+from .annotate import action as annotate_action
+from .annotate import prepare
 
 data_path = Path(pkg_resources.resource_filename(__name__, "."))
 
@@ -21,7 +24,7 @@ def parse_dhall(content: str, cwd: Optional[Path] = None) -> JSONType:
         stderr=subprocess.PIPE, encoding="utf-8", check=True)
     return json.loads(result.stdout)
 
-## ------ begin <<bootstrap-action>>[0] project://lit/entangled-python.md#709
+## ------ begin <<bootstrap-card-deck>>[0] project://lit/entangled-python.md#716
 def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
     def outer_container(*elements: Element):
         return Div(Div(*elements, classes=["row"]), classes=["container-fluid"])
@@ -52,7 +55,35 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
 
     return None
 ## ------ end
+## ------ begin <<bootstrap-fold-code-block>>[0] project://lit/entangled-python.md#750
+def fix_name(name: str) -> str:
+    return name.replace(".", "-dot-").replace("/", "-slash-")
+
+
+def bootstrap_fold_code(elem: Element, doc: Doc) -> Optional[Element]:
+    if isinstance(elem, CodeBlock):
+        name = get_name(elem)
+        if "bootstrap-fold" in elem.classes and name is not None:
+            fixed_name = fix_name(name)
+            button_attrs = {
+                "class": "btn btn-primary",
+                "type": "button",
+                "data-toggle": "collapse",
+                "data-target": "#" + fixed_name + "-container",
+                "aria-controls": fixed_name + "-container"
+            }
+            attr_str = " ".join(f"{k}=\"{v}\"" for k, v in button_attrs.items())
+            button = RawBlock(f"<button {attr_str}>&lt;&lt;{name}&gt;&gt;=</button>")
+            elem.classes.append("overflow-auto")
+            elem.attributes["style"] = "max-height: 50vh"
+            return Div(button, Div(elem, classes=["collapse"], identifier=fixed_name + "-container"))
+
+        else:
+            return annotate_action(elem, doc)
+
+    return None
+## ------ end
 
 def main(doc: Optional[Doc] = None) -> None:
-    run_filter(bootstrap_card_deck, doc=doc)
+    run_filters([bootstrap_card_deck, bootstrap_fold_code], prepare=prepare, doc=doc)
 ## ------ end
