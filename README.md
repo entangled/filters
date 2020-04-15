@@ -5,16 +5,12 @@
 
 This contains several Pandoc filters and scripts for literate programming in Markdown. These filters are enough to get you going with literate programming using Pandoc.
 
--------------------------------------------------------------------------------
-Filter                       Function
----------------------------- --------------------------------------------------
-`pandoc-annotate-codeblocks` Adds annotation to code blocks in the woven output. 
-`pandoc-doctest`             Runs doc-tests by passing the content of code
-                             blocks through Jupyter.
-`pandoc-tangle`              Generate source files from the content of code blocks.
-`pandoc-bootstrap`           Expand some elements specifically targeting a
-                             Bootstrap page.
--------------------------------------------------------------------------------
+| Filter                     | Function                                         |
+|----------------------------|--------------------------------------------------|
+|`pandoc-annotate-codeblocks`| Adds annotation to code blocks in the woven output. |
+|`pandoc-doctest`            | Runs doc-tests by passing the content of code blocks through Jupyter. |
+|`pandoc-tangle`             | Generate source files from the content of code blocks. |
+|`pandoc-bootstrap`          | Expand some elements specifically targeting a Bootstrap page. |
 
 ## Install
 
