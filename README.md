@@ -85,13 +85,32 @@ Extracts code blocks and writes them to files.
 pandoc -t plain --filter pandoc-tangle hello.md
 ```
 
+## `pandoc-annotate-codeblocks`
+
+Annotates code blocks in generated HTML or PDF output with name tags.
+
+```shell
+pandoc -t html5 -s --filter pandoc-anotate-codeblocks hello.md
+```
+
 ## `pandoc-doctest`
 
-Runs doctests, and include results into output.
+Runs doctests, and include results into output. Also annotates the code blocks (so no need
+to run `pandoc-annotate-codeblocks`).
 
 ```shell
 pandoc -t html5 -s --filter pandoc-doctest hello.md
 ```
+
+## `pandoc-bootstrap`
+
+Also annotates code blocks, and has two features:
+
+- Expand a Dhall specification into a card deck for Bootstrap, that is a flex-box with a single row and several columns of cards. This is nice to have at the top of a page to draw attention to some key points. 
+
+- Collapsible/foldable code blocks. Add a `.bootstrap-fold` class to a code block to have the code block hidden behind a button. This is nice for some larger uninteresting code.
+
+This filter should be used together with a Bootstrap template for Pandoc. An example of its use can be seen here: [Chaotic Pendulum](https://jhidding.github.io/chaotic-pendulum), with the source code at [gh:jhidding/chaotic-pendulum](https://github.com/jhidding/chaotic-pendulum).
 
 ## Docker
 
