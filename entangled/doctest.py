@@ -49,7 +49,7 @@ def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
             s = code.split("\n---\n")
             if len(s) != 2:
                 raise ValueError(f"Doc test `{name}` should have single `---` line.")
-            return Test(*s)
+            return Test(s[0], s[1])
         else:
             return Test(code, None)
 

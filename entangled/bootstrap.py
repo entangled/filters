@@ -1,6 +1,6 @@
 ## ------ language="Python" file="entangled/bootstrap.py" project://lit/entangled-python.md#684
 from panflute import (Element, Doc, Plain, CodeBlock, Div, Str, Image, Header,
-                      Link, convert_text, run_filters, RawBlock)
+                      Link, convert_text, run_filters, RawBlock, Space, LineBreak, MetaInlines)
 from typing import (Optional)
 from pathlib import (Path)
 
@@ -10,8 +10,7 @@ import json
 
 from .typing import (JSONType)
 from .tangle import get_name
-from .annotate import action as annotate_action
-from .annotate import prepare
+from . import annotate
 
 data_path = Path(pkg_resources.resource_filename(__name__, "."))
 
@@ -24,10 +23,10 @@ def parse_dhall(content: str, cwd: Optional[Path] = None) -> JSONType:
         stderr=subprocess.PIPE, encoding="utf-8", check=True)
     return json.loads(result.stdout)
 
-## ------ begin <<bootstrap-card-deck>>[0] project://lit/entangled-python.md#716
+## ------ begin <<bootstrap-card-deck>>[0] project://lit/entangled-python.md#717
 def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
     def outer_container(*elements: Element):
-        return Div(Div(*elements, classes=["row"]), classes=["container-fluid"])
+        return Div(Div(*elements, classes=["row"]), classes=["container-fluid", "my-4"])
 
     def card(card_data: JSONType) -> Element:
         assert "title" in card_data and "text" in card_data
@@ -36,17 +35,21 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
 
         content = []
         if "image" in card_data:
-            content.append(Plain(Image(url=card_data["image"], title=title, classes=["card-image"])))
-        content.append(Header(Str(title), level=3, classes=["card-title"]))
-        content.append(Div(*text, classes=["card-text"]))
+            content.append(Plain(Image(url=card_data["image"], title=title, classes=["card-img-top"])))
 
-        content = [Div(*content, classes=["card-body"])]
+        body = [
+            Header(Str(title), level=3, classes=["card-title"]),
+            Div(*text, classes=["card-text"])
+        ]
 
         if "link" in card_data:
-            content.append(Plain(Link(Str(card_data["link"]["content"]),
-                                url=card_data["link"]["href"],
-                                classes=["btn", "btn-primary", "mt-auto", "mx-4"])))
-        content = Div(Div(*content, classes=["card", "h-100"]), classes=["col"])
+            body.append(Plain(Link(Str(card_data["link"]["content"]),
+                                   url=card_data["link"]["href"],
+                                   classes=["btn", "btn-secondary", "mt-auto", "mx-4"])))
+
+        content.append(Div(*body, classes=["card-body", "d-flex", "flex-column"]))
+
+        content = Div(Div(*content, classes=["card", "h-100", "rounded-lg"]), classes=["col"])
         return content
 
     if isinstance(elem, CodeBlock) and "bootstrap-card-deck" in elem.classes:
@@ -55,7 +58,7 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
 
     return None
 ## ------ end
-## ------ begin <<bootstrap-fold-code-block>>[0] project://lit/entangled-python.md#750
+## ------ begin <<bootstrap-fold-code-block>>[0] project://lit/entangled-python.md#755
 def fix_name(name: str) -> str:
     return name.replace(".", "-dot-").replace("/", "-slash-")
 
@@ -79,10 +82,31 @@ def bootstrap_fold_code(elem: Element, doc: Doc) -> Optional[Element]:
             return Div(button, Div(elem, classes=["collapse"], identifier=fixed_name + "-container"))
 
         else:
-            return annotate_action(elem, doc)
+            return annotate.action(elem, doc)
 
     return None
 ## ------ end
+
+def prepare(doc: Doc) -> Doc:
+    from datetime import date
+    annotate.prepare(doc)
+
+    if "footer" in doc.metadata:
+        try:
+            old_footer = list(doc.metadata["footer"].content)
+        except AttributeError:
+            old_footer = [Str("")]
+
+        try:
+            version = doc.metadata["version"].content[0]
+        except (AttributeError, KeyError):
+            version = Str("unknown")
+        
+        doc.metadata["footer"] = MetaInlines(
+            Str(str(date.today())), Space, Str("—"), Space,
+            Str("version"), Space, version, LineBreak,
+            *old_footer)
+
 
 def main(doc: Optional[Doc] = None) -> None:
     run_filters([bootstrap_card_deck, bootstrap_fold_code], prepare=prepare, doc=doc)
