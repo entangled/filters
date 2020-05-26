@@ -98,6 +98,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   <a href="#" class="ml-5 mr-auto navbar-brand">Entangled Python module<br><span style="font-size: smaller"> by <i>Johan Hidding</i></span></a>
 <div class="collapse navbar-collapse" id="navbarSupportedContent">
 <ul>
+<li><a href="#readme-entangled-pandoc-filters">Readme – Entangled, Pandoc filters</a></li>
 <li><a href="#config">Config</a></li>
 <li><a href="#panflute">Panflute</a></li>
 <li><a href="#tangle">Tangle</a></li>
@@ -114,6 +115,46 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
  -->
 
 <main role="main" class="flex-fill"><div class="container my-5">
+<div class="container-fluid my-4">
+<div class="card-deck">
+<div class="col">
+<div class="card h-100 rounded-lg">
+<img src="literate.jpg" title="Literate Programming" class="card-img-top" />
+<div class="card-body d-flex flex-column">
+<h3 class="card-title">Literate Programming</h3>
+<div class="card-text">
+<p>Write prose and code intermixed. This works great for scientific software, tutorials, or any other software.</p>
+</div>
+<a href="http://entangled.github.io/" class="btn btn-secondary mt-auto mx-4">About Entangled</a>
+</div>
+</div>
+</div>
+<div class="col">
+<div class="card h-100 rounded-lg">
+<img src="bootstrap.jpg" title="Bootstrap" class="card-img-top" />
+<div class="card-body d-flex flex-column">
+<h3 class="card-title">Bootstrap</h3>
+<div class="card-text">
+<p>Generate pretty Bootstrap websites. Your Markdown is translated to a snappy responsive website.</p>
+</div>
+<a href="https://getbootstrap.com/" class="btn btn-secondary mt-auto mx-4">About Bootstrap</a>
+</div>
+</div>
+</div>
+<div class="col">
+<div class="card h-100 rounded-lg">
+<img src="jupiter.jpg" title="Jupyter" class="card-img-top" />
+<div class="card-body d-flex flex-column">
+<h3 class="card-title">Jupyter</h3>
+<div class="card-text">
+<p>Use Jupyter to evaluate code snippets on the fly. Great for writing documentation.</p>
+</div>
+<a href="https://jupyter.org/" class="btn btn-secondary mt-auto mx-4">About Jupyter</a>
+</div>
+</div>
+</div>
+</div>
+</div>
 <p>This is a set of Pandoc filters for literate programming written in Python. These filters are part of Entangled. They constitute a complete workflow for literate programming on them selves, but it is advised to use them in conjunction with Entangled.</p>
 <p>In particular, while you can tangle source files with the <code>entangled.tangle</code> Python module, it is much more convenient to use the <code>entangled</code> executable, which automatically tangles files upon saving the Markdown files, and more importantly, also does the reverse, keeping your files continuously in sync.</p>
 <p>This module also acts as a test-bed and environment for rapid prototyping of features that may end up in the main (Haskell based part of) Entangled distribution. Currently we have:</p>
@@ -123,44 +164,169 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li><code>doctest</code>, run documentation tests through Jupyter.</li>
 <li><code>bootstrap</code>, expand some elements into Bootstrap widgets.</li>
 </ul>
+<h2 id="version">Version</h2>
 <div class="annotated-code">
 <p><span><em>«entangled/__init__.py»=</em></span></p>
 <div class="sourceCode" id="cb1" data-file="entangled/__init__.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a>__version__ <span class="op">=</span> <span class="st">&quot;0.6.0&quot;</span></span></code></pre></div>
 </div>
+<h2 id="demo">Demo</h2>
+<ul>
+<li><p>This page uses the very same pandoc filters it implements. On the top you see a rendering of a Bootstrap card-deck. This deck is generated from a code block containing the Dhall description of the content.</p></li>
+<li><p>Sometimes, when you write literate code it cannot be avoided that you have to implement some boring stuff that doesn’t warrant a detailed explanation. In this case you can collapse a code block behind a button.</p></li>
+</ul>
+<div class="fold-block">
+<button class="btn btn-outline-primary btn-sm fold-toggle" type="button" data-toggle="collapse" data-target="#compute-pi-container" aria-controls="compute-pi-container">&lt;&lt;compute-pi&gt;&gt;=</button>
+<div id="compute-pi-container" class="collapse">
+<div class="sourceCode" id="compute-pi" style="max-height: 50vh"><pre class="sourceCode python bootstrap-fold overflow-auto"><code class="sourceCode python"><span id="compute-pi-1"><a href="#compute-pi-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="compute-pi-2"><a href="#compute-pi-2"></a></span>
+<span id="compute-pi-3"><a href="#compute-pi-3"></a><span class="kw">def</span> compute_pi(sample_size):</span>
+<span id="compute-pi-4"><a href="#compute-pi-4"></a>    points <span class="op">=</span> np.random.uniform(<span class="dv">0</span>, <span class="dv">1</span>, size<span class="op">=</span>[sample_size, <span class="dv">2</span>])</span>
+<span id="compute-pi-5"><a href="#compute-pi-5"></a>    within_circle <span class="op">=</span> np.count_nonzero((points<span class="op">**</span><span class="dv">2</span>).<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>) <span class="op">&lt;=</span> <span class="fl">1.0</span>)</span>
+<span id="compute-pi-6"><a href="#compute-pi-6"></a>    <span class="cf">return</span> <span class="dv">4</span> <span class="op">*</span> within_circle <span class="op">/</span> sample_size</span></code></pre></div>
+</div>
+</div>
+<ul>
+<li>If you’re documenting a library you may want to have code blocks evaluated inline.</li>
+</ul>
+<div class="annotated-code">
+<p><span><em>«compute-pi»=</em></span></p>
+<div class="doctest" data-status="SUCCESS">
+<div class="doctestInput">
+<div class="sourceCode" id="compute-pi"><pre class="sourceCode python eval"><code class="sourceCode python"><span id="compute-pi-1"><a href="#compute-pi-1"></a><span class="bu">print</span>(<span class="st">&quot;π ≈ </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(compute_pi(<span class="dv">1000000</span>)))</span></code></pre></div>
+</div>
+<div class="doctestResult">
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ <span class="fl">3.141628</span></span></code></pre></div>
+</div>
+</div>
+</div>
+<h1 id="readme-entangled-pandoc-filters">Readme – Entangled, Pandoc filters</h1>
+<p><a href="https://github.com/entangled/filters/actions?query=workflow%3ATests"><img src="https://github.com/entangled/filters/workflows/Tests/badge.svg" alt="Test Badge" /></a> <a href="https://codecov.io/gh/entangled/filters"><img src="https://codecov.io/gh/entangled/filters/branch/master/graph/badge.svg" alt="codecov" /></a></p>
+<p>This contains several Pandoc filters and scripts for literate programming in Markdown. These filters are enough to get you going with literate programming using Pandoc.</p>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 64%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Filter</th>
+<th>Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pandoc-annotate-codeblocks</code></td>
+<td>Adds annotation to code blocks in the woven output.</td>
+</tr>
+<tr class="even">
+<td><code>pandoc-doctest</code></td>
+<td>Runs doc-tests by passing the content of code blocks through Jupyter.</td>
+</tr>
+<tr class="odd">
+<td><code>pandoc-tangle</code></td>
+<td>Generate source files from the content of code blocks.</td>
+</tr>
+<tr class="even">
+<td><code>pandoc-bootstrap</code></td>
+<td>Expand some elements specifically targeting a Bootstrap page.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="install">Install</h2>
+<p>Entangled filters has the following prerequisites:</p>
+<ul>
+<li><strong>Python &gt;=3.7</strong>: All of these filters are written in Python. This is mainly to encourage as many users (<strong>I mean YOU</strong>) to start developing Pandoc filters.</li>
+<li><strong>Dhall</strong>: the <code>pandoc-bootstrap</code> filter requires <code>dhall-to-json</code> to be installed: see <a href="https://dhall-lang.org/">Dhall language</a>. TLDR: download <code>dhall-json-*-[windows|macos|linux].[zip|tar.bz2]</code> from the <a href="https://github.com/dhall-lang/dhall-haskell/releases">Dhall release page</a>, and extract it to a location in your <code>$PATH</code>. Dhall is awesome, it <em>will</em> make your life better.</li>
+</ul>
+<p>Installation is easiest using <code>pip</code>,</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a><span class="ex">pip</span> install entangled-filters</span></code></pre></div>
+<h3 id="for-development">For development</h3>
+<p>To run tests, after doing a normal install (to get the executables installed), run</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">pip</span> install --upgrade -e .[test]</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="ex">pytest</span></span></code></pre></div>
+<p>The executables are auto-generated by the <code>setup.py</code> script and call some <code>python -m</code> command.</p>
+<h2 id="supported-syntax">Supported syntax</h2>
+<p>See the <a href="https://entangled.github.io">project homepage</a> for more info.</p>
+<h3 id="named-code-blocks">Named code blocks</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1"></a><span class="bn">``` {.python #hello}</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="bn">print(&quot;Hello, World!&quot;)</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="bn">```</span></span></code></pre></div>
+<h3 id="reference-code-blocks">Reference code blocks</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1"></a><span class="bn">``` {.python #main}</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="bn">def main():</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="bn">    &lt;&lt;hello&gt;&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="bn">```</span></span></code></pre></div>
+<h3 id="define-files">Define files</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1"></a><span class="bn">``` {.python file=hello.py}</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="bn">&lt;&lt;main&gt;&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="bn">if __name__ == &quot;__main__&quot;:</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="bn">    main()</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="bn">```</span></span></code></pre></div>
+<h3 id="documentation-tests">Documentation tests</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1"></a><span class="bn">``` {.python .doctest #the-question}</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="bn">6*7</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="bn">---</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="bn">42</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="bn">```</span></span></code></pre></div>
+<h2 id="pandoc-tangle"><code>pandoc-tangle</code></h2>
+<p>Extracts code blocks and writes them to files.</p>
+<pre class="shell"><code>pandoc -t plain --filter pandoc-tangle hello.md</code></pre>
+<h2 id="pandoc-annotate-codeblocks"><code>pandoc-annotate-codeblocks</code></h2>
+<p>Annotates code blocks in generated HTML or PDF output with name tags.</p>
+<pre class="shell"><code>pandoc -t html5 -s --filter pandoc-anotate-codeblocks hello.md</code></pre>
+<h2 id="pandoc-doctest"><code>pandoc-doctest</code></h2>
+<p>Runs doctests, and include results into output. Also annotates the code blocks (so no need to run <code>pandoc-annotate-codeblocks</code>).</p>
+<pre class="shell"><code>pandoc -t html5 -s --filter pandoc-doctest hello.md</code></pre>
+<h2 id="pandoc-bootstrap"><code>pandoc-bootstrap</code></h2>
+<p>Also annotates code blocks, and has two features:</p>
+<ul>
+<li><p>Expand a Dhall specification into a card deck for Bootstrap, that is a flex-box with a single row and several columns of cards. This is nice to have at the top of a page to draw attention to some key points.</p></li>
+<li><p>Collapsible/foldable code blocks. Add a <code>.bootstrap-fold</code> class to a code block to have the code block hidden behind a button. This is nice for some larger uninteresting code.</p></li>
+</ul>
+<p>This filter should be used together with a Bootstrap template for Pandoc. An example of its use can be seen here: <a href="https://jhidding.github.io/chaotic-pendulum">Chaotic Pendulum</a>, with the source code at <a href="https://github.com/jhidding/chaotic-pendulum">gh:jhidding/chaotic-pendulum</a>.</p>
+<h2 id="docker">Docker</h2>
+<p>The Entangled pandoc filters is available as a <a href="https://hub.docker.com/repository/docker/nlesc/pandoc-tangle">Docker image</a>.</p>
+<h3 id="run">Run</h3>
+<p>In your current working directory with a README.md file run</p>
+<pre><code>docker run --rm -ti --user $UID -v $PWD:/data nlesc/pandoc-tangle README.md</code></pre>
+<p>This will extracts code blocks and writes them to files.</p>
+<h3 id="build">Build</h3>
+<pre class="shell"><code>docker build -t nlesc/pandoc-tangle .</code></pre>
 <h1 id="config">Config</h1>
 <p>Configuration of the <code>entangled</code> module is done through a file that should sit in the current directory.</p>
 <p>As a configuration format we use <a href="https://dhall-lang.org/"><strong>Dhall</strong></a>, with a fall-back to JSON. The file should be named either <code>entangled.dhall</code> or <code>entangled.json</code>. For the Dhall based configuration to work, you need to have the <code>dhall-to-json</code> executable installed.</p>
 <div class="annotated-code">
 <p><span><em>«entangled/config.py»=</em></span></p>
-<div class="sourceCode" id="cb2" data-file="entangled/config.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">from</span> .typing <span class="im">import</span> (JSONType)</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="im">import</span> subprocess</span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="im">import</span> json</span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="im">import</span> sys</span>
-<span id="cb2-5"><a href="#cb2-5"></a></span>
-<span id="cb2-6"><a href="#cb2-6"></a><span class="kw">def</span> read_config() <span class="op">-&gt;</span> JSONType:</span>
-<span id="cb2-7"><a href="#cb2-7"></a>    <span class="co">&quot;&quot;&quot;Reads config from `entangled.dhall` with fall-back to `entangled.json`.&quot;&quot;&quot;</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a>    <span class="cf">try</span>:</span>
-<span id="cb2-9"><a href="#cb2-9"></a>        result <span class="op">=</span> subprocess.run(</span>
-<span id="cb2-10"><a href="#cb2-10"></a>            [<span class="st">&quot;dhall-to-json&quot;</span>, <span class="st">&quot;--file&quot;</span>, <span class="st">&quot;entangled.dhall&quot;</span>],</span>
-<span id="cb2-11"><a href="#cb2-11"></a>            stdout<span class="op">=</span>subprocess.PIPE, stderr<span class="op">=</span>subprocess.PIPE, encoding<span class="op">=</span><span class="st">&#39;utf-8&#39;</span>, check<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb2-12"><a href="#cb2-12"></a>        <span class="cf">return</span> json.loads(result.stdout)</span>
-<span id="cb2-13"><a href="#cb2-13"></a>    <span class="cf">except</span> subprocess.CalledProcessError <span class="im">as</span> e:</span>
-<span id="cb2-14"><a href="#cb2-14"></a>        <span class="bu">print</span>(<span class="st">&quot;Error reading `entangled.dhall`:</span><span class="ch">\n</span><span class="st">&quot;</span> <span class="op">+</span> e.stderr, <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
-<span id="cb2-15"><a href="#cb2-15"></a>    <span class="cf">except</span> <span class="pp">FileNotFoundError</span>:</span>
-<span id="cb2-16"><a href="#cb2-16"></a>        <span class="bu">print</span>(<span class="st">&quot;Warning: could not find `dhall-to-json`, trying to read JSON instead.&quot;</span>,</span>
-<span id="cb2-17"><a href="#cb2-17"></a>              <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
-<span id="cb2-18"><a href="#cb2-18"></a>    <span class="cf">return</span> json.load(<span class="bu">open</span>(<span class="st">&quot;entangled.json&quot;</span>, <span class="st">&quot;r&quot;</span>))</span>
-<span id="cb2-19"><a href="#cb2-19"></a></span>
-<span id="cb2-20"><a href="#cb2-20"></a><span class="kw">def</span> get_language_info(config: JSONType, identifier: <span class="bu">str</span>) <span class="op">-&gt;</span> JSONType:</span>
-<span id="cb2-21"><a href="#cb2-21"></a>    kernels <span class="op">=</span> { k[<span class="st">&quot;language&quot;</span>]: k[<span class="st">&quot;kernel&quot;</span>] <span class="cf">for</span> k <span class="kw">in</span> config[<span class="st">&quot;jupyter&quot;</span>] }</span>
-<span id="cb2-22"><a href="#cb2-22"></a></span>
-<span id="cb2-23"><a href="#cb2-23"></a>    <span class="cf">try</span>:</span>
-<span id="cb2-24"><a href="#cb2-24"></a>        language <span class="op">=</span> <span class="bu">next</span>(lang <span class="cf">for</span> lang <span class="kw">in</span> config[<span class="st">&quot;entangled&quot;</span>][<span class="st">&quot;languages&quot;</span>]</span>
-<span id="cb2-25"><a href="#cb2-25"></a>                        <span class="cf">if</span> identifier <span class="kw">in</span> lang[<span class="st">&quot;identifiers&quot;</span>])</span>
-<span id="cb2-26"><a href="#cb2-26"></a>    <span class="cf">except</span> <span class="pp">StopIteration</span>:</span>
-<span id="cb2-27"><a href="#cb2-27"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;Language with identifier `</span><span class="sc">{</span>identifier<span class="sc">}</span><span class="ss">` not found in config.&quot;</span>)</span>
-<span id="cb2-28"><a href="#cb2-28"></a></span>
-<span id="cb2-29"><a href="#cb2-29"></a>    <span class="cf">return</span> {<span class="st">&quot;jupyter&quot;</span>: kernels.get(language[<span class="st">&quot;name&quot;</span>]), <span class="op">**</span>language}</span></code></pre></div>
+<div class="sourceCode" id="cb14" data-file="entangled/config.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="im">from</span> .typing <span class="im">import</span> (JSONType)</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="im">import</span> subprocess</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="im">import</span> json</span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="im">import</span> sys</span>
+<span id="cb14-5"><a href="#cb14-5"></a></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="kw">def</span> read_config() <span class="op">-&gt;</span> JSONType:</span>
+<span id="cb14-7"><a href="#cb14-7"></a>    <span class="co">&quot;&quot;&quot;Reads config from `entangled.dhall` with fall-back to `entangled.json`.&quot;&quot;&quot;</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a>    <span class="cf">try</span>:</span>
+<span id="cb14-9"><a href="#cb14-9"></a>        result <span class="op">=</span> subprocess.run(</span>
+<span id="cb14-10"><a href="#cb14-10"></a>            [<span class="st">&quot;dhall-to-json&quot;</span>, <span class="st">&quot;--file&quot;</span>, <span class="st">&quot;entangled.dhall&quot;</span>],</span>
+<span id="cb14-11"><a href="#cb14-11"></a>            stdout<span class="op">=</span>subprocess.PIPE, stderr<span class="op">=</span>subprocess.PIPE, encoding<span class="op">=</span><span class="st">&#39;utf-8&#39;</span>, check<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-12"><a href="#cb14-12"></a>        <span class="cf">return</span> json.loads(result.stdout)</span>
+<span id="cb14-13"><a href="#cb14-13"></a>    <span class="cf">except</span> subprocess.CalledProcessError <span class="im">as</span> e:</span>
+<span id="cb14-14"><a href="#cb14-14"></a>        <span class="bu">print</span>(<span class="st">&quot;Error reading `entangled.dhall`:</span><span class="ch">\n</span><span class="st">&quot;</span> <span class="op">+</span> e.stderr, <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
+<span id="cb14-15"><a href="#cb14-15"></a>    <span class="cf">except</span> <span class="pp">FileNotFoundError</span>:</span>
+<span id="cb14-16"><a href="#cb14-16"></a>        <span class="bu">print</span>(<span class="st">&quot;Warning: could not find `dhall-to-json`, trying to read JSON instead.&quot;</span>,</span>
+<span id="cb14-17"><a href="#cb14-17"></a>              <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
+<span id="cb14-18"><a href="#cb14-18"></a>    <span class="cf">return</span> json.load(<span class="bu">open</span>(<span class="st">&quot;entangled.json&quot;</span>, <span class="st">&quot;r&quot;</span>))</span>
+<span id="cb14-19"><a href="#cb14-19"></a></span>
+<span id="cb14-20"><a href="#cb14-20"></a><span class="kw">def</span> get_language_info(config: JSONType, identifier: <span class="bu">str</span>) <span class="op">-&gt;</span> JSONType:</span>
+<span id="cb14-21"><a href="#cb14-21"></a>    kernels <span class="op">=</span> { k[<span class="st">&quot;language&quot;</span>]: k[<span class="st">&quot;kernel&quot;</span>] <span class="cf">for</span> k <span class="kw">in</span> config[<span class="st">&quot;jupyter&quot;</span>] }</span>
+<span id="cb14-22"><a href="#cb14-22"></a></span>
+<span id="cb14-23"><a href="#cb14-23"></a>    <span class="cf">try</span>:</span>
+<span id="cb14-24"><a href="#cb14-24"></a>        language <span class="op">=</span> <span class="bu">next</span>(lang <span class="cf">for</span> lang <span class="kw">in</span> config[<span class="st">&quot;entangled&quot;</span>][<span class="st">&quot;languages&quot;</span>]</span>
+<span id="cb14-25"><a href="#cb14-25"></a>                        <span class="cf">if</span> identifier <span class="kw">in</span> lang[<span class="st">&quot;identifiers&quot;</span>])</span>
+<span id="cb14-26"><a href="#cb14-26"></a>    <span class="cf">except</span> <span class="pp">StopIteration</span>:</span>
+<span id="cb14-27"><a href="#cb14-27"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f&quot;Language with identifier `</span><span class="sc">{</span>identifier<span class="sc">}</span><span class="ss">` not found in config.&quot;</span>)</span>
+<span id="cb14-28"><a href="#cb14-28"></a></span>
+<span id="cb14-29"><a href="#cb14-29"></a>    <span class="cf">return</span> {<span class="st">&quot;jupyter&quot;</span>: kernels.get(language[<span class="st">&quot;name&quot;</span>]), <span class="op">**</span>language}</span></code></pre></div>
 </div>
 <h1 id="panflute">Panflute</h1>
 <p>Panflute reads JSON from standard input, lets you apply filters to an intermediate object based representation and writes back to JSON. The actual filtering is done by a Panflute <code>Action</code>. The action takes an <code>Element</code> and a <code>Document</code> as argument and can return one of three things:</p>
@@ -172,32 +338,32 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <p>These are some types that we can use for type annotations.</p>
 <div class="annotated-code">
 <p><span><em>«entangled/typing.py»=</em></span></p>
-<div class="sourceCode" id="cb3" data-file="entangled/typing.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">from</span> typing <span class="im">import</span> (Union, List, Dict, Callable, Any)</span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="im">from</span> panflute <span class="im">import</span> (Element, Doc, CodeBlock)</span>
-<span id="cb3-3"><a href="#cb3-3"></a></span>
-<span id="cb3-4"><a href="#cb3-4"></a>ActionReturn <span class="op">=</span> Union[Element, List[Element], <span class="va">None</span>]</span>
-<span id="cb3-5"><a href="#cb3-5"></a>Action <span class="op">=</span> Callable[[Element, Doc], ActionReturn]</span>
-<span id="cb3-6"><a href="#cb3-6"></a>CodeMap <span class="op">=</span> Dict[<span class="bu">str</span>, List[CodeBlock]]</span>
-<span id="cb3-7"><a href="#cb3-7"></a>JSONType <span class="op">=</span> Any</span></code></pre></div>
+<div class="sourceCode" id="cb15" data-file="entangled/typing.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="im">from</span> typing <span class="im">import</span> (Union, List, Dict, Callable, Any)</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="im">from</span> panflute <span class="im">import</span> (Element, Doc, CodeBlock)</span>
+<span id="cb15-3"><a href="#cb15-3"></a></span>
+<span id="cb15-4"><a href="#cb15-4"></a>ActionReturn <span class="op">=</span> Union[Element, List[Element], <span class="va">None</span>]</span>
+<span id="cb15-5"><a href="#cb15-5"></a>Action <span class="op">=</span> Callable[[Element, Doc], ActionReturn]</span>
+<span id="cb15-6"><a href="#cb15-6"></a>CodeMap <span class="op">=</span> Dict[<span class="bu">str</span>, List[CodeBlock]]</span>
+<span id="cb15-7"><a href="#cb15-7"></a>JSONType <span class="op">=</span> Any</span></code></pre></div>
 </div>
 <h1 id="tangle">Tangle</h1>
 <p>The global structure of a filter in <code>panflute</code> runs <code>run_filter</code> from a <code>main</code> function. We’ll keep a global registry of all code-blocks entered. In <code>panflute</code> a global variable is passed on top of the <code>doc</code> parameter that is passed to all involved functions.</p>
 <div class="annotated-code">
 <p><span><em>«entangled/tangle.py»=</em></span></p>
-<div class="sourceCode" id="cb4" data-file="entangled/tangle.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="im">from</span> panflute <span class="im">import</span> (run_filter, Doc, Element, CodeBlock)</span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="im">from</span> typing <span class="im">import</span> (Optional, Dict, Callable)</span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="im">from</span> .typing <span class="im">import</span> (CodeMap)</span>
-<span id="cb4-4"><a href="#cb4-4"></a><span class="im">import</span> sys</span>
-<span id="cb4-5"><a href="#cb4-5"></a></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="op">&lt;&lt;</span>get<span class="op">-</span>code<span class="op">-</span>block<span class="op">&gt;&gt;</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a></span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="op">&lt;&lt;</span>tangle<span class="op">-</span>prepare<span class="op">&gt;&gt;</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="op">&lt;&lt;</span>tangle<span class="op">-</span>action<span class="op">&gt;&gt;</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="op">&lt;&lt;</span>tangle<span class="op">-</span>finalize<span class="op">&gt;&gt;</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a></span>
-<span id="cb4-12"><a href="#cb4-12"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="cb4-13"><a href="#cb4-13"></a>    run_filter(</span>
-<span id="cb4-14"><a href="#cb4-14"></a>        action, prepare<span class="op">=</span>prepare, finalize<span class="op">=</span>finalize, doc<span class="op">=</span>doc)</span></code></pre></div>
+<div class="sourceCode" id="cb16" data-file="entangled/tangle.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a><span class="im">from</span> panflute <span class="im">import</span> (run_filter, Doc, Element, CodeBlock)</span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="im">from</span> typing <span class="im">import</span> (Optional, Dict, Callable)</span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="im">from</span> .typing <span class="im">import</span> (CodeMap)</span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="im">import</span> sys</span>
+<span id="cb16-5"><a href="#cb16-5"></a></span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="op">&lt;&lt;</span>get<span class="op">-</span>code<span class="op">-</span>block<span class="op">&gt;&gt;</span></span>
+<span id="cb16-7"><a href="#cb16-7"></a></span>
+<span id="cb16-8"><a href="#cb16-8"></a><span class="op">&lt;&lt;</span>tangle<span class="op">-</span>prepare<span class="op">&gt;&gt;</span></span>
+<span id="cb16-9"><a href="#cb16-9"></a><span class="op">&lt;&lt;</span>tangle<span class="op">-</span>action<span class="op">&gt;&gt;</span></span>
+<span id="cb16-10"><a href="#cb16-10"></a><span class="op">&lt;&lt;</span>tangle<span class="op">-</span>finalize<span class="op">&gt;&gt;</span></span>
+<span id="cb16-11"><a href="#cb16-11"></a></span>
+<span id="cb16-12"><a href="#cb16-12"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb16-13"><a href="#cb16-13"></a>    run_filter(</span>
+<span id="cb16-14"><a href="#cb16-14"></a>        action, prepare<span class="op">=</span>prepare, finalize<span class="op">=</span>finalize, doc<span class="op">=</span>doc)</span></code></pre></div>
 </div>
 <p>We prepare a global variable <code>doc.codes</code> with a <code>defaultdict</code> for empty lists.</p>
 <div class="annotated-code">
@@ -327,64 +493,64 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <p>This adds the name of a code block to the output.</p>
 <div class="annotated-code">
 <p><span><em>«entangled/annotate.py»=</em></span></p>
-<div class="sourceCode" id="cb5" data-file="entangled/annotate.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="im">from</span> .tangle <span class="im">import</span> get_name</span>
-<span id="cb5-3"><a href="#cb5-3"></a><span class="im">from</span> panflute <span class="im">import</span> (Span, Str, Para, CodeBlock, Div, Emph, Doc, run_filter)</span>
-<span id="cb5-4"><a href="#cb5-4"></a><span class="im">from</span> typing <span class="im">import</span> (Optional)</span>
-<span id="cb5-5"><a href="#cb5-5"></a></span>
-<span id="cb5-6"><a href="#cb5-6"></a><span class="kw">def</span> prepare(doc):</span>
-<span id="cb5-7"><a href="#cb5-7"></a>    doc.code_count <span class="op">=</span> defaultdict(<span class="kw">lambda</span>: <span class="dv">0</span>)</span>
-<span id="cb5-8"><a href="#cb5-8"></a></span>
-<span id="cb5-9"><a href="#cb5-9"></a><span class="kw">def</span> action(elem, doc):</span>
-<span id="cb5-10"><a href="#cb5-10"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(elem, CodeBlock):</span>
-<span id="cb5-11"><a href="#cb5-11"></a>        name <span class="op">=</span> get_name(elem)</span>
-<span id="cb5-12"><a href="#cb5-12"></a>        <span class="cf">if</span> name <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb5-13"><a href="#cb5-13"></a>            <span class="cf">return</span></span>
-<span id="cb5-14"><a href="#cb5-14"></a>        <span class="cf">if</span> doc.code_count[name] <span class="op">==</span> <span class="dv">0</span>:</span>
-<span id="cb5-15"><a href="#cb5-15"></a>            label <span class="op">=</span> Span(Emph(Str(<span class="ss">f&quot;«</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">»=&quot;</span>)))</span>
-<span id="cb5-16"><a href="#cb5-16"></a>            doc.code_count[name] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb5-17"><a href="#cb5-17"></a>        <span class="cf">else</span>:</span>
-<span id="cb5-18"><a href="#cb5-18"></a>            label <span class="op">=</span> Span(Emph(Str(<span class="ss">f&quot;«</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">»+&quot;</span>)))</span>
-<span id="cb5-19"><a href="#cb5-19"></a>        <span class="cf">return</span> Div(Para(label), elem, classes<span class="op">=</span>[<span class="st">&quot;annotated-code&quot;</span>])</span>
-<span id="cb5-20"><a href="#cb5-20"></a></span>
-<span id="cb5-21"><a href="#cb5-21"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="cb5-22"><a href="#cb5-22"></a>    <span class="cf">return</span> run_filter(action, prepare<span class="op">=</span>prepare)</span></code></pre></div>
+<div class="sourceCode" id="cb17" data-file="entangled/annotate.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
+<span id="cb17-2"><a href="#cb17-2"></a><span class="im">from</span> .tangle <span class="im">import</span> get_name</span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="im">from</span> panflute <span class="im">import</span> (Span, Str, Para, CodeBlock, Div, Emph, Doc, run_filter)</span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="im">from</span> typing <span class="im">import</span> (Optional)</span>
+<span id="cb17-5"><a href="#cb17-5"></a></span>
+<span id="cb17-6"><a href="#cb17-6"></a><span class="kw">def</span> prepare(doc):</span>
+<span id="cb17-7"><a href="#cb17-7"></a>    doc.code_count <span class="op">=</span> defaultdict(<span class="kw">lambda</span>: <span class="dv">0</span>)</span>
+<span id="cb17-8"><a href="#cb17-8"></a></span>
+<span id="cb17-9"><a href="#cb17-9"></a><span class="kw">def</span> action(elem, doc):</span>
+<span id="cb17-10"><a href="#cb17-10"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(elem, CodeBlock):</span>
+<span id="cb17-11"><a href="#cb17-11"></a>        name <span class="op">=</span> get_name(elem)</span>
+<span id="cb17-12"><a href="#cb17-12"></a>        <span class="cf">if</span> name <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb17-13"><a href="#cb17-13"></a>            <span class="cf">return</span></span>
+<span id="cb17-14"><a href="#cb17-14"></a>        <span class="cf">if</span> doc.code_count[name] <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb17-15"><a href="#cb17-15"></a>            label <span class="op">=</span> Span(Emph(Str(<span class="ss">f&quot;«</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">»=&quot;</span>)))</span>
+<span id="cb17-16"><a href="#cb17-16"></a>            doc.code_count[name] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb17-17"><a href="#cb17-17"></a>        <span class="cf">else</span>:</span>
+<span id="cb17-18"><a href="#cb17-18"></a>            label <span class="op">=</span> Span(Emph(Str(<span class="ss">f&quot;«</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">»+&quot;</span>)))</span>
+<span id="cb17-19"><a href="#cb17-19"></a>        <span class="cf">return</span> Div(Para(label), elem, classes<span class="op">=</span>[<span class="st">&quot;annotated-code&quot;</span>])</span>
+<span id="cb17-20"><a href="#cb17-20"></a></span>
+<span id="cb17-21"><a href="#cb17-21"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb17-22"><a href="#cb17-22"></a>    <span class="cf">return</span> run_filter(action, prepare<span class="op">=</span>prepare)</span></code></pre></div>
 </div>
 <h1 id="doctesting">Doctesting</h1>
 <p>This Pandoc filter runs doc-tests from Python. If a cell is marked with a <code>.doctest</code> class, the output is checked against the given output. We use Jupyter kernels to evaluate the input.</p>
 <div class="annotated-code">
 <p><span><em>«entangled/doctest.py»=</em></span></p>
-<div class="sourceCode" id="cb6" data-file="entangled/doctest.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="im">from</span> panflute <span class="im">import</span> (Doc, Element, CodeBlock)</span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="im">from</span> .typing <span class="im">import</span> (ActionReturn, JSONType, CodeMap)</span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="im">from</span> .tangle <span class="im">import</span> (get_name, expand_code_block)</span>
-<span id="cb6-4"><a href="#cb6-4"></a><span class="im">from</span> .config <span class="im">import</span> get_language_info</span>
-<span id="cb6-5"><a href="#cb6-5"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
-<span id="cb6-6"><a href="#cb6-6"></a></span>
-<span id="cb6-7"><a href="#cb6-7"></a><span class="im">import</span> sys</span>
-<span id="cb6-8"><a href="#cb6-8"></a></span>
-<span id="cb6-9"><a href="#cb6-9"></a><span class="op">&lt;&lt;</span>doctest<span class="op">-</span>suite<span class="op">&gt;&gt;</span></span>
-<span id="cb6-10"><a href="#cb6-10"></a><span class="op">&lt;&lt;</span>get<span class="op">-</span>doc<span class="op">-</span>tests<span class="op">&gt;&gt;</span></span>
-<span id="cb6-11"><a href="#cb6-11"></a><span class="op">&lt;&lt;</span>doctest<span class="op">-</span>report<span class="op">&gt;&gt;</span></span>
-<span id="cb6-12"><a href="#cb6-12"></a><span class="op">&lt;&lt;</span>doctest<span class="op">-</span>run<span class="op">-</span>suite<span class="op">&gt;&gt;</span></span>
-<span id="cb6-13"><a href="#cb6-13"></a></span>
-<span id="cb6-14"><a href="#cb6-14"></a><span class="kw">def</span> prepare(doc: Doc) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="cb6-15"><a href="#cb6-15"></a>    <span class="cf">assert</span> <span class="bu">hasattr</span>(doc, <span class="st">&quot;config&quot;</span>), <span class="st">&quot;Need to read config first.&quot;</span></span>
-<span id="cb6-16"><a href="#cb6-16"></a>    <span class="cf">assert</span> <span class="bu">hasattr</span>(doc, <span class="st">&quot;code_map&quot;</span>), <span class="st">&quot;Need to tangle first.&quot;</span></span>
-<span id="cb6-17"><a href="#cb6-17"></a>    doc.suites <span class="op">=</span> get_doc_tests(doc.code_map)</span>
-<span id="cb6-18"><a href="#cb6-18"></a>    <span class="cf">for</span> name, suite <span class="kw">in</span> doc.suites.items():</span>
-<span id="cb6-19"><a href="#cb6-19"></a>        run_suite(doc.config, suite)</span>
-<span id="cb6-20"><a href="#cb6-20"></a>    doc.code_counter <span class="op">=</span> defaultdict(<span class="kw">lambda</span>: <span class="dv">0</span>)</span>
-<span id="cb6-21"><a href="#cb6-21"></a></span>
-<span id="cb6-22"><a href="#cb6-22"></a><span class="kw">def</span> action(elem: Element, doc: Doc) <span class="op">-&gt;</span> ActionReturn:</span>
-<span id="cb6-23"><a href="#cb6-23"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(elem, CodeBlock):</span>
-<span id="cb6-24"><a href="#cb6-24"></a>        name <span class="op">=</span> get_name(elem)</span>
-<span id="cb6-25"><a href="#cb6-25"></a>        <span class="cf">if</span> <span class="st">&quot;doctest&quot;</span> <span class="kw">in</span> elem.classes <span class="kw">or</span> <span class="st">&quot;eval&quot;</span> <span class="kw">in</span> elem.classes:</span>
-<span id="cb6-26"><a href="#cb6-26"></a>            test <span class="op">=</span> doc.suites[name].code_blocks[doc.code_counter[name]]</span>
-<span id="cb6-27"><a href="#cb6-27"></a>            doc.code_counter[name] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb6-28"><a href="#cb6-28"></a>            <span class="cf">return</span> generate_report(elem, test)</span>
-<span id="cb6-29"><a href="#cb6-29"></a></span>
-<span id="cb6-30"><a href="#cb6-30"></a>        doc.code_counter[name] <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb6-31"><a href="#cb6-31"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+<div class="sourceCode" id="cb18" data-file="entangled/doctest.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a><span class="im">from</span> panflute <span class="im">import</span> (Doc, Element, CodeBlock)</span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="im">from</span> .typing <span class="im">import</span> (ActionReturn, JSONType, CodeMap)</span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="im">from</span> .tangle <span class="im">import</span> (get_name, expand_code_block)</span>
+<span id="cb18-4"><a href="#cb18-4"></a><span class="im">from</span> .config <span class="im">import</span> get_language_info</span>
+<span id="cb18-5"><a href="#cb18-5"></a><span class="im">from</span> collections <span class="im">import</span> defaultdict</span>
+<span id="cb18-6"><a href="#cb18-6"></a></span>
+<span id="cb18-7"><a href="#cb18-7"></a><span class="im">import</span> sys</span>
+<span id="cb18-8"><a href="#cb18-8"></a></span>
+<span id="cb18-9"><a href="#cb18-9"></a><span class="op">&lt;&lt;</span>doctest<span class="op">-</span>suite<span class="op">&gt;&gt;</span></span>
+<span id="cb18-10"><a href="#cb18-10"></a><span class="op">&lt;&lt;</span>get<span class="op">-</span>doc<span class="op">-</span>tests<span class="op">&gt;&gt;</span></span>
+<span id="cb18-11"><a href="#cb18-11"></a><span class="op">&lt;&lt;</span>doctest<span class="op">-</span>report<span class="op">&gt;&gt;</span></span>
+<span id="cb18-12"><a href="#cb18-12"></a><span class="op">&lt;&lt;</span>doctest<span class="op">-</span>run<span class="op">-</span>suite<span class="op">&gt;&gt;</span></span>
+<span id="cb18-13"><a href="#cb18-13"></a></span>
+<span id="cb18-14"><a href="#cb18-14"></a><span class="kw">def</span> prepare(doc: Doc) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb18-15"><a href="#cb18-15"></a>    <span class="cf">assert</span> <span class="bu">hasattr</span>(doc, <span class="st">&quot;config&quot;</span>), <span class="st">&quot;Need to read config first.&quot;</span></span>
+<span id="cb18-16"><a href="#cb18-16"></a>    <span class="cf">assert</span> <span class="bu">hasattr</span>(doc, <span class="st">&quot;code_map&quot;</span>), <span class="st">&quot;Need to tangle first.&quot;</span></span>
+<span id="cb18-17"><a href="#cb18-17"></a>    doc.suites <span class="op">=</span> get_doc_tests(doc.code_map)</span>
+<span id="cb18-18"><a href="#cb18-18"></a>    <span class="cf">for</span> name, suite <span class="kw">in</span> doc.suites.items():</span>
+<span id="cb18-19"><a href="#cb18-19"></a>        run_suite(doc.config, suite)</span>
+<span id="cb18-20"><a href="#cb18-20"></a>    doc.code_counter <span class="op">=</span> defaultdict(<span class="kw">lambda</span>: <span class="dv">0</span>)</span>
+<span id="cb18-21"><a href="#cb18-21"></a></span>
+<span id="cb18-22"><a href="#cb18-22"></a><span class="kw">def</span> action(elem: Element, doc: Doc) <span class="op">-&gt;</span> ActionReturn:</span>
+<span id="cb18-23"><a href="#cb18-23"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(elem, CodeBlock):</span>
+<span id="cb18-24"><a href="#cb18-24"></a>        name <span class="op">=</span> get_name(elem)</span>
+<span id="cb18-25"><a href="#cb18-25"></a>        <span class="cf">if</span> <span class="st">&quot;doctest&quot;</span> <span class="kw">in</span> elem.classes <span class="kw">or</span> <span class="st">&quot;eval&quot;</span> <span class="kw">in</span> elem.classes:</span>
+<span id="cb18-26"><a href="#cb18-26"></a>            test <span class="op">=</span> doc.suites[name].code_blocks[doc.code_counter[name]]</span>
+<span id="cb18-27"><a href="#cb18-27"></a>            doc.code_counter[name] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb18-28"><a href="#cb18-28"></a>            <span class="cf">return</span> generate_report(elem, test)</span>
+<span id="cb18-29"><a href="#cb18-29"></a></span>
+<span id="cb18-30"><a href="#cb18-30"></a>        doc.code_counter[name] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb18-31"><a href="#cb18-31"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
 </div>
 <h2 id="get-doc-tests-from-code-map">Get doc tests from code map</h2>
 <div class="annotated-code">
@@ -583,10 +749,10 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <h2 id="generate-report">Generate report</h2>
 <p>The generic output of a documentation test, in HTML, should look something like:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;doctest&quot;</span><span class="ot"> data-status=</span><span class="st">&quot;STATUS&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a>    <span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;doctestInput&quot;</span><span class="kw">&gt;</span><span class="er">&lt;</span>...&gt;<span class="kw">&lt;/div&gt;</span></span>
-<span id="cb7-3"><a href="#cb7-3"></a>    <span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;doctestResult&quot;</span><span class="kw">&gt;</span><span class="er">&lt;</span>...&gt;<span class="kw">&lt;/div&gt;</span></span>
-<span id="cb7-4"><a href="#cb7-4"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb19-1"><a href="#cb19-1"></a><span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;doctest&quot;</span><span class="ot"> data-status=</span><span class="st">&quot;STATUS&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a>    <span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;doctestInput&quot;</span><span class="kw">&gt;</span><span class="er">&lt;</span>...&gt;<span class="kw">&lt;/div&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3"></a>    <span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;doctestResult&quot;</span><span class="kw">&gt;</span><span class="er">&lt;</span>...&gt;<span class="kw">&lt;/div&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4"></a><span class="kw">&lt;/div&gt;</span></span></code></pre></div>
 <p>To create the outer <code>div</code> we have a helper function.</p>
 <div class="annotated-code">
 <p><span><em>«doctest-content-div»=</em></span></p>
@@ -629,29 +795,29 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <p>This module reuses most of the tangle module.</p>
 <div class="annotated-code">
 <p><span><em>«entangled/doctest_main.py»=</em></span></p>
-<div class="sourceCode" id="cb8" data-file="entangled/doctest_main.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="im">import</span> panflute</span>
-<span id="cb8-2"><a href="#cb8-2"></a></span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="im">from</span> . <span class="im">import</span> tangle</span>
-<span id="cb8-4"><a href="#cb8-4"></a><span class="im">from</span> . <span class="im">import</span> annotate</span>
-<span id="cb8-5"><a href="#cb8-5"></a><span class="im">from</span> . <span class="im">import</span> doctest</span>
-<span id="cb8-6"><a href="#cb8-6"></a></span>
-<span id="cb8-7"><a href="#cb8-7"></a><span class="im">from</span> .config <span class="im">import</span> read_config</span>
-<span id="cb8-8"><a href="#cb8-8"></a></span>
-<span id="cb8-9"><a href="#cb8-9"></a></span>
-<span id="cb8-10"><a href="#cb8-10"></a><span class="kw">def</span> main() <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="cb8-11"><a href="#cb8-11"></a>    <span class="op">&lt;&lt;</span>load<span class="op">-</span>document<span class="op">&gt;&gt;</span></span>
-<span id="cb8-12"><a href="#cb8-12"></a>    doc.config <span class="op">=</span> read_config()</span>
-<span id="cb8-13"><a href="#cb8-13"></a></span>
-<span id="cb8-14"><a href="#cb8-14"></a>    tangle.prepare(doc)</span>
-<span id="cb8-15"><a href="#cb8-15"></a>    doc <span class="op">=</span> doc.walk(tangle.action)</span>
-<span id="cb8-16"><a href="#cb8-16"></a></span>
-<span id="cb8-17"><a href="#cb8-17"></a>    annotate.prepare(doc)</span>
-<span id="cb8-18"><a href="#cb8-18"></a>    <span class="co"># doc = doc.walk(annotate.action)</span></span>
-<span id="cb8-19"><a href="#cb8-19"></a></span>
-<span id="cb8-20"><a href="#cb8-20"></a>    doctest.prepare(doc)</span>
-<span id="cb8-21"><a href="#cb8-21"></a>    doc <span class="op">=</span> doc.walk(doctest.action)</span>
-<span id="cb8-22"><a href="#cb8-22"></a></span>
-<span id="cb8-23"><a href="#cb8-23"></a>    panflute.dump(doc)</span></code></pre></div>
+<div class="sourceCode" id="cb20" data-file="entangled/doctest_main.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="im">import</span> panflute</span>
+<span id="cb20-2"><a href="#cb20-2"></a></span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="im">from</span> . <span class="im">import</span> tangle</span>
+<span id="cb20-4"><a href="#cb20-4"></a><span class="im">from</span> . <span class="im">import</span> annotate</span>
+<span id="cb20-5"><a href="#cb20-5"></a><span class="im">from</span> . <span class="im">import</span> doctest</span>
+<span id="cb20-6"><a href="#cb20-6"></a></span>
+<span id="cb20-7"><a href="#cb20-7"></a><span class="im">from</span> .config <span class="im">import</span> read_config</span>
+<span id="cb20-8"><a href="#cb20-8"></a></span>
+<span id="cb20-9"><a href="#cb20-9"></a></span>
+<span id="cb20-10"><a href="#cb20-10"></a><span class="kw">def</span> main() <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb20-11"><a href="#cb20-11"></a>    <span class="op">&lt;&lt;</span>load<span class="op">-</span>document<span class="op">&gt;&gt;</span></span>
+<span id="cb20-12"><a href="#cb20-12"></a>    doc.config <span class="op">=</span> read_config()</span>
+<span id="cb20-13"><a href="#cb20-13"></a></span>
+<span id="cb20-14"><a href="#cb20-14"></a>    tangle.prepare(doc)</span>
+<span id="cb20-15"><a href="#cb20-15"></a>    doc <span class="op">=</span> doc.walk(tangle.action)</span>
+<span id="cb20-16"><a href="#cb20-16"></a></span>
+<span id="cb20-17"><a href="#cb20-17"></a>    annotate.prepare(doc)</span>
+<span id="cb20-18"><a href="#cb20-18"></a>    <span class="co"># doc = doc.walk(annotate.action)</span></span>
+<span id="cb20-19"><a href="#cb20-19"></a></span>
+<span id="cb20-20"><a href="#cb20-20"></a>    doctest.prepare(doc)</span>
+<span id="cb20-21"><a href="#cb20-21"></a>    doc <span class="op">=</span> doc.walk(doctest.action)</span>
+<span id="cb20-22"><a href="#cb20-22"></a></span>
+<span id="cb20-23"><a href="#cb20-23"></a>    panflute.dump(doc)</span></code></pre></div>
 </div>
 <h2 id="bug-in-panflute-or-jupyter_client">Bug in <code>panflute</code> or <code>jupyter_client</code></h2>
 <p>There is a bug in <code>jupyter_client</code> that prevents it from working when either <code>stdin</code> or <code>stdout</code> is closed. This means that we have to read the input seperately.</p>
@@ -673,107 +839,107 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="card-deck">Card deck</h2>
 <div class="annotated-code">
 <p><span><em>«entangled/schema/Card.dhall»=</em></span></p>
-<div class="sourceCode" id="cb9" data-file="entangled/schema/Card.dhall"><pre class="sourceCode dhall"><code class="sourceCode dhall"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">let</span> <span class="dt">Link</span> <span class="fu">=</span></span>
-<span id="cb9-2"><a href="#cb9-2"></a>    { href <span class="fu">:</span> <span class="dt">Text</span></span>
-<span id="cb9-3"><a href="#cb9-3"></a>    , content <span class="fu">:</span> <span class="dt">Text</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a>    }</span>
-<span id="cb9-5"><a href="#cb9-5"></a></span>
-<span id="cb9-6"><a href="#cb9-6"></a><span class="kw">in</span> <span class="kw">let</span> <span class="dt">Card</span> <span class="fu">=</span></span>
-<span id="cb9-7"><a href="#cb9-7"></a>    { <span class="dt">Type</span> <span class="fu">=</span></span>
-<span id="cb9-8"><a href="#cb9-8"></a>        { image <span class="fu">:</span> <span class="dt">Optional</span> <span class="dt">Text</span></span>
-<span id="cb9-9"><a href="#cb9-9"></a>        , title <span class="fu">:</span> <span class="dt">Text</span></span>
-<span id="cb9-10"><a href="#cb9-10"></a>        , text <span class="fu">:</span> <span class="dt">Text</span></span>
-<span id="cb9-11"><a href="#cb9-11"></a>        , link <span class="fu">:</span> <span class="dt">Optional</span> <span class="dt">Link</span> }</span>
-<span id="cb9-12"><a href="#cb9-12"></a>    , default <span class="fu">=</span></span>
-<span id="cb9-13"><a href="#cb9-13"></a>        { image <span class="fu">=</span> <span class="dt">None</span> <span class="dt">Text</span></span>
-<span id="cb9-14"><a href="#cb9-14"></a>        , link <span class="fu">=</span> <span class="dt">None</span> <span class="dt">Link</span> }</span>
-<span id="cb9-15"><a href="#cb9-15"></a>    }</span>
-<span id="cb9-16"><a href="#cb9-16"></a></span>
-<span id="cb9-17"><a href="#cb9-17"></a><span class="kw">in</span> <span class="dt">Card</span></span></code></pre></div>
+<div class="sourceCode" id="cb21" data-file="entangled/schema/Card.dhall"><pre class="sourceCode dhall"><code class="sourceCode dhall"><span id="cb21-1"><a href="#cb21-1"></a><span class="kw">let</span> <span class="dt">Link</span> <span class="fu">=</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a>    { href <span class="fu">:</span> <span class="dt">Text</span></span>
+<span id="cb21-3"><a href="#cb21-3"></a>    , content <span class="fu">:</span> <span class="dt">Text</span></span>
+<span id="cb21-4"><a href="#cb21-4"></a>    }</span>
+<span id="cb21-5"><a href="#cb21-5"></a></span>
+<span id="cb21-6"><a href="#cb21-6"></a><span class="kw">in</span> <span class="kw">let</span> <span class="dt">Card</span> <span class="fu">=</span></span>
+<span id="cb21-7"><a href="#cb21-7"></a>    { <span class="dt">Type</span> <span class="fu">=</span></span>
+<span id="cb21-8"><a href="#cb21-8"></a>        { image <span class="fu">:</span> <span class="dt">Optional</span> <span class="dt">Text</span></span>
+<span id="cb21-9"><a href="#cb21-9"></a>        , title <span class="fu">:</span> <span class="dt">Text</span></span>
+<span id="cb21-10"><a href="#cb21-10"></a>        , text <span class="fu">:</span> <span class="dt">Text</span></span>
+<span id="cb21-11"><a href="#cb21-11"></a>        , link <span class="fu">:</span> <span class="dt">Optional</span> <span class="dt">Link</span> }</span>
+<span id="cb21-12"><a href="#cb21-12"></a>    , default <span class="fu">=</span></span>
+<span id="cb21-13"><a href="#cb21-13"></a>        { image <span class="fu">=</span> <span class="dt">None</span> <span class="dt">Text</span></span>
+<span id="cb21-14"><a href="#cb21-14"></a>        , link <span class="fu">=</span> <span class="dt">None</span> <span class="dt">Link</span> }</span>
+<span id="cb21-15"><a href="#cb21-15"></a>    }</span>
+<span id="cb21-16"><a href="#cb21-16"></a></span>
+<span id="cb21-17"><a href="#cb21-17"></a><span class="kw">in</span> <span class="dt">Card</span></span></code></pre></div>
 </div>
 <div class="annotated-code">
 <p><span><em>«test/card-deck-example.dhall»=</em></span></p>
-<div class="sourceCode" id="cb10" data-file="test/card-deck-example.dhall"><pre class="sourceCode dhall"><code class="sourceCode dhall"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">let</span> <span class="dt">Card</span> <span class="fu">=</span> <span class="fu">./</span>schema<span class="fu">/</span>Card.dhall</span>
-<span id="cb10-2"><a href="#cb10-2"></a></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">in</span> [ <span class="dt">Card</span><span class="ot"> ::</span> { title <span class="fu">=</span> <span class="st">&quot;Literate Programming&quot;</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a>             , text <span class="fu">=</span></span>
-<span id="cb10-5"><a href="#cb10-5"></a>                 <span class="st">&#39;&#39;</span></span>
-<span id="cb10-6"><a href="#cb10-6"></a><span class="st">                 Write prose and code intermixed. Not just some choice snippets: **all code is included!**</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a><span class="st">                 This document is a rendering of a completely **self-contained Markdown** file.</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a><span class="st">                 &#39;&#39;</span></span>
-<span id="cb10-9"><a href="#cb10-9"></a>             , link <span class="fu">=</span> <span class="dt">Some</span> { href <span class="fu">=</span> <span class="st">&quot;http://entangled.github.io/&quot;</span></span>
-<span id="cb10-10"><a href="#cb10-10"></a>                           , content <span class="fu">=</span> <span class="st">&quot;About Entangled&quot;</span> } } ]</span></code></pre></div>
+<div class="sourceCode" id="cb22" data-file="test/card-deck-example.dhall"><pre class="sourceCode dhall"><code class="sourceCode dhall"><span id="cb22-1"><a href="#cb22-1"></a><span class="kw">let</span> <span class="dt">Card</span> <span class="fu">=</span> <span class="fu">./</span>schema<span class="fu">/</span>Card.dhall</span>
+<span id="cb22-2"><a href="#cb22-2"></a></span>
+<span id="cb22-3"><a href="#cb22-3"></a><span class="kw">in</span> [ <span class="dt">Card</span><span class="ot"> ::</span> { title <span class="fu">=</span> <span class="st">&quot;Literate Programming&quot;</span></span>
+<span id="cb22-4"><a href="#cb22-4"></a>             , text <span class="fu">=</span></span>
+<span id="cb22-5"><a href="#cb22-5"></a>                 <span class="st">&#39;&#39;</span></span>
+<span id="cb22-6"><a href="#cb22-6"></a><span class="st">                 Write prose and code intermixed. Not just some choice snippets: **all code is included!**</span></span>
+<span id="cb22-7"><a href="#cb22-7"></a><span class="st">                 This document is a rendering of a completely **self-contained Markdown** file.</span></span>
+<span id="cb22-8"><a href="#cb22-8"></a><span class="st">                 &#39;&#39;</span></span>
+<span id="cb22-9"><a href="#cb22-9"></a>             , link <span class="fu">=</span> <span class="dt">Some</span> { href <span class="fu">=</span> <span class="st">&quot;http://entangled.github.io/&quot;</span></span>
+<span id="cb22-10"><a href="#cb22-10"></a>                           , content <span class="fu">=</span> <span class="st">&quot;About Entangled&quot;</span> } } ]</span></code></pre></div>
 </div>
 <p>Should generate something like:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;container-fluid&quot;</span><span class="kw">&gt;&lt;div</span><span class="ot"> class=</span><span class="st">&quot;row&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2"></a>    <span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;col&quot;</span><span class="kw">&gt;&lt;div</span><span class="ot"> class=</span><span class="st">&quot;card h-100&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3"></a>    <span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;card-body&quot;</span><span class="kw">&gt;</span></span>
-<span id="cb11-4"><a href="#cb11-4"></a>    <span class="kw">&lt;h3</span><span class="ot"> class=</span><span class="st">&quot;card-title&quot;</span><span class="kw">&gt;</span>Literate Programming<span class="kw">&lt;/h3&gt;</span></span>
-<span id="cb11-5"><a href="#cb11-5"></a>    <span class="kw">&lt;p</span><span class="ot"> class=</span><span class="st">&quot;card-text&quot;</span><span class="kw">&gt;</span>Write prose and code intermixed. Not just some choice snippets: **all code is included!**</span>
-<span id="cb11-6"><a href="#cb11-6"></a>    This document is a rendering of a completely **self-contained Markdown** file.<span class="kw">&lt;/p&gt;</span></span>
-<span id="cb11-7"><a href="#cb11-7"></a>    <span class="kw">&lt;/div&gt;</span></span>
-<span id="cb11-8"><a href="#cb11-8"></a>    <span class="kw">&lt;a</span><span class="ot"> href=</span><span class="st">&quot;https://entangled.github.io/&quot;</span><span class="ot"> class=</span><span class="st">&quot;btn btn-primary mt-auto mx-4&quot;</span><span class="kw">&gt;</span>About Entangled<span class="kw">&lt;/a&gt;</span></span>
-<span id="cb11-9"><a href="#cb11-9"></a>    <span class="kw">&lt;/div&gt;&lt;/div&gt;</span></span>
-<span id="cb11-10"><a href="#cb11-10"></a>...</span>
-<span id="cb11-11"><a href="#cb11-11"></a><span class="kw">&lt;/div&gt;&lt;/div&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb23-1"><a href="#cb23-1"></a><span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;container-fluid&quot;</span><span class="kw">&gt;&lt;div</span><span class="ot"> class=</span><span class="st">&quot;row&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2"></a>    <span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;col&quot;</span><span class="kw">&gt;&lt;div</span><span class="ot"> class=</span><span class="st">&quot;card h-100&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb23-3"><a href="#cb23-3"></a>    <span class="kw">&lt;div</span><span class="ot"> class=</span><span class="st">&quot;card-body&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb23-4"><a href="#cb23-4"></a>    <span class="kw">&lt;h3</span><span class="ot"> class=</span><span class="st">&quot;card-title&quot;</span><span class="kw">&gt;</span>Literate Programming<span class="kw">&lt;/h3&gt;</span></span>
+<span id="cb23-5"><a href="#cb23-5"></a>    <span class="kw">&lt;p</span><span class="ot"> class=</span><span class="st">&quot;card-text&quot;</span><span class="kw">&gt;</span>Write prose and code intermixed. Not just some choice snippets: **all code is included!**</span>
+<span id="cb23-6"><a href="#cb23-6"></a>    This document is a rendering of a completely **self-contained Markdown** file.<span class="kw">&lt;/p&gt;</span></span>
+<span id="cb23-7"><a href="#cb23-7"></a>    <span class="kw">&lt;/div&gt;</span></span>
+<span id="cb23-8"><a href="#cb23-8"></a>    <span class="kw">&lt;a</span><span class="ot"> href=</span><span class="st">&quot;https://entangled.github.io/&quot;</span><span class="ot"> class=</span><span class="st">&quot;btn btn-primary mt-auto mx-4&quot;</span><span class="kw">&gt;</span>About Entangled<span class="kw">&lt;/a&gt;</span></span>
+<span id="cb23-9"><a href="#cb23-9"></a>    <span class="kw">&lt;/div&gt;&lt;/div&gt;</span></span>
+<span id="cb23-10"><a href="#cb23-10"></a>...</span>
+<span id="cb23-11"><a href="#cb23-11"></a><span class="kw">&lt;/div&gt;&lt;/div&gt;</span></span></code></pre></div>
 <div class="annotated-code">
 <p><span><em>«entangled/bootstrap.py»=</em></span></p>
-<div class="sourceCode" id="cb12" data-file="entangled/bootstrap.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="im">from</span> panflute <span class="im">import</span> (Element, Doc, Plain, CodeBlock, Div, Str, Image, Header,</span>
-<span id="cb12-2"><a href="#cb12-2"></a>                      Link, convert_text, run_filters, RawBlock, Space, LineBreak, MetaInlines)</span>
-<span id="cb12-3"><a href="#cb12-3"></a><span class="im">from</span> typing <span class="im">import</span> (Optional)</span>
-<span id="cb12-4"><a href="#cb12-4"></a><span class="im">from</span> pathlib <span class="im">import</span> (Path)</span>
-<span id="cb12-5"><a href="#cb12-5"></a></span>
-<span id="cb12-6"><a href="#cb12-6"></a><span class="im">import</span> subprocess</span>
-<span id="cb12-7"><a href="#cb12-7"></a><span class="im">import</span> pkg_resources</span>
-<span id="cb12-8"><a href="#cb12-8"></a><span class="im">import</span> json</span>
-<span id="cb12-9"><a href="#cb12-9"></a></span>
-<span id="cb12-10"><a href="#cb12-10"></a><span class="im">from</span> .typing <span class="im">import</span> (JSONType)</span>
-<span id="cb12-11"><a href="#cb12-11"></a><span class="im">from</span> .tangle <span class="im">import</span> get_name</span>
-<span id="cb12-12"><a href="#cb12-12"></a><span class="im">from</span> . <span class="im">import</span> annotate</span>
-<span id="cb12-13"><a href="#cb12-13"></a></span>
-<span id="cb12-14"><a href="#cb12-14"></a>data_path <span class="op">=</span> Path(pkg_resources.resource_filename(<span class="va">__name__</span>, <span class="st">&quot;.&quot;</span>))</span>
-<span id="cb12-15"><a href="#cb12-15"></a></span>
-<span id="cb12-16"><a href="#cb12-16"></a><span class="kw">def</span> parse_dhall(content: <span class="bu">str</span>, cwd: Optional[Path] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> JSONType:</span>
-<span id="cb12-17"><a href="#cb12-17"></a>    <span class="co">&quot;&quot;&quot;Takes Dhall content and parses it to JSON compatible data.&quot;&quot;&quot;</span></span>
-<span id="cb12-18"><a href="#cb12-18"></a>    cwd <span class="op">=</span> cwd <span class="kw">or</span> Path(<span class="st">&quot;.&quot;</span>)</span>
-<span id="cb12-19"><a href="#cb12-19"></a>    result <span class="op">=</span> subprocess.run(</span>
-<span id="cb12-20"><a href="#cb12-20"></a>        [<span class="st">&quot;dhall-to-json&quot;</span>], cwd<span class="op">=</span>cwd,</span>
-<span id="cb12-21"><a href="#cb12-21"></a>        <span class="bu">input</span><span class="op">=</span>content, stdout<span class="op">=</span>subprocess.PIPE,</span>
-<span id="cb12-22"><a href="#cb12-22"></a>        stderr<span class="op">=</span>subprocess.PIPE, encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>, check<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb12-23"><a href="#cb12-23"></a>    <span class="cf">return</span> json.loads(result.stdout)</span>
-<span id="cb12-24"><a href="#cb12-24"></a></span>
-<span id="cb12-25"><a href="#cb12-25"></a><span class="op">&lt;&lt;</span>bootstrap<span class="op">-</span>card<span class="op">-</span>deck<span class="op">&gt;&gt;</span></span>
-<span id="cb12-26"><a href="#cb12-26"></a><span class="op">&lt;&lt;</span>bootstrap<span class="op">-</span>fold<span class="op">-</span>code<span class="op">-</span>block<span class="op">&gt;&gt;</span></span>
-<span id="cb12-27"><a href="#cb12-27"></a></span>
-<span id="cb12-28"><a href="#cb12-28"></a><span class="kw">def</span> prepare(doc: Doc) <span class="op">-&gt;</span> Doc:</span>
-<span id="cb12-29"><a href="#cb12-29"></a>    <span class="im">from</span> datetime <span class="im">import</span> date</span>
-<span id="cb12-30"><a href="#cb12-30"></a>    annotate.prepare(doc)</span>
-<span id="cb12-31"><a href="#cb12-31"></a></span>
-<span id="cb12-32"><a href="#cb12-32"></a>    <span class="cf">if</span> <span class="st">&quot;footer&quot;</span> <span class="kw">in</span> doc.metadata:</span>
-<span id="cb12-33"><a href="#cb12-33"></a>        <span class="cf">try</span>:</span>
-<span id="cb12-34"><a href="#cb12-34"></a>            old_footer <span class="op">=</span> <span class="bu">list</span>(doc.metadata[<span class="st">&quot;footer&quot;</span>].content)</span>
-<span id="cb12-35"><a href="#cb12-35"></a>        <span class="cf">except</span> <span class="pp">AttributeError</span>:</span>
-<span id="cb12-36"><a href="#cb12-36"></a>            old_footer <span class="op">=</span> [Str(<span class="st">&quot;&quot;</span>)]</span>
-<span id="cb12-37"><a href="#cb12-37"></a></span>
-<span id="cb12-38"><a href="#cb12-38"></a>        <span class="cf">try</span>:</span>
-<span id="cb12-39"><a href="#cb12-39"></a>            version <span class="op">=</span> doc.metadata[<span class="st">&quot;version&quot;</span>].content[<span class="dv">0</span>]</span>
-<span id="cb12-40"><a href="#cb12-40"></a>        <span class="cf">except</span> (<span class="pp">AttributeError</span>, <span class="pp">KeyError</span>):</span>
-<span id="cb12-41"><a href="#cb12-41"></a>            version <span class="op">=</span> Str(<span class="st">&quot;unknown&quot;</span>)</span>
-<span id="cb12-42"><a href="#cb12-42"></a>        </span>
-<span id="cb12-43"><a href="#cb12-43"></a>        doc.metadata[<span class="st">&quot;footer&quot;</span>] <span class="op">=</span> MetaInlines(</span>
-<span id="cb12-44"><a href="#cb12-44"></a>            Str(<span class="bu">str</span>(date.today())), Space, Str(<span class="st">&quot;—&quot;</span>), Space,</span>
-<span id="cb12-45"><a href="#cb12-45"></a>            Str(<span class="st">&quot;version&quot;</span>), Space, version, LineBreak,</span>
-<span id="cb12-46"><a href="#cb12-46"></a>            <span class="op">*</span>old_footer)</span>
-<span id="cb12-47"><a href="#cb12-47"></a></span>
-<span id="cb12-48"><a href="#cb12-48"></a></span>
-<span id="cb12-49"><a href="#cb12-49"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="cb12-50"><a href="#cb12-50"></a>    run_filters([bootstrap_card_deck, bootstrap_fold_code], prepare<span class="op">=</span>prepare, doc<span class="op">=</span>doc)</span></code></pre></div>
+<div class="sourceCode" id="cb24" data-file="entangled/bootstrap.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="im">from</span> panflute <span class="im">import</span> (Element, Doc, Plain, CodeBlock, Div, Str, Image, Header,</span>
+<span id="cb24-2"><a href="#cb24-2"></a>                      Link, convert_text, run_filters, RawBlock, Space, LineBreak, MetaInlines)</span>
+<span id="cb24-3"><a href="#cb24-3"></a><span class="im">from</span> typing <span class="im">import</span> (Optional)</span>
+<span id="cb24-4"><a href="#cb24-4"></a><span class="im">from</span> pathlib <span class="im">import</span> (Path)</span>
+<span id="cb24-5"><a href="#cb24-5"></a></span>
+<span id="cb24-6"><a href="#cb24-6"></a><span class="im">import</span> subprocess</span>
+<span id="cb24-7"><a href="#cb24-7"></a><span class="im">import</span> pkg_resources</span>
+<span id="cb24-8"><a href="#cb24-8"></a><span class="im">import</span> json</span>
+<span id="cb24-9"><a href="#cb24-9"></a></span>
+<span id="cb24-10"><a href="#cb24-10"></a><span class="im">from</span> .typing <span class="im">import</span> (JSONType)</span>
+<span id="cb24-11"><a href="#cb24-11"></a><span class="im">from</span> .tangle <span class="im">import</span> get_name</span>
+<span id="cb24-12"><a href="#cb24-12"></a><span class="im">from</span> . <span class="im">import</span> annotate</span>
+<span id="cb24-13"><a href="#cb24-13"></a></span>
+<span id="cb24-14"><a href="#cb24-14"></a>data_path <span class="op">=</span> Path(pkg_resources.resource_filename(<span class="va">__name__</span>, <span class="st">&quot;.&quot;</span>))</span>
+<span id="cb24-15"><a href="#cb24-15"></a></span>
+<span id="cb24-16"><a href="#cb24-16"></a><span class="kw">def</span> parse_dhall(content: <span class="bu">str</span>, cwd: Optional[Path] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> JSONType:</span>
+<span id="cb24-17"><a href="#cb24-17"></a>    <span class="co">&quot;&quot;&quot;Takes Dhall content and parses it to JSON compatible data.&quot;&quot;&quot;</span></span>
+<span id="cb24-18"><a href="#cb24-18"></a>    cwd <span class="op">=</span> cwd <span class="kw">or</span> Path(<span class="st">&quot;.&quot;</span>)</span>
+<span id="cb24-19"><a href="#cb24-19"></a>    result <span class="op">=</span> subprocess.run(</span>
+<span id="cb24-20"><a href="#cb24-20"></a>        [<span class="st">&quot;dhall-to-json&quot;</span>], cwd<span class="op">=</span>cwd,</span>
+<span id="cb24-21"><a href="#cb24-21"></a>        <span class="bu">input</span><span class="op">=</span>content, stdout<span class="op">=</span>subprocess.PIPE,</span>
+<span id="cb24-22"><a href="#cb24-22"></a>        stderr<span class="op">=</span>subprocess.PIPE, encoding<span class="op">=</span><span class="st">&quot;utf-8&quot;</span>, check<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb24-23"><a href="#cb24-23"></a>    <span class="cf">return</span> json.loads(result.stdout)</span>
+<span id="cb24-24"><a href="#cb24-24"></a></span>
+<span id="cb24-25"><a href="#cb24-25"></a><span class="op">&lt;&lt;</span>bootstrap<span class="op">-</span>card<span class="op">-</span>deck<span class="op">&gt;&gt;</span></span>
+<span id="cb24-26"><a href="#cb24-26"></a><span class="op">&lt;&lt;</span>bootstrap<span class="op">-</span>fold<span class="op">-</span>code<span class="op">-</span>block<span class="op">&gt;&gt;</span></span>
+<span id="cb24-27"><a href="#cb24-27"></a></span>
+<span id="cb24-28"><a href="#cb24-28"></a><span class="kw">def</span> prepare(doc: Doc) <span class="op">-&gt;</span> Doc:</span>
+<span id="cb24-29"><a href="#cb24-29"></a>    <span class="im">from</span> datetime <span class="im">import</span> date</span>
+<span id="cb24-30"><a href="#cb24-30"></a>    annotate.prepare(doc)</span>
+<span id="cb24-31"><a href="#cb24-31"></a></span>
+<span id="cb24-32"><a href="#cb24-32"></a>    <span class="cf">if</span> <span class="st">&quot;footer&quot;</span> <span class="kw">in</span> doc.metadata:</span>
+<span id="cb24-33"><a href="#cb24-33"></a>        <span class="cf">try</span>:</span>
+<span id="cb24-34"><a href="#cb24-34"></a>            old_footer <span class="op">=</span> <span class="bu">list</span>(doc.metadata[<span class="st">&quot;footer&quot;</span>].content)</span>
+<span id="cb24-35"><a href="#cb24-35"></a>        <span class="cf">except</span> <span class="pp">AttributeError</span>:</span>
+<span id="cb24-36"><a href="#cb24-36"></a>            old_footer <span class="op">=</span> [Str(<span class="st">&quot;&quot;</span>)]</span>
+<span id="cb24-37"><a href="#cb24-37"></a></span>
+<span id="cb24-38"><a href="#cb24-38"></a>        <span class="cf">try</span>:</span>
+<span id="cb24-39"><a href="#cb24-39"></a>            version <span class="op">=</span> doc.metadata[<span class="st">&quot;version&quot;</span>].content[<span class="dv">0</span>]</span>
+<span id="cb24-40"><a href="#cb24-40"></a>        <span class="cf">except</span> (<span class="pp">AttributeError</span>, <span class="pp">KeyError</span>):</span>
+<span id="cb24-41"><a href="#cb24-41"></a>            version <span class="op">=</span> Str(<span class="st">&quot;unknown&quot;</span>)</span>
+<span id="cb24-42"><a href="#cb24-42"></a>        </span>
+<span id="cb24-43"><a href="#cb24-43"></a>        doc.metadata[<span class="st">&quot;footer&quot;</span>] <span class="op">=</span> MetaInlines(</span>
+<span id="cb24-44"><a href="#cb24-44"></a>            Str(<span class="bu">str</span>(date.today())), Space, Str(<span class="st">&quot;—&quot;</span>), Space,</span>
+<span id="cb24-45"><a href="#cb24-45"></a>            Str(<span class="st">&quot;version&quot;</span>), Space, version, LineBreak,</span>
+<span id="cb24-46"><a href="#cb24-46"></a>            <span class="op">*</span>old_footer)</span>
+<span id="cb24-47"><a href="#cb24-47"></a></span>
+<span id="cb24-48"><a href="#cb24-48"></a></span>
+<span id="cb24-49"><a href="#cb24-49"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb24-50"><a href="#cb24-50"></a>    run_filters([bootstrap_card_deck, bootstrap_fold_code], prepare<span class="op">=</span>prepare, doc<span class="op">=</span>doc)</span></code></pre></div>
 </div>
 <div class="annotated-code">
 <p><span><em>«bootstrap-card-deck»=</em></span></p>
 <div class="sourceCode" id="bootstrap-card-deck"><pre class="sourceCode python"><code class="sourceCode python"><span id="bootstrap-card-deck-1"><a href="#bootstrap-card-deck-1"></a><span class="kw">def</span> bootstrap_card_deck(elem: Element, doc: Doc) <span class="op">-&gt;</span> Optional[Element]:</span>
 <span id="bootstrap-card-deck-2"><a href="#bootstrap-card-deck-2"></a>    <span class="kw">def</span> outer_container(<span class="op">*</span>elements: Element):</span>
-<span id="bootstrap-card-deck-3"><a href="#bootstrap-card-deck-3"></a>        <span class="cf">return</span> Div(Div(<span class="op">*</span>elements, classes<span class="op">=</span>[<span class="st">&quot;row&quot;</span>]), classes<span class="op">=</span>[<span class="st">&quot;container-fluid&quot;</span>, <span class="st">&quot;my-4&quot;</span>])</span>
+<span id="bootstrap-card-deck-3"><a href="#bootstrap-card-deck-3"></a>        <span class="cf">return</span> Div(Div(<span class="op">*</span>elements, classes<span class="op">=</span>[<span class="st">&quot;card-deck&quot;</span>]), classes<span class="op">=</span>[<span class="st">&quot;container-fluid&quot;</span>, <span class="st">&quot;my-4&quot;</span>])</span>
 <span id="bootstrap-card-deck-4"><a href="#bootstrap-card-deck-4"></a></span>
 <span id="bootstrap-card-deck-5"><a href="#bootstrap-card-deck-5"></a>    <span class="kw">def</span> card(card_data: JSONType) <span class="op">-&gt;</span> Element:</span>
 <span id="bootstrap-card-deck-6"><a href="#bootstrap-card-deck-6"></a>        <span class="cf">assert</span> <span class="st">&quot;title&quot;</span> <span class="kw">in</span> card_data <span class="kw">and</span> <span class="st">&quot;text&quot;</span> <span class="kw">in</span> card_data</span>
@@ -818,7 +984,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <span id="bootstrap-fold-code-block-8"><a href="#bootstrap-fold-code-block-8"></a>        <span class="cf">if</span> <span class="st">&quot;bootstrap-fold&quot;</span> <span class="kw">in</span> elem.classes <span class="kw">and</span> name <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
 <span id="bootstrap-fold-code-block-9"><a href="#bootstrap-fold-code-block-9"></a>            fixed_name <span class="op">=</span> fix_name(name)</span>
 <span id="bootstrap-fold-code-block-10"><a href="#bootstrap-fold-code-block-10"></a>            button_attrs <span class="op">=</span> {</span>
-<span id="bootstrap-fold-code-block-11"><a href="#bootstrap-fold-code-block-11"></a>                <span class="st">&quot;class&quot;</span>: <span class="st">&quot;btn btn-primary&quot;</span>,</span>
+<span id="bootstrap-fold-code-block-11"><a href="#bootstrap-fold-code-block-11"></a>                <span class="st">&quot;class&quot;</span>: <span class="st">&quot;btn btn-outline-primary btn-sm fold-toggle&quot;</span>,</span>
 <span id="bootstrap-fold-code-block-12"><a href="#bootstrap-fold-code-block-12"></a>                <span class="st">&quot;type&quot;</span>: <span class="st">&quot;button&quot;</span>,</span>
 <span id="bootstrap-fold-code-block-13"><a href="#bootstrap-fold-code-block-13"></a>                <span class="st">&quot;data-toggle&quot;</span>: <span class="st">&quot;collapse&quot;</span>,</span>
 <span id="bootstrap-fold-code-block-14"><a href="#bootstrap-fold-code-block-14"></a>                <span class="st">&quot;data-target&quot;</span>: <span class="st">&quot;#&quot;</span> <span class="op">+</span> fixed_name <span class="op">+</span> <span class="st">&quot;-container&quot;</span>,</span>
@@ -828,12 +994,13 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <span id="bootstrap-fold-code-block-18"><a href="#bootstrap-fold-code-block-18"></a>            button <span class="op">=</span> RawBlock(<span class="ss">f&quot;&lt;button </span><span class="sc">{</span>attr_str<span class="sc">}</span><span class="ss">&gt;&amp;lt;&amp;lt;</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">&amp;gt;&amp;gt;=&lt;/button&gt;&quot;</span>)</span>
 <span id="bootstrap-fold-code-block-19"><a href="#bootstrap-fold-code-block-19"></a>            elem.classes.append(<span class="st">&quot;overflow-auto&quot;</span>)</span>
 <span id="bootstrap-fold-code-block-20"><a href="#bootstrap-fold-code-block-20"></a>            elem.attributes[<span class="st">&quot;style&quot;</span>] <span class="op">=</span> <span class="st">&quot;max-height: 50vh&quot;</span></span>
-<span id="bootstrap-fold-code-block-21"><a href="#bootstrap-fold-code-block-21"></a>            <span class="cf">return</span> Div(button, Div(elem, classes<span class="op">=</span>[<span class="st">&quot;collapse&quot;</span>], identifier<span class="op">=</span>fixed_name <span class="op">+</span> <span class="st">&quot;-container&quot;</span>))</span>
-<span id="bootstrap-fold-code-block-22"><a href="#bootstrap-fold-code-block-22"></a></span>
-<span id="bootstrap-fold-code-block-23"><a href="#bootstrap-fold-code-block-23"></a>        <span class="cf">else</span>:</span>
-<span id="bootstrap-fold-code-block-24"><a href="#bootstrap-fold-code-block-24"></a>            <span class="cf">return</span> annotate.action(elem, doc)</span>
-<span id="bootstrap-fold-code-block-25"><a href="#bootstrap-fold-code-block-25"></a></span>
-<span id="bootstrap-fold-code-block-26"><a href="#bootstrap-fold-code-block-26"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+<span id="bootstrap-fold-code-block-21"><a href="#bootstrap-fold-code-block-21"></a>            <span class="cf">return</span> Div(button, Div(elem, classes<span class="op">=</span>[<span class="st">&quot;collapse&quot;</span>], identifier<span class="op">=</span>fixed_name <span class="op">+</span> <span class="st">&quot;-container&quot;</span>),</span>
+<span id="bootstrap-fold-code-block-22"><a href="#bootstrap-fold-code-block-22"></a>                       classes<span class="op">=</span>[<span class="st">&quot;fold-block&quot;</span>])</span>
+<span id="bootstrap-fold-code-block-23"><a href="#bootstrap-fold-code-block-23"></a></span>
+<span id="bootstrap-fold-code-block-24"><a href="#bootstrap-fold-code-block-24"></a>        <span class="cf">else</span>:</span>
+<span id="bootstrap-fold-code-block-25"><a href="#bootstrap-fold-code-block-25"></a>            <span class="cf">return</span> annotate.action(elem, doc)</span>
+<span id="bootstrap-fold-code-block-26"><a href="#bootstrap-fold-code-block-26"></a></span>
+<span id="bootstrap-fold-code-block-27"><a href="#bootstrap-fold-code-block-27"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
 </div>
 </div></main>
 

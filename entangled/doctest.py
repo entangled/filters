@@ -1,5 +1,5 @@
 # ~\~ language=Python filename=entangled/doctest.py
-# ~\~ begin <<lit/entangled-python.md|entangled/doctest.py>>[0]
+# ~\~ begin <<lit/filters.md|entangled/doctest.py>>[0]
 from panflute import (Doc, Element, CodeBlock)
 from .typing import (ActionReturn, JSONType, CodeMap)
 from .tangle import (get_name, expand_code_block)
@@ -8,7 +8,7 @@ from collections import defaultdict
 
 import sys
 
-# ~\~ begin <<lit/entangled-python.md|doctest-suite>>[0]
+# ~\~ begin <<lit/filters.md|doctest-suite>>[0]
 from dataclasses import dataclass
 from typing import (Optional, List, Dict)
 from enum import Enum
@@ -20,7 +20,7 @@ class TestStatus(Enum):
     ERROR = 3
     UNKNOWN = 4
 # ~\~ end
-# ~\~ begin <<lit/entangled-python.md|doctest-suite>>[1]
+# ~\~ begin <<lit/filters.md|doctest-suite>>[1]
 @dataclass
 class Test:
     __test__ = False    # not a pytest class
@@ -30,13 +30,13 @@ class Test:
     error: Optional[str] = None
     status: TestStatus = TestStatus.PENDING
 # ~\~ end
-# ~\~ begin <<lit/entangled-python.md|doctest-suite>>[2]
+# ~\~ begin <<lit/filters.md|doctest-suite>>[2]
 @dataclass
 class Suite:
     code_blocks: List[Test]
     language: str
 # ~\~ end
-# ~\~ begin <<lit/entangled-python.md|get-doc-tests>>[0]
+# ~\~ begin <<lit/filters.md|get-doc-tests>>[0]
 def get_language(c: CodeBlock) -> str:
     if not c.classes:
         raise ValueError(f"Code block `{c.name}` has no language specified.")
@@ -63,13 +63,13 @@ def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
 
     return result
 # ~\~ end
-# ~\~ begin <<lit/entangled-python.md|doctest-report>>[0]
+# ~\~ begin <<lit/filters.md|doctest-report>>[0]
 from panflute import Div
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
     lang_class = elem.classes[0]
 
-    # ~\~ begin <<lit/entangled-python.md|doctest-content-div>>[0]
+    # ~\~ begin <<lit/filters.md|doctest-content-div>>[0]
     def content_div(*output):
         status_attr = {"status": t.status.name}
         code = elem.text.split("\n---\n")
@@ -96,12 +96,12 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
                                , classes=["doctestUnknown"] ) )
     return None
 # ~\~ end
-# ~\~ begin <<lit/entangled-python.md|doctest-run-suite>>[0]
+# ~\~ begin <<lit/filters.md|doctest-run-suite>>[0]
 import jupyter_client
 import queue
 
 def run_suite(config: JSONType, s: Suite) -> None:
-    # ~\~ begin <<lit/entangled-python.md|jupyter-get-kernel-name>>[0]
+    # ~\~ begin <<lit/filters.md|jupyter-get-kernel-name>>[0]
     info = get_language_info(config, s.language)
     kernel_name = info["jupyter"] if "jupyter" in info else None
     if not kernel_name:
@@ -112,7 +112,7 @@ def run_suite(config: JSONType, s: Suite) -> None:
     # ~\~ end
     with jupyter_client.run_kernel(kernel_name=kernel_name) as kc:
         print(f"Kernel `{kernel_name}` running ...", file=sys.stderr)
-        # ~\~ begin <<lit/entangled-python.md|jupyter-eval-test>>[0]
+        # ~\~ begin <<lit/filters.md|jupyter-eval-test>>[0]
         def jupyter_eval(test: Test):
             msg_id = kc.execute(test.code)
             while True:
@@ -126,10 +126,10 @@ def run_suite(config: JSONType, s: Suite) -> None:
                     test.status = TestStatus.ERROR
                     return
         # ~\~ end
-        # ~\~ begin <<lit/entangled-python.md|jupyter-eval-test>>[1]
+        # ~\~ begin <<lit/filters.md|jupyter-eval-test>>[1]
         def handle(test, msg_id, msg):
             from pampy import match, _
-            # ~\~ begin <<lit/entangled-python.md|jupyter-handlers>>[0]
+            # ~\~ begin <<lit/filters.md|jupyter-handlers>>[0]
             def execute_result_text(data):
                 test.result = data
                 if (test.expect is None) or test.result.strip() == test.expect.strip():
@@ -138,13 +138,13 @@ def run_suite(config: JSONType, s: Suite) -> None:
                     test.status = TestStatus.FAIL
                 return False
             # ~\~ end
-            # ~\~ begin <<lit/entangled-python.md|jupyter-handlers>>[1]
+            # ~\~ begin <<lit/filters.md|jupyter-handlers>>[1]
             def stream_text(data):
                 test.result = test.result or ""
                 test.result += data
                 return False
             # ~\~ end
-            # ~\~ begin <<lit/entangled-python.md|jupyter-handlers>>[2]
+            # ~\~ begin <<lit/filters.md|jupyter-handlers>>[2]
             def status_idle(_):
                 if test.expect is None:
                     test.status = TestStatus.SUCCESS
@@ -152,38 +152,38 @@ def run_suite(config: JSONType, s: Suite) -> None:
                     test.status = TestStatus.FAIL
                 return True
             # ~\~ end
-            # ~\~ begin <<lit/entangled-python.md|jupyter-handlers>>[3]
+            # ~\~ begin <<lit/filters.md|jupyter-handlers>>[3]
             def error_traceback(tb):
                 test.error = "\n".join(msg["content"]["traceback"])
                 test.status = TestStatus.ERROR 
                 return True
             # ~\~ end
             return match(msg
-                # ~\~ begin <<lit/entangled-python.md|jupyter-match>>[0]
+                # ~\~ begin <<lit/filters.md|jupyter-match>>[0]
                 , { "msg_type": "execute_result"
                   , "parent_header": { "msg_id" : msg_id }
                   , "content": { "data" : { "text/plain": _ } } }
                 , execute_result_text
                 # ~\~ end
-                # ~\~ begin <<lit/entangled-python.md|jupyter-match>>[1]
+                # ~\~ begin <<lit/filters.md|jupyter-match>>[1]
                 , { "msg_type": "stream"
                   , "parent_header": { "msg_id" : msg_id }
                   , "content": { "text": _ } }
                 , stream_text
                 # ~\~ end
-                # ~\~ begin <<lit/entangled-python.md|jupyter-match>>[2]
+                # ~\~ begin <<lit/filters.md|jupyter-match>>[2]
                 , { "msg_type": "status"
                   , "parent_header": { "msg_id" : msg_id }
                   , "content": { "execution_state": "idle" } }
                 , status_idle
                 # ~\~ end
-                # ~\~ begin <<lit/entangled-python.md|jupyter-match>>[3]
+                # ~\~ begin <<lit/filters.md|jupyter-match>>[3]
                 , { "msg_type": "error"
                   , "parent_header": { "msg_id" : msg_id }
                   , "content": { "traceback": _ } }
                 , error_traceback
                 # ~\~ end
-                # ~\~ begin <<lit/entangled-python.md|jupyter-match>>[4]
+                # ~\~ begin <<lit/filters.md|jupyter-match>>[4]
                 , _
                 , lambda x: False
                 # ~\~ end

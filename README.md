@@ -1,7 +1,6 @@
+# Readme -- Entangled, Pandoc filters
 [![Test Badge](https://github.com/entangled/filters/workflows/Tests/badge.svg)](https://github.com/entangled/filters/actions?query=workflow%3ATests)
 [![codecov](https://codecov.io/gh/entangled/filters/branch/master/graph/badge.svg)](https://codecov.io/gh/entangled/filters)
-
-# Entangled - Pandoc filters
 
 This contains several Pandoc filters and scripts for literate programming in Markdown. These filters are enough to get you going with literate programming using Pandoc.
 
@@ -14,13 +13,15 @@ This contains several Pandoc filters and scripts for literate programming in Mar
 
 ## Install
 
-### Prerequisites
+Entangled filters has the following prerequisites:
 
 - **Python >=3.7**: All of these filters are written in Python. This is mainly to encourage as many users (**I mean YOU**) to start developing Pandoc filters.
 - **Dhall**: the `pandoc-bootstrap` filter requires `dhall-to-json` to be installed: see [Dhall language](https://dhall-lang.org/).
   TLDR: download `dhall-json-*-[windows|macos|linux].[zip|tar.bz2]` from the [Dhall release page](https://github.com/dhall-lang/dhall-haskell/releases), and extract it to a location in your `$PATH`. Dhall is awesome, it *will* make your life better.
 
-```shell
+Installation is easiest using `pip`,
+
+```bash
 pip install entangled-filters
 ```
 
@@ -28,7 +29,7 @@ pip install entangled-filters
 
 To run tests, after doing a normal install (to get the executables installed), run
 
-```shell
+```bash
 pip install --upgrade -e .[test]
 pytest
 ```

@@ -1,5 +1,5 @@
 -- ~\~ language=Dhall filename=entangled/schema/Card.dhall
--- ~\~ begin <<lit/entangled-python.md|entangled/schema/Card.dhall>>[0]
+-- ~\~ begin <<lit/filters.md|entangled/schema/Card.dhall>>[0]
 let Link =
     { href : Text
     , content : Text

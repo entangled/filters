@@ -1,5 +1,5 @@
 # ~\~ language=Python filename=entangled/bootstrap.py
-# ~\~ begin <<lit/entangled-python.md|entangled/bootstrap.py>>[0]
+# ~\~ begin <<lit/filters.md|entangled/bootstrap.py>>[0]
 from panflute import (Element, Doc, Plain, CodeBlock, Div, Str, Image, Header,
                       Link, convert_text, run_filters, RawBlock, Space, LineBreak, MetaInlines)
 from typing import (Optional)
@@ -24,10 +24,10 @@ def parse_dhall(content: str, cwd: Optional[Path] = None) -> JSONType:
         stderr=subprocess.PIPE, encoding="utf-8", check=True)
     return json.loads(result.stdout)
 
-# ~\~ begin <<lit/entangled-python.md|bootstrap-card-deck>>[0]
+# ~\~ begin <<lit/filters.md|bootstrap-card-deck>>[0]
 def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
     def outer_container(*elements: Element):
-        return Div(Div(*elements, classes=["row"]), classes=["container-fluid", "my-4"])
+        return Div(Div(*elements, classes=["card-deck"]), classes=["container-fluid", "my-4"])
 
     def card(card_data: JSONType) -> Element:
         assert "title" in card_data and "text" in card_data
@@ -59,7 +59,7 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
 
     return None
 # ~\~ end
-# ~\~ begin <<lit/entangled-python.md|bootstrap-fold-code-block>>[0]
+# ~\~ begin <<lit/filters.md|bootstrap-fold-code-block>>[0]
 def fix_name(name: str) -> str:
     return name.replace(".", "-dot-").replace("/", "-slash-")
 
@@ -70,7 +70,7 @@ def bootstrap_fold_code(elem: Element, doc: Doc) -> Optional[Element]:
         if "bootstrap-fold" in elem.classes and name is not None:
             fixed_name = fix_name(name)
             button_attrs = {
-                "class": "btn btn-primary",
+                "class": "btn btn-outline-primary btn-sm fold-toggle",
                 "type": "button",
                 "data-toggle": "collapse",
                 "data-target": "#" + fixed_name + "-container",
@@ -80,7 +80,8 @@ def bootstrap_fold_code(elem: Element, doc: Doc) -> Optional[Element]:
             button = RawBlock(f"<button {attr_str}>&lt;&lt;{name}&gt;&gt;=</button>")
             elem.classes.append("overflow-auto")
             elem.attributes["style"] = "max-height: 50vh"
-            return Div(button, Div(elem, classes=["collapse"], identifier=fixed_name + "-container"))
+            return Div(button, Div(elem, classes=["collapse"], identifier=fixed_name + "-container"),
+                       classes=["fold-block"])
 
         else:
             return annotate.action(elem, doc)

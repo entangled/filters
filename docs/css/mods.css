@@ -17,6 +17,11 @@ h1 {
         border-bottom: thin solid black;
 }
 
+h2 {
+        margin-top: 15pt;
+        border-bottom: thin solid black;
+}
+
 strong {
         font-weight: 500;
 }
@@ -41,8 +46,8 @@ nav li a:hover {
 
 div.sourceCode {
         padding: 0;
-        border-radius: 5pt;
         margin: 0.2em 2em 1em 2em;
+        border-radius: 5pt;
         box-shadow: 1px 1px 3px 0px #ccc;
 }
 
@@ -57,6 +62,17 @@ pre.sourceCode {
 
 .doctestResult pre.sourceCode {
         border-color: #484;
+}
+
+.doctestInput div.sourceCode {
+        border-radius: 5pt 5pt 0 0;
+        margin-bottom: 0;
+}
+
+.doctestResult div.sourceCode {
+        border-radius: 0 0 5pt 5pt;
+        margin-top: 0;
+        border-top: thin solid #ccc;
 }
 
 footer {
@@ -74,10 +90,17 @@ table {
         margin-left: 2em;
         margin-right: 2em;
         border-left: thick solid #888;
+        background: white;
+        border-radius: 5pt;
+        box-shadow: 1px 1px 3px 0px #ccc;
 }
 
 td, th {
         padding: 2pt 5pt 2pt 5pt;
+}
+
+th {
+        border-bottom: solid thin black;
 }
 
 tr:nth-child(even) {
@@ -89,5 +112,24 @@ code {
         font-family: "Source Code Pro", monospace;
         font-weight: 400;
         font-size: smaller;
+}
+
+.fold-block {
+        margin-right: 20pt;
+        margin-bottom: 20pt;
+}
+
+.fold-block div.sourceCode {
+        margin-left: 30pt;
+        margin-right: 10pt;
+}
+
+.fold-toggle {
+        text-align: left;
+        font-family: "Cantarell", sans-serif;
+        /*font-size: 13pt;*/
+        font-weight: 400;
+        font-style: italic;
+        margin-bottom: 3pt;
 }
 

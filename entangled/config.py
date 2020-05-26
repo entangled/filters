@@ -1,5 +1,5 @@
 # ~\~ language=Python filename=entangled/config.py
-# ~\~ begin <<lit/entangled-python.md|entangled/config.py>>[0]
+# ~\~ begin <<lit/filters.md|entangled/config.py>>[0]
 from .typing import (JSONType)
 import subprocess
 import json

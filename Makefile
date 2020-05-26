@@ -4,6 +4,7 @@ pandoc_args += --css css/mods.css
 pandoc_args += -t html5 -s --mathjax --toc
 pandoc_args += --toc-depth 1
 pandoc_args += --filter pandoc-bootstrap
+pandoc_args += --filter pandoc-doctest
 pandoc_args += -f markdown+multiline_tables+simple_tables
 
 # Load syntax definitions for languages that are not supported
@@ -18,7 +19,7 @@ pandoc_args += --highlight-style tango
 static_files := $(shell find -L lit -type f -not -name '*.md')
 static_targets := $(static_files:lit/%=docs/%)
 
-input_files := lit/entangled-python.md
+input_files := lit/entangled-python.md README.md lit/filters.md
 
 .PHONY: site clean watch watch-pandoc watch-browser-sync
 
@@ -39,7 +40,7 @@ watch:
 
 watch-pandoc:
 	@while true; do \
-		inotifywait -e close_write bootstrap lit Makefile; \
+		inotifywait -e close_write bootstrap lit Makefile README.md; \
 		make site; \
 	done
 

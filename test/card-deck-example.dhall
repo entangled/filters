@@ -1,5 +1,5 @@
 -- ~\~ language=Dhall filename=test/card-deck-example.dhall
--- ~\~ begin <<lit/entangled-python.md|test/card-deck-example.dhall>>[0]
+-- ~\~ begin <<lit/filters.md|test/card-deck-example.dhall>>[0]
 let Card = ./schema/Card.dhall
 
 in [ Card :: { title = "Literate Programming"
