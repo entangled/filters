@@ -1,4 +1,5 @@
-## ------ language="Python" file="entangled/annotate.py" project://lit/entangled-python.md#272
+# ~\~ language=Python filename=entangled/annotate.py
+# ~\~ begin <<lit/entangled-python.md|entangled/annotate.py>>[0]
 from collections import defaultdict
 from .tangle import get_name
 from panflute import (Span, Str, Para, CodeBlock, Div, Emph, Doc, run_filter)
@@ -21,4 +22,4 @@ def action(elem, doc):
 
 def main(doc: Optional[Doc] = None) -> None:
     return run_filter(action, prepare=prepare)
-## ------ end
+# ~\~ end

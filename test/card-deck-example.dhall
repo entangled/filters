@@ -1,4 +1,5 @@
--- ------ language="Dhall" file="test/card-deck-example.dhall" project://lit/entangled-python.md#655
+-- ~\~ language=Dhall filename=test/card-deck-example.dhall
+-- ~\~ begin <<lit/entangled-python.md|test/card-deck-example.dhall>>[0]
 let Card = ./schema/Card.dhall
 
 in [ Card :: { title = "Literate Programming"
@@ -9,4 +10,4 @@ in [ Card :: { title = "Literate Programming"
                  ''
              , link = Some { href = "http://entangled.github.io/"
                            , content = "About Entangled" } } ]
--- ------ end
+-- ~\~ end

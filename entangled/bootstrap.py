@@ -1,4 +1,5 @@
-## ------ language="Python" file="entangled/bootstrap.py" project://lit/entangled-python.md#684
+# ~\~ language=Python filename=entangled/bootstrap.py
+# ~\~ begin <<lit/entangled-python.md|entangled/bootstrap.py>>[0]
 from panflute import (Element, Doc, Plain, CodeBlock, Div, Str, Image, Header,
                       Link, convert_text, run_filters, RawBlock, Space, LineBreak, MetaInlines)
 from typing import (Optional)
@@ -23,7 +24,7 @@ def parse_dhall(content: str, cwd: Optional[Path] = None) -> JSONType:
         stderr=subprocess.PIPE, encoding="utf-8", check=True)
     return json.loads(result.stdout)
 
-## ------ begin <<bootstrap-card-deck>>[0] project://lit/entangled-python.md#717
+# ~\~ begin <<lit/entangled-python.md|bootstrap-card-deck>>[0]
 def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
     def outer_container(*elements: Element):
         return Div(Div(*elements, classes=["row"]), classes=["container-fluid", "my-4"])
@@ -57,8 +58,8 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
         return outer_container(*content)
 
     return None
-## ------ end
-## ------ begin <<bootstrap-fold-code-block>>[0] project://lit/entangled-python.md#755
+# ~\~ end
+# ~\~ begin <<lit/entangled-python.md|bootstrap-fold-code-block>>[0]
 def fix_name(name: str) -> str:
     return name.replace(".", "-dot-").replace("/", "-slash-")
 
@@ -85,7 +86,7 @@ def bootstrap_fold_code(elem: Element, doc: Doc) -> Optional[Element]:
             return annotate.action(elem, doc)
 
     return None
-## ------ end
+# ~\~ end
 
 def prepare(doc: Doc) -> Doc:
     from datetime import date
@@ -110,4 +111,4 @@ def prepare(doc: Doc) -> Doc:
 
 def main(doc: Optional[Doc] = None) -> None:
     run_filters([bootstrap_card_deck, bootstrap_fold_code], prepare=prepare, doc=doc)
-## ------ end
+# ~\~ end

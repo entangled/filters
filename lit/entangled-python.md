@@ -12,53 +12,16 @@ This module also acts as a test-bed and environment for rapid prototyping of fea
 - `tangle`, extract source files from embedded code blocks in Markdown.
 - `annotate`, add name tags to code blocks.
 - `doctest`, run documentation tests through Jupyter.
+* `bootstrap`, expand some elements into Bootstrap widgets.
 
 ``` {.python file=entangled/__init__.py}
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 ```
 
 # Config
-
 Configuration of the `entangled` module is done through a file that should sit in the current directory.
 
-::: {.future}
-As a planned feature. Config files may sit in several places.
-
-- `${ENTANGLED_PREFIX}/share/entangled`
-- `${XDG_CONFIG_HOME}/entangled`
-- Find first parent of current working directory
-:::
-
 As a configuration format we use [**Dhall**](https://dhall-lang.org/), with a fall-back to JSON. The file should be named either `entangled.dhall` or `entangled.json`. For the Dhall based configuration to work, you need to have the `dhall-to-json` executable installed.
-
-The schema is as follows:
-
-``` {.dhall #dhall-config-schema}
-let Comment : Type =
-    { start : Text
-    , end : Optional Text }
-
-let Language : Type =
-    { name : Text
-    , identifiers : List Text
-    , comment : Comment
-    , jupyter : Optional Text }
-
-let Config : Type =
-    { languages : List Language }
-```
-
-A number of comment styles can be defined.
-
-``` {.dhall #config-comment-styles}
-let hashComment         : Comment = { start = "#", end = None Text }
-let lispStyleComment    : Comment = { start = ";", end = None Text }
-let cStyleComment       : Comment = { start = "/*", end = Some "*/" }
-let cppStyleComment     : Comment = { start = "//", end = None Text }
-let haskellStyleComment : Comment = { start = "--", end = None Text }
-let mlStyleComment      : Comment = { start = "(*", end = Some "*)" }
-let xmlStyleComment     : Comment = { start = "<!--", end = Some "-->" }
-```
 
 ``` {.python file=entangled/config.py}
 from .typing import (JSONType)
@@ -81,11 +44,15 @@ def read_config() -> JSONType:
     return json.load(open("entangled.json", "r"))
 
 def get_language_info(config: JSONType, identifier: str) -> JSONType:
+    kernels = { k["language"]: k["kernel"] for k in config["jupyter"] }
+
     try:
-        return next(lang for lang in config["languages"]
-                    if identifier in lang["identifiers"])
+        language = next(lang for lang in config["entangled"]["languages"]
+                        if identifier in lang["identifiers"])
     except StopIteration:
         raise ValueError(f"Language with identifier `{identifier}` not found in config.")
+
+    return {"jupyter": kernels.get(language["name"]), **language}
 ```
 
 # Panflute
@@ -267,6 +234,7 @@ def finalize(doc: Doc) -> None:
 ```
 
 # Code block annotation
+This adds the name of a code block to the output.
 
 ``` {.python file=entangled/annotate.py}
 from collections import defaultdict
@@ -294,7 +262,6 @@ def main(doc: Optional[Doc] = None) -> None:
 ```
 
 # Doctesting
-
 This Pandoc filter runs doc-tests from Python. If a cell is marked with a `.doctest` class, the output is checked against the given output. We use Jupyter kernels to evaluate the input.
 
 ``` {.python file=entangled/doctest.py}
@@ -326,7 +293,7 @@ def action(elem: Element, doc: Doc) -> ActionReturn:
             test = doc.suites[name].code_blocks[doc.code_counter[name]]
             doc.code_counter[name] += 1
             return generate_report(elem, test)
-            
+
         doc.code_counter[name] += 1
     return None
 ```
@@ -421,7 +388,6 @@ def run_suite(config: JSONType, s: Suite) -> None:
 ```
 
 ### Jupyter
-
 The configuration should have a Jupyter kernel name stored for the language.
 
 ``` {.python #jupyter-get-kernel-name}
@@ -463,7 +429,6 @@ def handle(test, msg_id, msg):
 ```
 
 #### `execute_result`
-
 A result is tested for equality with the expected result.
 
 ``` {.python #jupyter-match}
@@ -480,11 +445,26 @@ def execute_result_text(data):
         test.status = TestStatus.SUCCESS
     else:
         test.status = TestStatus.FAIL
-    return True
+    return False
+```
+
+#### output to stdout or stderr
+
+``` {.python #jupyter-match}
+, { "msg_type": "stream"
+  , "parent_header": { "msg_id" : msg_id }
+  , "content": { "text": _ } }
+, stream_text
+```
+
+``` {.python #jupyter-handlers}
+def stream_text(data):
+    test.result = test.result or ""
+    test.result += data
+    return False
 ```
 
 #### `status`
-
 If status `idle` is given, the computation is done, and we don't need to wait for further messages.
 
 ``` {.python #jupyter-match}
@@ -498,7 +478,7 @@ If status `idle` is given, the computation is done, and we don't need to wait fo
 def status_idle(_):
     if test.expect is None:
         test.status = TestStatus.SUCCESS
-    else:
+    elif test.status == TestStatus.PENDING:
         test.status = TestStatus.FAIL
     return True
 ```
@@ -529,7 +509,6 @@ Any other message we ignore and wait for further messages.
 ```
 
 ## Generate report
-
 The generic output of a documentation test, in HTML, should look something like:
 
 ``` {.html}
@@ -580,7 +559,6 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
 ```
 
 ## Main
-
 This module reuses most of the tangle module.
 
 ``` {.python file=entangled/doctest_main.py}
@@ -601,7 +579,7 @@ def main() -> None:
     doc = doc.walk(tangle.action)
 
     annotate.prepare(doc)
-    doc = doc.walk(annotate.action)
+    # doc = doc.walk(annotate.action)
 
     doctest.prepare(doc)
     doc = doc.walk(doctest.action)
@@ -610,7 +588,6 @@ def main() -> None:
 ```
 
 ## Bug in `panflute` or `jupyter_client`
-
 There is a bug in `jupyter_client` that prevents it from working when either `stdin` or `stdout` is closed. This means that we have to read the input seperately.
 
 ``` {.python #load-document}

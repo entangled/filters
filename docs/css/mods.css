@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css?family=Zilla+Slab:300,400,500&display=swap');
+
+body {
+        font-family: 'Zilla Slab', serif;
+        font-size: 16pt;
+        font-weight: 300;
+        min-height: 100vh;
+}
+
+main {
+        background: #eee;
+}
+
+h1 {
+        margin: 1em 0 0.5em -1em;
+        padding-left: 0.5em;
+        border-bottom: thin solid black;
+}
+
+strong {
+        font-weight: 500;
+}
+
+nav ul {
+        color: white;
+}
+
+nav li a {
+        color: white;
+}
+
+nav li a:hover {
+        color: white;
+}
+
+.annotated-code p {
+        margin-bottom: 2pt;
+        font-family: "Cantarell", sans-serif;
+        font-size: smaller;
+}
+
+div.sourceCode {
+        padding: 0;
+        border-radius: 5pt;
+        margin: 0.2em 2em 1em 2em;
+        box-shadow: 1px 1px 3px 0px #ccc;
+}
+
+pre.sourceCode {
+        /* background: #eee; */
+        color: inherit;
+        margin: 0;
+        border-left: thick solid #888;
+        padding: 10pt 10pt 10pt 20pt;
+        font-size: 1rem;
+}
+
+.doctestResult pre.sourceCode {
+        border-color: #484;
+}
+
+footer {
+        background: #eee;
+        padding: 0.5em 0 0.5em 0;
+}
+
+blockquote {
+        border-left: thick solid #888;
+        padding: 10pt 10pt 10pt 20pt;
+        margin-left: 2em;
+}
+
+table {
+        margin-left: 2em;
+        margin-right: 2em;
+        border-left: thick solid #888;
+}
+
+td, th {
+        padding: 2pt 5pt 2pt 5pt;
+}
+
+tr:nth-child(even) {
+        background-color: #eee;
+}
+
+code {
+        color: #bd2130;
+        font-family: "Source Code Pro", monospace;
+        font-weight: 400;
+        font-size: smaller;
+}
+

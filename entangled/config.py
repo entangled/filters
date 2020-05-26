@@ -1,4 +1,5 @@
-## ------ language="Python" file="entangled/config.py" project://lit/entangled-python.md#64
+# ~\~ language=Python filename=entangled/config.py
+# ~\~ begin <<lit/entangled-python.md|entangled/config.py>>[0]
 from .typing import (JSONType)
 import subprocess
 import json
@@ -19,9 +20,13 @@ def read_config() -> JSONType:
     return json.load(open("entangled.json", "r"))
 
 def get_language_info(config: JSONType, identifier: str) -> JSONType:
+    kernels = { k["language"]: k["kernel"] for k in config["jupyter"] }
+
     try:
-        return next(lang for lang in config["languages"]
-                    if identifier in lang["identifiers"])
+        language = next(lang for lang in config["entangled"]["languages"]
+                        if identifier in lang["identifiers"])
     except StopIteration:
         raise ValueError(f"Language with identifier `{identifier}` not found in config.")
-## ------ end
+
+    return {"jupyter": kernels.get(language["name"]), **language}
+# ~\~ end

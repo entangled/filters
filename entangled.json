@@ -1,38 +1,257 @@
 {
-  "languages": [
-    {
-      "comment": {
-        "start": "#"
+  "entangled": {
+    "annotate": "Standard",
+    "database": ".entangled/db.sqlite",
+    "languages": [
+      {
+        "comment": "#",
+        "identifiers": [
+          "awk"
+        ],
+        "name": "Awk"
       },
-      "identifiers": [
-        "py",
-        "python",
-        "python3"
-      ],
-      "jupyter": "python3",
-      "name": "Python"
-    },
-    {
-      "comment": {
-        "start": ";"
+      {
+        "comment": {
+          "end": "*/",
+          "start": "/*"
+        },
+        "identifiers": [
+          "c"
+        ],
+        "name": "C"
       },
-      "identifiers": [
-        "scheme",
-        "r6rs",
-        "r7rs"
-      ],
-      "jupyter": "guile",
-      "name": "Scheme"
-    },
-    {
-      "comment": {
-        "start": "//"
+      {
+        "comment": "//",
+        "identifiers": [
+          "cpp",
+          "c++"
+        ],
+        "name": "C++"
       },
-      "identifiers": [
-        "cpp",
-        "c++"
-      ],
-      "name": "C++"
+      {
+        "comment": ";",
+        "identifiers": [
+          "clojure"
+        ],
+        "name": "Clojure"
+      },
+      {
+        "comment": {
+          "end": "*/",
+          "start": "/*"
+        },
+        "identifiers": [
+          "css"
+        ],
+        "name": "CSS"
+      },
+      {
+        "comment": "//",
+        "identifiers": [
+          "d"
+        ],
+        "name": "D"
+      },
+      {
+        "comment": "--",
+        "identifiers": [
+          "dhall"
+        ],
+        "name": "Dhall"
+      },
+      {
+        "comment": "--",
+        "identifiers": [
+          "elm"
+        ],
+        "name": "Elm"
+      },
+      {
+        "comment": "#",
+        "identifiers": [
+          "gnuplot"
+        ],
+        "name": "Gnuplot"
+      },
+      {
+        "comment": "--",
+        "identifiers": [
+          "haskell"
+        ],
+        "name": "Haskell"
+      },
+      {
+        "comment": {
+          "end": "-->",
+          "start": "<!--"
+        },
+        "identifiers": [
+          "html"
+        ],
+        "name": "HTML"
+      },
+      {
+        "comment": "--",
+        "identifiers": [
+          "idris"
+        ],
+        "name": "Idris"
+      },
+      {
+        "comment": "#",
+        "identifiers": [
+          "julia"
+        ],
+        "name": "Julia"
+      },
+      {
+        "comment": {
+          "end": "*/",
+          "start": "/*"
+        },
+        "identifiers": [
+          "js",
+          "javascript",
+          "ecma"
+        ],
+        "name": "JavaScript"
+      },
+      {
+        "comment": "%",
+        "identifiers": [
+          "latex"
+        ],
+        "name": "LaTeX"
+      },
+      {
+        "comment": "--",
+        "identifiers": [
+          "lua"
+        ],
+        "name": "Lua"
+      },
+      {
+        "comment": "#",
+        "identifiers": [
+          "make",
+          "makefile"
+        ],
+        "name": "Make"
+      },
+      {
+        "comment": {
+          "end": "*)",
+          "start": "(*"
+        },
+        "identifiers": [
+          "ocaml"
+        ],
+        "name": "OCaml"
+      },
+      {
+        "comment": {
+          "end": "*/",
+          "start": "/*"
+        },
+        "identifiers": [
+          "opencl"
+        ],
+        "name": "OpenCL"
+      },
+      {
+        "comment": "--",
+        "identifiers": [
+          "purs",
+          "purescript"
+        ],
+        "name": "PureScript"
+      },
+      {
+        "comment": "#",
+        "identifiers": [
+          "py",
+          "python"
+        ],
+        "name": "Python"
+      },
+      {
+        "comment": "#",
+        "identifiers": [
+          "r"
+        ],
+        "name": "R"
+      },
+      {
+        "comment": "//",
+        "identifiers": [
+          "rust"
+        ],
+        "name": "Rust"
+      },
+      {
+        "comment": ";",
+        "identifiers": [
+          "scheme",
+          "r6rs",
+          "racket",
+          "r7rs"
+        ],
+        "name": "Scheme"
+      },
+      {
+        "comment": "--",
+        "identifiers": [
+          "sqlite"
+        ],
+        "name": "SQLite"
+      },
+      {
+        "comment": "#",
+        "identifiers": [
+          "toml"
+        ],
+        "name": "TOML"
+      },
+      {
+        "comment": "//",
+        "identifiers": [
+          "ts",
+          "typescript"
+        ],
+        "name": "TypeScript"
+      },
+      {
+        "comment": "#",
+        "identifiers": [
+          "yaml"
+        ],
+        "name": "YAML"
+      }
+    ],
+    "lineDirectives": [
+      {
+        "format": "#LINE {linenumber} \"{filename}\"",
+        "name": "C"
+      },
+      {
+        "format": "#LINE {linenumber} \"{filename}\"",
+        "name": "C++"
+      },
+      {
+        "format": "{{-# LINE {linenumber} \"{filename}\" #-}}",
+        "name": "Haskell"
+      }
+    ],
+    "useLineDirectives": false,
+    "version": "1.0.0",
+    "watchList": [
+      "lit/*.md"
+    ]
+  },
+  "jupyter": [
+    {
+      "kernel": "python3",
+      "language": "Python"
     }
   ]
 }

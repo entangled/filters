@@ -1,4 +1,5 @@
--- ------ language="Dhall" file="entangled/schema/Card.dhall" project://lit/entangled-python.md#635
+-- ~\~ language=Dhall filename=entangled/schema/Card.dhall
+-- ~\~ begin <<lit/entangled-python.md|entangled/schema/Card.dhall>>[0]
 let Link =
     { href : Text
     , content : Text
@@ -16,4 +17,4 @@ in let Card =
     }
 
 in Card
--- ------ end
+-- ~\~ end

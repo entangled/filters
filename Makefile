@@ -1,91 +1,60 @@
-#| Makefile
-#| ========
-#|
-#| Write your presentation in Markdown. This `Makefile` lets you watch the sources
-#| and preview the presentation, live in your browser.
-#|
-#| Usage
-#| -----
-#|
-#|     make [help|clean|watch|pages]
-#|
-#| Prerequisites
-#| -------------
-#|
-#| * Pandoc
-#| * Node (stable)
-#| * inotify-tools
-#|
+# Arguments to Pandoc; these are reasonable defaults
+pandoc_args += --template bootstrap/template.html
+pandoc_args += --css css/mods.css
+pandoc_args += -t html5 -s --mathjax --toc
+pandoc_args += --toc-depth 1
+pandoc_args += --filter pandoc-bootstrap
+pandoc_args += -f markdown+multiline_tables+simple_tables
 
-build_dir := docs
-src_dir := docsrc
-source := $(src_dir)/index.md lit/entangled-python.md
-style := dark.css
-images := $(shell find $(src_dir)/img/*)
-image_tgts := $(images:$(src_dir)/%=$(build_dir)/%)
+# Load syntax definitions for languages that are not supported
+# by default. These XML files are in the format of the Kate editor.
+pandoc_args += --syntax-definition bootstrap/elm.xml
+pandoc_args += --syntax-definition bootstrap/pure.xml
+pandoc_args += --syntax-definition bootstrap/dhall.xml
+pandoc_args += --highlight-style tango
 
-pandoc_args := -s -t html5
-pandoc_args += --highlight-style $(src_dir)/style/syntax.theme
-pandoc_args += --filter pandoc-citeproc --mathjax
-pandoc_args += --filter pandoc-test
-pandoc_args += --css dark.css
-pandoc_args += --template=$(src_dir)/template.html
+# Any file in the `lit` directory that is not a Markdown source 
+# is to be copied to the `docs` directory
+static_files := $(shell find -L lit -type f -not -name '*.md')
+static_targets := $(static_files:lit/%=docs/%)
 
-#|
-#| Targets
-#| -------
+input_files := lit/entangled-python.md
 
-#| * `help`: print this help
-help:
-	@ grep -e '^#|' Makefile \
-	| sed -e 's/^#| \?\(.*\)/\1/' \
-	| pandoc -f markdown -t filters/terminal.lua \
-	| fold -s -w 80
+.PHONY: site clean watch watch-pandoc watch-browser-sync
 
-#| * `watch`: reload browser upon changes
-watch: $(build_dir)/source.html $(build_dir)/index.html $(build_dir)/img $(build_dir)/$(style)
+# This should build everything needed to generate your web site. That includes
+# possible Javascript targets that may need compiling.
+site: docs/index.html docs/css/mods.css $(static_targets)
+
+clean:
+	rm -rf docs
+
+# Starts a tmux with Entangled, Browser-sync and an Inotify loop for running
+# Pandoc.
+watch:
 	@tmux new-session make --no-print-directory watch-pandoc \; \
-		split-window -v make --no-print-directory watch-browser \; \
+		split-window -v make --no-print-directory watch-browser-sync \; \
+		split-window -v entangled daemon \; \
 		select-layout even-vertical \;
 
 watch-pandoc:
 	@while true; do \
-		inotifywait -e close_write $(source) $(src_dir)/style/* Makefile $(src_dir)/img/*; \
-		make build; \
+		inotifywait -e close_write bootstrap lit Makefile; \
+		make site; \
 	done
 
-watch-browser:
-	browser-sync start -s $(build_dir) -f $(build_dir) --no-notify
+watch-browser-sync:
+	browser-sync start -w -s docs
 
-#| * `clean`: clean reveal.js and docs
-clean:
-	rm -rf $(build_dir)
+docs/index.html: $(input_files) Makefile
+	@mkdir -p docs
+	pandoc $(pandoc_args) $(input_files) -o $@
 
-build: $(build_dir)/index.html $(build_dir)/source.html \
-       $(build_dir)/$(style) $(image_tgts) $(build_dir)/fonts
-
-# Rules ============================================
-
-$(build_dir)/%.html: $(src_dir)/%.md $(src_dir)/style/syntax.theme $(src_dir)/template.html Makefile
-	@mkdir -p $(build_dir)
-	pandoc $(pandoc_args) -o $@ $<
-
-$(build_dir)/source.html: lit/entangled-python.md $(src_dir)/style/syntax.theme $(src_dir)/template.html Makefile
-	@mkdir -p $(build_dir)
-	pandoc --toc $(pandoc_args) -o $@ $<	
-
-$(build_dir)/img/%: $(src_dir)/img/%
-	@mkdir -p $(build_dir)/img
-	cp -r $(src_dir)/img/* $(build_dir)/img
-
-$(build_dir)/%.css: $(src_dir)/style/%.css
-	@mkdir -p $(build_dir)
+docs/css/mods.css: bootstrap/mods.css
+	@mkdir -p docs/css
 	cp $< $@
 
-$(build_dir)/fonts: $(src_dir)/fonts
-	@mkdir -p $(build_dir)
-	cp -r $< $@
-
-.PHONY: all clean build watch watch-pandoc watch-browser
-
+$(static_targets): docs/%: lit/%
+	@mkdir -p $(dir $@)
+	cp $< $@
 

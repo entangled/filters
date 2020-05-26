@@ -1,31 +1,8 @@
-let Comment : Type = { start : Text, end : Optional Text }
-let Language : Type = { name : Text, identifiers : List Text, comment : Comment, jupyter : Optional Text }
+let entangled = https://raw.githubusercontent.com/entangled/entangled/master/data/config-schema.dhall
+                sha256:a924fcffa514e3909459e48c45924886062ff4a77be582af0517f9c4bae7ae73
 
-let Config : Type =
-    { languages : List Language }
+in { entangled = entangled.Config :: { watchList = [ "lit/*.md" ],
+                                       database = Some ".entangled/db.sqlite" }
+   , jupyter = [ { language = "Python", kernel = "python3" } ]
+   }
 
-let hashComment         : Comment = { start = "#", end = None Text }
-let lispStyleComment    : Comment = { start = ";", end = None Text }
-let cStyleComment       : Comment = { start = "/*", end = Some "*/" }
-let cppStyleComment     : Comment = { start = "//", end = None Text }
-let haskellStyleComment : Comment = { start = "--", end = None Text }
-let mlStyleComment      : Comment = { start = "(*", end = Some "*)" }
-let xmlStyleComment     : Comment = { start = "<!--", end = Some "-->" }
-
-in { languages =
-    [ { name = "Python"
-      , identifiers = ["py", "python", "python3"]
-      , comment = hashComment
-      , jupyter = Some "python3" }
-
-    , { name = "Scheme"
-      , identifiers = ["scheme", "r6rs", "r7rs"]
-      , comment = lispStyleComment
-      , jupyter = Some "guile" } 
-
-    , { name = "C++"
-      , identifiers = ["cpp", "c++"]
-      , comment = cppStyleComment
-      , jupyter = None Text }
-    ]
-   } : Config
