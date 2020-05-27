@@ -679,10 +679,16 @@ def prepare(doc: Doc) -> Doc:
             version = doc.metadata["version"].content[0]
         except (AttributeError, KeyError):
             version = Str("unknown")
-        
+       
+        try:
+            license = doc.metadata["license"].content[0]
+        except (AttributeError, KeyError):
+            license = Str("unknown")
+ 
         doc.metadata["footer"] = MetaInlines(
             Str(str(date.today())), Space, Str("—"), Space,
-            Str("version"), Space, version, LineBreak,
+            Str("version:"), Space, version, Space, Str("—"), Space,
+            Str("license:"), Space, license, LineBreak,
             *old_footer)
 
 

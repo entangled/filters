@@ -195,7 +195,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="compute-pi"><pre class="sourceCode python eval"><code class="sourceCode python"><span id="compute-pi-1"><a href="#compute-pi-1"></a><span class="bu">print</span>(<span class="st">&quot;π ≈ </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(compute_pi(<span class="dv">1000000</span>)))</span></code></pre></div>
 </div>
 <div class="doctestResult">
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ <span class="fl">3.141628</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ <span class="fl">3.143336</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -925,15 +925,21 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb24-39"><a href="#cb24-39"></a>            version <span class="op">=</span> doc.metadata[<span class="st">&quot;version&quot;</span>].content[<span class="dv">0</span>]</span>
 <span id="cb24-40"><a href="#cb24-40"></a>        <span class="cf">except</span> (<span class="pp">AttributeError</span>, <span class="pp">KeyError</span>):</span>
 <span id="cb24-41"><a href="#cb24-41"></a>            version <span class="op">=</span> Str(<span class="st">&quot;unknown&quot;</span>)</span>
-<span id="cb24-42"><a href="#cb24-42"></a>        </span>
-<span id="cb24-43"><a href="#cb24-43"></a>        doc.metadata[<span class="st">&quot;footer&quot;</span>] <span class="op">=</span> MetaInlines(</span>
-<span id="cb24-44"><a href="#cb24-44"></a>            Str(<span class="bu">str</span>(date.today())), Space, Str(<span class="st">&quot;—&quot;</span>), Space,</span>
-<span id="cb24-45"><a href="#cb24-45"></a>            Str(<span class="st">&quot;version&quot;</span>), Space, version, LineBreak,</span>
-<span id="cb24-46"><a href="#cb24-46"></a>            <span class="op">*</span>old_footer)</span>
-<span id="cb24-47"><a href="#cb24-47"></a></span>
-<span id="cb24-48"><a href="#cb24-48"></a></span>
-<span id="cb24-49"><a href="#cb24-49"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="cb24-50"><a href="#cb24-50"></a>    run_filters([bootstrap_card_deck, bootstrap_fold_code], prepare<span class="op">=</span>prepare, doc<span class="op">=</span>doc)</span></code></pre></div>
+<span id="cb24-42"><a href="#cb24-42"></a>       </span>
+<span id="cb24-43"><a href="#cb24-43"></a>        <span class="cf">try</span>:</span>
+<span id="cb24-44"><a href="#cb24-44"></a>            license <span class="op">=</span> doc.metadata[<span class="st">&quot;license&quot;</span>].content[<span class="dv">0</span>]</span>
+<span id="cb24-45"><a href="#cb24-45"></a>        <span class="cf">except</span> (<span class="pp">AttributeError</span>, <span class="pp">KeyError</span>):</span>
+<span id="cb24-46"><a href="#cb24-46"></a>            license <span class="op">=</span> Str(<span class="st">&quot;unknown&quot;</span>)</span>
+<span id="cb24-47"><a href="#cb24-47"></a> </span>
+<span id="cb24-48"><a href="#cb24-48"></a>        doc.metadata[<span class="st">&quot;footer&quot;</span>] <span class="op">=</span> MetaInlines(</span>
+<span id="cb24-49"><a href="#cb24-49"></a>            Str(<span class="bu">str</span>(date.today())), Space, Str(<span class="st">&quot;—&quot;</span>), Space,</span>
+<span id="cb24-50"><a href="#cb24-50"></a>            Str(<span class="st">&quot;version:&quot;</span>), Space, version, Space, Str(<span class="st">&quot;—&quot;</span>), Space,</span>
+<span id="cb24-51"><a href="#cb24-51"></a>            Str(<span class="st">&quot;license:&quot;</span>), Space, license, LineBreak,</span>
+<span id="cb24-52"><a href="#cb24-52"></a>            <span class="op">*</span>old_footer)</span>
+<span id="cb24-53"><a href="#cb24-53"></a></span>
+<span id="cb24-54"><a href="#cb24-54"></a></span>
+<span id="cb24-55"><a href="#cb24-55"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb24-56"><a href="#cb24-56"></a>    run_filters([bootstrap_card_deck, bootstrap_fold_code], prepare<span class="op">=</span>prepare, doc<span class="op">=</span>doc)</span></code></pre></div>
 </div>
 <div class="annotated-code">
 <p><span><em>«bootstrap-card-deck»=</em></span></p>
