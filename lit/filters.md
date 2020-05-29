@@ -594,15 +594,19 @@ let Link =
     , content : Text
     }
 
+let Location = < Top | Right | Bottom | Left >
+
 in let Card =
     { Type =
         { image : Optional Text
         , title : Text
         , text : Text
-        , link : Optional Link }
+        , link : Optional Link
+        , imageLocation : Location }
     , default =
         { image = None Text
-        , link = None Link }
+        , link = None Link
+        , imageLocation = Location.Top }
     }
 
 in Card
@@ -667,9 +671,15 @@ def parse_dhall(content: str, cwd: Optional[Path] = None) -> JSONType:
 
 def prepare(doc: Doc) -> Doc:
     from datetime import date
+    from itertools import islice, chain, repeat
+
+    def intersperse(delimiter, seq):
+        return islice(chain.from_iterable(zip(repeat(delimiter), seq)), 1, None)
+
     annotate.prepare(doc)
 
     if "footer" in doc.metadata:
+        content = [[Str(str(date.today()))]]
         try:
             old_footer = list(doc.metadata["footer"].content)
         except AttributeError:
@@ -677,19 +687,19 @@ def prepare(doc: Doc) -> Doc:
 
         try:
             version = doc.metadata["version"].content[0]
+            content.append([Str("version:"), Space, version])
         except (AttributeError, KeyError):
-            version = Str("unknown")
-       
+            pass
+
         try:
             license = doc.metadata["license"].content[0]
+            content.append([Str("license:"), Space, license])
         except (AttributeError, KeyError):
-            license = Str("unknown")
- 
+            pass
+
+        content = sum(intersperse([Space, Str("—"), Space], content), [])
         doc.metadata["footer"] = MetaInlines(
-            Str(str(date.today())), Space, Str("—"), Space,
-            Str("version:"), Space, version, Space, Str("—"), Space,
-            Str("license:"), Space, license, LineBreak,
-            *old_footer)
+            *old_footer, LineBreak, *content)
 
 
 def main(doc: Optional[Doc] = None) -> None:
@@ -701,7 +711,32 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
     def outer_container(*elements: Element):
         return Div(Div(*elements, classes=["card-deck"]), classes=["container-fluid", "my-4"])
 
-    def card(card_data: JSONType) -> Element:
+    def horizontal_card(card_data: JSONType) -> Element:
+        assert "title" in card_data and "text" in card_data
+        title = card_data["title"]
+        text = convert_text(card_data["text"])
+
+        content = []
+        body = [
+            Header(Str(title), level=3, classes=["card-title"]),
+            Div(*text, classes=["card-text"])
+        ]
+
+        if "link" in card_data:
+            body.append(Plain(Link(Str(card_data["link"]["content"]),
+                                   url=card_data["link"]["href"],
+                                   classes=["btn", "btn-secondary", "mt-auto", "mx-4"])))
+
+        card_img = Div(Plain(Image(url=card_data["image"], title=title, attributes={"width": "100%"})), classes=["col-4"])
+        card_body = Div(Div(*body, classes=["card-body"]), classes=["col-8"])
+        if card_data["imageLocation"] == "Left":
+            content = [ card_img, card_body ]
+        else:
+            content = [ card_body, card_img ]
+        content = Div(Div(*content, classes=["row", "no-gutters"]), classes=["card", "rounded-lg"])
+        return content
+
+    def vertical_card(card_data: JSONType) -> Element:
         assert "title" in card_data and "text" in card_data
         title = card_data["title"]
         text = convert_text(card_data["text"])
@@ -725,8 +760,15 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
         content = Div(Div(*content, classes=["card", "h-100", "rounded-lg"]), classes=["col"])
         return content
 
+    def card(card_data):
+        if card_data["imageLocation"] in ["Top", "Bottom"]:
+            return vertical_card(card_data)
+        else:
+            return horizontal_card(card_data)
+
     if isinstance(elem, CodeBlock) and "bootstrap-card-deck" in elem.classes:
-        content = map(card, parse_dhall(elem.text, cwd=data_path))
+        deck_data = parse_dhall(elem.text, cwd=data_path)
+        content = map(card, deck_data)
         return outer_container(*content)
 
     return None

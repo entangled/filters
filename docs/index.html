@@ -4,8 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="author" content="Johan Hidding" />
-  <title>Entangled Python module</title>
+  <title>Entangled</title>
   <style type="text/css">
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -95,7 +94,8 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <a href="#" class="ml-5 mr-auto navbar-brand">Entangled Python module<br><span style="font-size: smaller"> by <i>Johan Hidding</i></span></a>
+  <a href="#" class="ml-5 mr-auto navbar-brand">Entangled<br><span style="font-size: smaller">Python module 
+        </span></a>
 <div class="collapse navbar-collapse" id="navbarSupportedContent">
 <ul>
 <li><a href="#readme-entangled-pandoc-filters">Readme – Entangled, Pandoc filters</a></li>
@@ -110,7 +110,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </nav>
 
 <!-- <nav class="navbar navbar-dark navbar-expand-md bg-dark mb-4">
-<p class="author">Johan Hidding</p>
+<p class="subtitle">Python module</p>
 </nav>
  -->
 
@@ -167,7 +167,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="version">Version</h2>
 <div class="annotated-code">
 <p><span><em>«entangled/__init__.py»=</em></span></p>
-<div class="sourceCode" id="cb1" data-file="entangled/__init__.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a>__version__ <span class="op">=</span> <span class="st">&quot;0.6.0&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1" data-file="entangled/__init__.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a>__version__ <span class="op">=</span> <span class="st">&quot;0.6.1&quot;</span></span></code></pre></div>
 </div>
 <h2 id="demo">Demo</h2>
 <ul>
@@ -195,7 +195,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="compute-pi"><pre class="sourceCode python eval"><code class="sourceCode python"><span id="compute-pi-1"><a href="#compute-pi-1"></a><span class="bu">print</span>(<span class="st">&quot;π ≈ </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(compute_pi(<span class="dv">1000000</span>)))</span></code></pre></div>
 </div>
 <div class="doctestResult">
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ <span class="fl">3.143336</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ <span class="fl">3.141704</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -844,18 +844,22 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb21-3"><a href="#cb21-3"></a>    , content <span class="fu">:</span> <span class="dt">Text</span></span>
 <span id="cb21-4"><a href="#cb21-4"></a>    }</span>
 <span id="cb21-5"><a href="#cb21-5"></a></span>
-<span id="cb21-6"><a href="#cb21-6"></a><span class="kw">in</span> <span class="kw">let</span> <span class="dt">Card</span> <span class="fu">=</span></span>
-<span id="cb21-7"><a href="#cb21-7"></a>    { <span class="dt">Type</span> <span class="fu">=</span></span>
-<span id="cb21-8"><a href="#cb21-8"></a>        { image <span class="fu">:</span> <span class="dt">Optional</span> <span class="dt">Text</span></span>
-<span id="cb21-9"><a href="#cb21-9"></a>        , title <span class="fu">:</span> <span class="dt">Text</span></span>
-<span id="cb21-10"><a href="#cb21-10"></a>        , text <span class="fu">:</span> <span class="dt">Text</span></span>
-<span id="cb21-11"><a href="#cb21-11"></a>        , link <span class="fu">:</span> <span class="dt">Optional</span> <span class="dt">Link</span> }</span>
-<span id="cb21-12"><a href="#cb21-12"></a>    , default <span class="fu">=</span></span>
-<span id="cb21-13"><a href="#cb21-13"></a>        { image <span class="fu">=</span> <span class="dt">None</span> <span class="dt">Text</span></span>
-<span id="cb21-14"><a href="#cb21-14"></a>        , link <span class="fu">=</span> <span class="dt">None</span> <span class="dt">Link</span> }</span>
-<span id="cb21-15"><a href="#cb21-15"></a>    }</span>
-<span id="cb21-16"><a href="#cb21-16"></a></span>
-<span id="cb21-17"><a href="#cb21-17"></a><span class="kw">in</span> <span class="dt">Card</span></span></code></pre></div>
+<span id="cb21-6"><a href="#cb21-6"></a><span class="kw">let</span> <span class="dt">Location</span> <span class="fu">=</span> <span class="fu">&lt;</span> <span class="dt">Top</span> <span class="fu">|</span> <span class="dt">Right</span> <span class="fu">|</span> <span class="dt">Bottom</span> <span class="fu">|</span> <span class="dt">Left</span> <span class="fu">&gt;</span></span>
+<span id="cb21-7"><a href="#cb21-7"></a></span>
+<span id="cb21-8"><a href="#cb21-8"></a><span class="kw">in</span> <span class="kw">let</span> <span class="dt">Card</span> <span class="fu">=</span></span>
+<span id="cb21-9"><a href="#cb21-9"></a>    { <span class="dt">Type</span> <span class="fu">=</span></span>
+<span id="cb21-10"><a href="#cb21-10"></a>        { image <span class="fu">:</span> <span class="dt">Optional</span> <span class="dt">Text</span></span>
+<span id="cb21-11"><a href="#cb21-11"></a>        , title <span class="fu">:</span> <span class="dt">Text</span></span>
+<span id="cb21-12"><a href="#cb21-12"></a>        , text <span class="fu">:</span> <span class="dt">Text</span></span>
+<span id="cb21-13"><a href="#cb21-13"></a>        , link <span class="fu">:</span> <span class="dt">Optional</span> <span class="dt">Link</span></span>
+<span id="cb21-14"><a href="#cb21-14"></a>        , imageLocation <span class="fu">:</span> <span class="dt">Location</span> }</span>
+<span id="cb21-15"><a href="#cb21-15"></a>    , default <span class="fu">=</span></span>
+<span id="cb21-16"><a href="#cb21-16"></a>        { image <span class="fu">=</span> <span class="dt">None</span> <span class="dt">Text</span></span>
+<span id="cb21-17"><a href="#cb21-17"></a>        , link <span class="fu">=</span> <span class="dt">None</span> <span class="dt">Link</span></span>
+<span id="cb21-18"><a href="#cb21-18"></a>        , imageLocation <span class="fu">=</span> <span class="dt">Location.Top</span> }</span>
+<span id="cb21-19"><a href="#cb21-19"></a>    }</span>
+<span id="cb21-20"><a href="#cb21-20"></a></span>
+<span id="cb21-21"><a href="#cb21-21"></a><span class="kw">in</span> <span class="dt">Card</span></span></code></pre></div>
 </div>
 <div class="annotated-code">
 <p><span><em>«test/card-deck-example.dhall»=</em></span></p>
@@ -913,33 +917,39 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb24-27"><a href="#cb24-27"></a></span>
 <span id="cb24-28"><a href="#cb24-28"></a><span class="kw">def</span> prepare(doc: Doc) <span class="op">-&gt;</span> Doc:</span>
 <span id="cb24-29"><a href="#cb24-29"></a>    <span class="im">from</span> datetime <span class="im">import</span> date</span>
-<span id="cb24-30"><a href="#cb24-30"></a>    annotate.prepare(doc)</span>
+<span id="cb24-30"><a href="#cb24-30"></a>    <span class="im">from</span> itertools <span class="im">import</span> islice, chain, repeat</span>
 <span id="cb24-31"><a href="#cb24-31"></a></span>
-<span id="cb24-32"><a href="#cb24-32"></a>    <span class="cf">if</span> <span class="st">&quot;footer&quot;</span> <span class="kw">in</span> doc.metadata:</span>
-<span id="cb24-33"><a href="#cb24-33"></a>        <span class="cf">try</span>:</span>
-<span id="cb24-34"><a href="#cb24-34"></a>            old_footer <span class="op">=</span> <span class="bu">list</span>(doc.metadata[<span class="st">&quot;footer&quot;</span>].content)</span>
-<span id="cb24-35"><a href="#cb24-35"></a>        <span class="cf">except</span> <span class="pp">AttributeError</span>:</span>
-<span id="cb24-36"><a href="#cb24-36"></a>            old_footer <span class="op">=</span> [Str(<span class="st">&quot;&quot;</span>)]</span>
-<span id="cb24-37"><a href="#cb24-37"></a></span>
-<span id="cb24-38"><a href="#cb24-38"></a>        <span class="cf">try</span>:</span>
-<span id="cb24-39"><a href="#cb24-39"></a>            version <span class="op">=</span> doc.metadata[<span class="st">&quot;version&quot;</span>].content[<span class="dv">0</span>]</span>
-<span id="cb24-40"><a href="#cb24-40"></a>        <span class="cf">except</span> (<span class="pp">AttributeError</span>, <span class="pp">KeyError</span>):</span>
-<span id="cb24-41"><a href="#cb24-41"></a>            version <span class="op">=</span> Str(<span class="st">&quot;unknown&quot;</span>)</span>
-<span id="cb24-42"><a href="#cb24-42"></a>       </span>
-<span id="cb24-43"><a href="#cb24-43"></a>        <span class="cf">try</span>:</span>
-<span id="cb24-44"><a href="#cb24-44"></a>            license <span class="op">=</span> doc.metadata[<span class="st">&quot;license&quot;</span>].content[<span class="dv">0</span>]</span>
-<span id="cb24-45"><a href="#cb24-45"></a>        <span class="cf">except</span> (<span class="pp">AttributeError</span>, <span class="pp">KeyError</span>):</span>
-<span id="cb24-46"><a href="#cb24-46"></a>            license <span class="op">=</span> Str(<span class="st">&quot;unknown&quot;</span>)</span>
-<span id="cb24-47"><a href="#cb24-47"></a> </span>
-<span id="cb24-48"><a href="#cb24-48"></a>        doc.metadata[<span class="st">&quot;footer&quot;</span>] <span class="op">=</span> MetaInlines(</span>
-<span id="cb24-49"><a href="#cb24-49"></a>            Str(<span class="bu">str</span>(date.today())), Space, Str(<span class="st">&quot;—&quot;</span>), Space,</span>
-<span id="cb24-50"><a href="#cb24-50"></a>            Str(<span class="st">&quot;version:&quot;</span>), Space, version, Space, Str(<span class="st">&quot;—&quot;</span>), Space,</span>
-<span id="cb24-51"><a href="#cb24-51"></a>            Str(<span class="st">&quot;license:&quot;</span>), Space, license, LineBreak,</span>
-<span id="cb24-52"><a href="#cb24-52"></a>            <span class="op">*</span>old_footer)</span>
-<span id="cb24-53"><a href="#cb24-53"></a></span>
-<span id="cb24-54"><a href="#cb24-54"></a></span>
-<span id="cb24-55"><a href="#cb24-55"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
-<span id="cb24-56"><a href="#cb24-56"></a>    run_filters([bootstrap_card_deck, bootstrap_fold_code], prepare<span class="op">=</span>prepare, doc<span class="op">=</span>doc)</span></code></pre></div>
+<span id="cb24-32"><a href="#cb24-32"></a>    <span class="kw">def</span> intersperse(delimiter, seq):</span>
+<span id="cb24-33"><a href="#cb24-33"></a>        <span class="cf">return</span> islice(chain.from_iterable(<span class="bu">zip</span>(repeat(delimiter), seq)), <span class="dv">1</span>, <span class="va">None</span>)</span>
+<span id="cb24-34"><a href="#cb24-34"></a></span>
+<span id="cb24-35"><a href="#cb24-35"></a>    annotate.prepare(doc)</span>
+<span id="cb24-36"><a href="#cb24-36"></a></span>
+<span id="cb24-37"><a href="#cb24-37"></a>    <span class="cf">if</span> <span class="st">&quot;footer&quot;</span> <span class="kw">in</span> doc.metadata:</span>
+<span id="cb24-38"><a href="#cb24-38"></a>        content <span class="op">=</span> [[Str(<span class="bu">str</span>(date.today()))]]</span>
+<span id="cb24-39"><a href="#cb24-39"></a>        <span class="cf">try</span>:</span>
+<span id="cb24-40"><a href="#cb24-40"></a>            old_footer <span class="op">=</span> <span class="bu">list</span>(doc.metadata[<span class="st">&quot;footer&quot;</span>].content)</span>
+<span id="cb24-41"><a href="#cb24-41"></a>        <span class="cf">except</span> <span class="pp">AttributeError</span>:</span>
+<span id="cb24-42"><a href="#cb24-42"></a>            old_footer <span class="op">=</span> [Str(<span class="st">&quot;&quot;</span>)]</span>
+<span id="cb24-43"><a href="#cb24-43"></a></span>
+<span id="cb24-44"><a href="#cb24-44"></a>        <span class="cf">try</span>:</span>
+<span id="cb24-45"><a href="#cb24-45"></a>            version <span class="op">=</span> doc.metadata[<span class="st">&quot;version&quot;</span>].content[<span class="dv">0</span>]</span>
+<span id="cb24-46"><a href="#cb24-46"></a>            content.append([Str(<span class="st">&quot;version:&quot;</span>), Space, version])</span>
+<span id="cb24-47"><a href="#cb24-47"></a>        <span class="cf">except</span> (<span class="pp">AttributeError</span>, <span class="pp">KeyError</span>):</span>
+<span id="cb24-48"><a href="#cb24-48"></a>            <span class="cf">pass</span></span>
+<span id="cb24-49"><a href="#cb24-49"></a></span>
+<span id="cb24-50"><a href="#cb24-50"></a>        <span class="cf">try</span>:</span>
+<span id="cb24-51"><a href="#cb24-51"></a>            license <span class="op">=</span> doc.metadata[<span class="st">&quot;license&quot;</span>].content[<span class="dv">0</span>]</span>
+<span id="cb24-52"><a href="#cb24-52"></a>            content.append([Str(<span class="st">&quot;license:&quot;</span>), Space, license])</span>
+<span id="cb24-53"><a href="#cb24-53"></a>        <span class="cf">except</span> (<span class="pp">AttributeError</span>, <span class="pp">KeyError</span>):</span>
+<span id="cb24-54"><a href="#cb24-54"></a>            <span class="cf">pass</span></span>
+<span id="cb24-55"><a href="#cb24-55"></a></span>
+<span id="cb24-56"><a href="#cb24-56"></a>        content <span class="op">=</span> <span class="bu">sum</span>(intersperse([Space, Str(<span class="st">&quot;—&quot;</span>), Space], content), [])</span>
+<span id="cb24-57"><a href="#cb24-57"></a>        doc.metadata[<span class="st">&quot;footer&quot;</span>] <span class="op">=</span> MetaInlines(</span>
+<span id="cb24-58"><a href="#cb24-58"></a>            <span class="op">*</span>old_footer, LineBreak, <span class="op">*</span>content)</span>
+<span id="cb24-59"><a href="#cb24-59"></a></span>
+<span id="cb24-60"><a href="#cb24-60"></a></span>
+<span id="cb24-61"><a href="#cb24-61"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb24-62"><a href="#cb24-62"></a>    run_filters([bootstrap_card_deck, bootstrap_fold_code], prepare<span class="op">=</span>prepare, doc<span class="op">=</span>doc)</span></code></pre></div>
 </div>
 <div class="annotated-code">
 <p><span><em>«bootstrap-card-deck»=</em></span></p>
@@ -947,35 +957,67 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <span id="bootstrap-card-deck-2"><a href="#bootstrap-card-deck-2"></a>    <span class="kw">def</span> outer_container(<span class="op">*</span>elements: Element):</span>
 <span id="bootstrap-card-deck-3"><a href="#bootstrap-card-deck-3"></a>        <span class="cf">return</span> Div(Div(<span class="op">*</span>elements, classes<span class="op">=</span>[<span class="st">&quot;card-deck&quot;</span>]), classes<span class="op">=</span>[<span class="st">&quot;container-fluid&quot;</span>, <span class="st">&quot;my-4&quot;</span>])</span>
 <span id="bootstrap-card-deck-4"><a href="#bootstrap-card-deck-4"></a></span>
-<span id="bootstrap-card-deck-5"><a href="#bootstrap-card-deck-5"></a>    <span class="kw">def</span> card(card_data: JSONType) <span class="op">-&gt;</span> Element:</span>
+<span id="bootstrap-card-deck-5"><a href="#bootstrap-card-deck-5"></a>    <span class="kw">def</span> horizontal_card(card_data: JSONType) <span class="op">-&gt;</span> Element:</span>
 <span id="bootstrap-card-deck-6"><a href="#bootstrap-card-deck-6"></a>        <span class="cf">assert</span> <span class="st">&quot;title&quot;</span> <span class="kw">in</span> card_data <span class="kw">and</span> <span class="st">&quot;text&quot;</span> <span class="kw">in</span> card_data</span>
 <span id="bootstrap-card-deck-7"><a href="#bootstrap-card-deck-7"></a>        title <span class="op">=</span> card_data[<span class="st">&quot;title&quot;</span>]</span>
 <span id="bootstrap-card-deck-8"><a href="#bootstrap-card-deck-8"></a>        text <span class="op">=</span> convert_text(card_data[<span class="st">&quot;text&quot;</span>])</span>
 <span id="bootstrap-card-deck-9"><a href="#bootstrap-card-deck-9"></a></span>
 <span id="bootstrap-card-deck-10"><a href="#bootstrap-card-deck-10"></a>        content <span class="op">=</span> []</span>
-<span id="bootstrap-card-deck-11"><a href="#bootstrap-card-deck-11"></a>        <span class="cf">if</span> <span class="st">&quot;image&quot;</span> <span class="kw">in</span> card_data:</span>
-<span id="bootstrap-card-deck-12"><a href="#bootstrap-card-deck-12"></a>            content.append(Plain(Image(url<span class="op">=</span>card_data[<span class="st">&quot;image&quot;</span>], title<span class="op">=</span>title, classes<span class="op">=</span>[<span class="st">&quot;card-img-top&quot;</span>])))</span>
-<span id="bootstrap-card-deck-13"><a href="#bootstrap-card-deck-13"></a></span>
-<span id="bootstrap-card-deck-14"><a href="#bootstrap-card-deck-14"></a>        body <span class="op">=</span> [</span>
-<span id="bootstrap-card-deck-15"><a href="#bootstrap-card-deck-15"></a>            Header(Str(title), level<span class="op">=</span><span class="dv">3</span>, classes<span class="op">=</span>[<span class="st">&quot;card-title&quot;</span>]),</span>
-<span id="bootstrap-card-deck-16"><a href="#bootstrap-card-deck-16"></a>            Div(<span class="op">*</span>text, classes<span class="op">=</span>[<span class="st">&quot;card-text&quot;</span>])</span>
-<span id="bootstrap-card-deck-17"><a href="#bootstrap-card-deck-17"></a>        ]</span>
-<span id="bootstrap-card-deck-18"><a href="#bootstrap-card-deck-18"></a></span>
-<span id="bootstrap-card-deck-19"><a href="#bootstrap-card-deck-19"></a>        <span class="cf">if</span> <span class="st">&quot;link&quot;</span> <span class="kw">in</span> card_data:</span>
-<span id="bootstrap-card-deck-20"><a href="#bootstrap-card-deck-20"></a>            body.append(Plain(Link(Str(card_data[<span class="st">&quot;link&quot;</span>][<span class="st">&quot;content&quot;</span>]),</span>
-<span id="bootstrap-card-deck-21"><a href="#bootstrap-card-deck-21"></a>                                   url<span class="op">=</span>card_data[<span class="st">&quot;link&quot;</span>][<span class="st">&quot;href&quot;</span>],</span>
-<span id="bootstrap-card-deck-22"><a href="#bootstrap-card-deck-22"></a>                                   classes<span class="op">=</span>[<span class="st">&quot;btn&quot;</span>, <span class="st">&quot;btn-secondary&quot;</span>, <span class="st">&quot;mt-auto&quot;</span>, <span class="st">&quot;mx-4&quot;</span>])))</span>
-<span id="bootstrap-card-deck-23"><a href="#bootstrap-card-deck-23"></a></span>
-<span id="bootstrap-card-deck-24"><a href="#bootstrap-card-deck-24"></a>        content.append(Div(<span class="op">*</span>body, classes<span class="op">=</span>[<span class="st">&quot;card-body&quot;</span>, <span class="st">&quot;d-flex&quot;</span>, <span class="st">&quot;flex-column&quot;</span>]))</span>
-<span id="bootstrap-card-deck-25"><a href="#bootstrap-card-deck-25"></a></span>
-<span id="bootstrap-card-deck-26"><a href="#bootstrap-card-deck-26"></a>        content <span class="op">=</span> Div(Div(<span class="op">*</span>content, classes<span class="op">=</span>[<span class="st">&quot;card&quot;</span>, <span class="st">&quot;h-100&quot;</span>, <span class="st">&quot;rounded-lg&quot;</span>]), classes<span class="op">=</span>[<span class="st">&quot;col&quot;</span>])</span>
-<span id="bootstrap-card-deck-27"><a href="#bootstrap-card-deck-27"></a>        <span class="cf">return</span> content</span>
-<span id="bootstrap-card-deck-28"><a href="#bootstrap-card-deck-28"></a></span>
-<span id="bootstrap-card-deck-29"><a href="#bootstrap-card-deck-29"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(elem, CodeBlock) <span class="kw">and</span> <span class="st">&quot;bootstrap-card-deck&quot;</span> <span class="kw">in</span> elem.classes:</span>
-<span id="bootstrap-card-deck-30"><a href="#bootstrap-card-deck-30"></a>        content <span class="op">=</span> <span class="bu">map</span>(card, parse_dhall(elem.text, cwd<span class="op">=</span>data_path))</span>
-<span id="bootstrap-card-deck-31"><a href="#bootstrap-card-deck-31"></a>        <span class="cf">return</span> outer_container(<span class="op">*</span>content)</span>
-<span id="bootstrap-card-deck-32"><a href="#bootstrap-card-deck-32"></a></span>
-<span id="bootstrap-card-deck-33"><a href="#bootstrap-card-deck-33"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+<span id="bootstrap-card-deck-11"><a href="#bootstrap-card-deck-11"></a>        body <span class="op">=</span> [</span>
+<span id="bootstrap-card-deck-12"><a href="#bootstrap-card-deck-12"></a>            Header(Str(title), level<span class="op">=</span><span class="dv">3</span>, classes<span class="op">=</span>[<span class="st">&quot;card-title&quot;</span>]),</span>
+<span id="bootstrap-card-deck-13"><a href="#bootstrap-card-deck-13"></a>            Div(<span class="op">*</span>text, classes<span class="op">=</span>[<span class="st">&quot;card-text&quot;</span>])</span>
+<span id="bootstrap-card-deck-14"><a href="#bootstrap-card-deck-14"></a>        ]</span>
+<span id="bootstrap-card-deck-15"><a href="#bootstrap-card-deck-15"></a></span>
+<span id="bootstrap-card-deck-16"><a href="#bootstrap-card-deck-16"></a>        <span class="cf">if</span> <span class="st">&quot;link&quot;</span> <span class="kw">in</span> card_data:</span>
+<span id="bootstrap-card-deck-17"><a href="#bootstrap-card-deck-17"></a>            body.append(Plain(Link(Str(card_data[<span class="st">&quot;link&quot;</span>][<span class="st">&quot;content&quot;</span>]),</span>
+<span id="bootstrap-card-deck-18"><a href="#bootstrap-card-deck-18"></a>                                   url<span class="op">=</span>card_data[<span class="st">&quot;link&quot;</span>][<span class="st">&quot;href&quot;</span>],</span>
+<span id="bootstrap-card-deck-19"><a href="#bootstrap-card-deck-19"></a>                                   classes<span class="op">=</span>[<span class="st">&quot;btn&quot;</span>, <span class="st">&quot;btn-secondary&quot;</span>, <span class="st">&quot;mt-auto&quot;</span>, <span class="st">&quot;mx-4&quot;</span>])))</span>
+<span id="bootstrap-card-deck-20"><a href="#bootstrap-card-deck-20"></a></span>
+<span id="bootstrap-card-deck-21"><a href="#bootstrap-card-deck-21"></a>        card_img <span class="op">=</span> Div(Plain(Image(url<span class="op">=</span>card_data[<span class="st">&quot;image&quot;</span>], title<span class="op">=</span>title, attributes<span class="op">=</span>{<span class="st">&quot;width&quot;</span>: <span class="st">&quot;100%&quot;</span>})), classes<span class="op">=</span>[<span class="st">&quot;col-4&quot;</span>])</span>
+<span id="bootstrap-card-deck-22"><a href="#bootstrap-card-deck-22"></a>        card_body <span class="op">=</span> Div(Div(<span class="op">*</span>body, classes<span class="op">=</span>[<span class="st">&quot;card-body&quot;</span>]), classes<span class="op">=</span>[<span class="st">&quot;col-8&quot;</span>])</span>
+<span id="bootstrap-card-deck-23"><a href="#bootstrap-card-deck-23"></a>        <span class="cf">if</span> card_data[<span class="st">&quot;imageLocation&quot;</span>] <span class="op">==</span> <span class="st">&quot;Left&quot;</span>:</span>
+<span id="bootstrap-card-deck-24"><a href="#bootstrap-card-deck-24"></a>            content <span class="op">=</span> [ card_img, card_body ]</span>
+<span id="bootstrap-card-deck-25"><a href="#bootstrap-card-deck-25"></a>        <span class="cf">else</span>:</span>
+<span id="bootstrap-card-deck-26"><a href="#bootstrap-card-deck-26"></a>            content <span class="op">=</span> [ card_body, card_img ]</span>
+<span id="bootstrap-card-deck-27"><a href="#bootstrap-card-deck-27"></a>        content <span class="op">=</span> Div(Div(<span class="op">*</span>content, classes<span class="op">=</span>[<span class="st">&quot;row&quot;</span>, <span class="st">&quot;no-gutters&quot;</span>]), classes<span class="op">=</span>[<span class="st">&quot;card&quot;</span>, <span class="st">&quot;rounded-lg&quot;</span>])</span>
+<span id="bootstrap-card-deck-28"><a href="#bootstrap-card-deck-28"></a>        <span class="cf">return</span> content</span>
+<span id="bootstrap-card-deck-29"><a href="#bootstrap-card-deck-29"></a></span>
+<span id="bootstrap-card-deck-30"><a href="#bootstrap-card-deck-30"></a>    <span class="kw">def</span> vertical_card(card_data: JSONType) <span class="op">-&gt;</span> Element:</span>
+<span id="bootstrap-card-deck-31"><a href="#bootstrap-card-deck-31"></a>        <span class="cf">assert</span> <span class="st">&quot;title&quot;</span> <span class="kw">in</span> card_data <span class="kw">and</span> <span class="st">&quot;text&quot;</span> <span class="kw">in</span> card_data</span>
+<span id="bootstrap-card-deck-32"><a href="#bootstrap-card-deck-32"></a>        title <span class="op">=</span> card_data[<span class="st">&quot;title&quot;</span>]</span>
+<span id="bootstrap-card-deck-33"><a href="#bootstrap-card-deck-33"></a>        text <span class="op">=</span> convert_text(card_data[<span class="st">&quot;text&quot;</span>])</span>
+<span id="bootstrap-card-deck-34"><a href="#bootstrap-card-deck-34"></a></span>
+<span id="bootstrap-card-deck-35"><a href="#bootstrap-card-deck-35"></a>        content <span class="op">=</span> []</span>
+<span id="bootstrap-card-deck-36"><a href="#bootstrap-card-deck-36"></a>        <span class="cf">if</span> <span class="st">&quot;image&quot;</span> <span class="kw">in</span> card_data:</span>
+<span id="bootstrap-card-deck-37"><a href="#bootstrap-card-deck-37"></a>            content.append(Plain(Image(url<span class="op">=</span>card_data[<span class="st">&quot;image&quot;</span>], title<span class="op">=</span>title, classes<span class="op">=</span>[<span class="st">&quot;card-img-top&quot;</span>])))</span>
+<span id="bootstrap-card-deck-38"><a href="#bootstrap-card-deck-38"></a></span>
+<span id="bootstrap-card-deck-39"><a href="#bootstrap-card-deck-39"></a>        body <span class="op">=</span> [</span>
+<span id="bootstrap-card-deck-40"><a href="#bootstrap-card-deck-40"></a>            Header(Str(title), level<span class="op">=</span><span class="dv">3</span>, classes<span class="op">=</span>[<span class="st">&quot;card-title&quot;</span>]),</span>
+<span id="bootstrap-card-deck-41"><a href="#bootstrap-card-deck-41"></a>            Div(<span class="op">*</span>text, classes<span class="op">=</span>[<span class="st">&quot;card-text&quot;</span>])</span>
+<span id="bootstrap-card-deck-42"><a href="#bootstrap-card-deck-42"></a>        ]</span>
+<span id="bootstrap-card-deck-43"><a href="#bootstrap-card-deck-43"></a></span>
+<span id="bootstrap-card-deck-44"><a href="#bootstrap-card-deck-44"></a>        <span class="cf">if</span> <span class="st">&quot;link&quot;</span> <span class="kw">in</span> card_data:</span>
+<span id="bootstrap-card-deck-45"><a href="#bootstrap-card-deck-45"></a>            body.append(Plain(Link(Str(card_data[<span class="st">&quot;link&quot;</span>][<span class="st">&quot;content&quot;</span>]),</span>
+<span id="bootstrap-card-deck-46"><a href="#bootstrap-card-deck-46"></a>                                   url<span class="op">=</span>card_data[<span class="st">&quot;link&quot;</span>][<span class="st">&quot;href&quot;</span>],</span>
+<span id="bootstrap-card-deck-47"><a href="#bootstrap-card-deck-47"></a>                                   classes<span class="op">=</span>[<span class="st">&quot;btn&quot;</span>, <span class="st">&quot;btn-secondary&quot;</span>, <span class="st">&quot;mt-auto&quot;</span>, <span class="st">&quot;mx-4&quot;</span>])))</span>
+<span id="bootstrap-card-deck-48"><a href="#bootstrap-card-deck-48"></a></span>
+<span id="bootstrap-card-deck-49"><a href="#bootstrap-card-deck-49"></a>        content.append(Div(<span class="op">*</span>body, classes<span class="op">=</span>[<span class="st">&quot;card-body&quot;</span>, <span class="st">&quot;d-flex&quot;</span>, <span class="st">&quot;flex-column&quot;</span>]))</span>
+<span id="bootstrap-card-deck-50"><a href="#bootstrap-card-deck-50"></a></span>
+<span id="bootstrap-card-deck-51"><a href="#bootstrap-card-deck-51"></a>        content <span class="op">=</span> Div(Div(<span class="op">*</span>content, classes<span class="op">=</span>[<span class="st">&quot;card&quot;</span>, <span class="st">&quot;h-100&quot;</span>, <span class="st">&quot;rounded-lg&quot;</span>]), classes<span class="op">=</span>[<span class="st">&quot;col&quot;</span>])</span>
+<span id="bootstrap-card-deck-52"><a href="#bootstrap-card-deck-52"></a>        <span class="cf">return</span> content</span>
+<span id="bootstrap-card-deck-53"><a href="#bootstrap-card-deck-53"></a></span>
+<span id="bootstrap-card-deck-54"><a href="#bootstrap-card-deck-54"></a>    <span class="kw">def</span> card(card_data):</span>
+<span id="bootstrap-card-deck-55"><a href="#bootstrap-card-deck-55"></a>        <span class="cf">if</span> card_data[<span class="st">&quot;imageLocation&quot;</span>] <span class="kw">in</span> [<span class="st">&quot;Top&quot;</span>, <span class="st">&quot;Bottom&quot;</span>]:</span>
+<span id="bootstrap-card-deck-56"><a href="#bootstrap-card-deck-56"></a>            <span class="cf">return</span> vertical_card(card_data)</span>
+<span id="bootstrap-card-deck-57"><a href="#bootstrap-card-deck-57"></a>        <span class="cf">else</span>:</span>
+<span id="bootstrap-card-deck-58"><a href="#bootstrap-card-deck-58"></a>            <span class="cf">return</span> horizontal_card(card_data)</span>
+<span id="bootstrap-card-deck-59"><a href="#bootstrap-card-deck-59"></a></span>
+<span id="bootstrap-card-deck-60"><a href="#bootstrap-card-deck-60"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(elem, CodeBlock) <span class="kw">and</span> <span class="st">&quot;bootstrap-card-deck&quot;</span> <span class="kw">in</span> elem.classes:</span>
+<span id="bootstrap-card-deck-61"><a href="#bootstrap-card-deck-61"></a>        deck_data <span class="op">=</span> parse_dhall(elem.text, cwd<span class="op">=</span>data_path)</span>
+<span id="bootstrap-card-deck-62"><a href="#bootstrap-card-deck-62"></a>        content <span class="op">=</span> <span class="bu">map</span>(card, deck_data)</span>
+<span id="bootstrap-card-deck-63"><a href="#bootstrap-card-deck-63"></a>        <span class="cf">return</span> outer_container(<span class="op">*</span>content)</span>
+<span id="bootstrap-card-deck-64"><a href="#bootstrap-card-deck-64"></a></span>
+<span id="bootstrap-card-deck-65"><a href="#bootstrap-card-deck-65"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
 </div>
 <h2 id="foldable-code-blocks">Foldable code blocks</h2>
 <div class="annotated-code">
@@ -1010,6 +1052,10 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div></main>
 
+<footer class="py-4 bg-dark text-white-50 footer"><div class="container">
+Johan Hidding – <a href="https://esciencecenter.nl/">Netherlands eScience Center</a><br />
+2020-05-29 — version: 0.6.1 — license: <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2</a>
+</div></footer>
 
 
 <!-- Bootstrap 4.5.0 -->

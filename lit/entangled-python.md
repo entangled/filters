@@ -1,6 +1,9 @@
 ---
-title: Entangled Python module
-author: Johan Hidding
+title: Entangled
+subtitle: Python module
+footer: "Johan Hidding -- [Netherlands eScience Center](https://esciencecenter.nl/)"
+version: 0.6.1
+license: "[Apache 2](https://www.apache.org/licenses/LICENSE-2.0)"
 ---
 
 ``` {.dhall .bootstrap-card-deck}
@@ -48,7 +51,7 @@ This module also acts as a test-bed and environment for rapid prototyping of fea
 ## Version
 
 ``` {.python file=entangled/__init__.py}
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 ```
 
 ## Demo

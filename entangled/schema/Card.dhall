@@ -5,15 +5,19 @@ let Link =
     , content : Text
     }
 
+let Location = < Top | Right | Bottom | Left >
+
 in let Card =
     { Type =
         { image : Optional Text
         , title : Text
         , text : Text
-        , link : Optional Link }
+        , link : Optional Link
+        , imageLocation : Location }
     , default =
         { image = None Text
-        , link = None Link }
+        , link = None Link
+        , imageLocation = Location.Top }
     }
 
 in Card
