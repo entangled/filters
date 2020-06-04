@@ -516,19 +516,17 @@ Then the `generate_report` function transforms a `CodeBlock` as follows.
 from panflute import Div
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
-    lang_class = elem.classes[0]
-
     <<doctest-content-div>>
     if t.status is TestStatus.ERROR:
         return content_div( Div( CodeBlock(str(t.error))
                                , classes=["doctestError"] ) )
     if t.status is TestStatus.FAIL:
-        return content_div( Div( CodeBlock(str(t.result), classes=[lang_class])
+        return content_div( Div( CodeBlock(str(t.result), classes=["txt"])
                                , classes=["doctestResult"] )
-                          , Div( CodeBlock(str(t.expect), classes=[lang_class])
+                          , Div( CodeBlock(str(t.expect), classes=["txt"])
                                , classes=["doctestExpect"] ) )
     if t.status is TestStatus.SUCCESS:
-        return content_div( Div( CodeBlock(str(t.result), classes=[lang_class])
+        return content_div( Div( CodeBlock(str(t.result), classes=["txt"])
                                , classes=["doctestResult"] ) )
     if t.status is TestStatus.PENDING:
         return content_div()

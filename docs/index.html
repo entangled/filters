@@ -195,7 +195,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="compute-pi"><pre class="sourceCode python eval"><code class="sourceCode python"><span id="compute-pi-1"><a href="#compute-pi-1"></a><span class="bu">print</span>(<span class="st">&quot;π ≈ </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(compute_pi(<span class="dv">1000000</span>)))</span></code></pre></div>
 </div>
 <div class="doctestResult">
-<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ <span class="fl">3.141704</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ 3.142408</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -770,26 +770,24 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="doctest-report"><pre class="sourceCode python"><code class="sourceCode python"><span id="doctest-report-1"><a href="#doctest-report-1"></a><span class="im">from</span> panflute <span class="im">import</span> Div</span>
 <span id="doctest-report-2"><a href="#doctest-report-2"></a></span>
 <span id="doctest-report-3"><a href="#doctest-report-3"></a><span class="kw">def</span> generate_report(elem: CodeBlock, t: Test) <span class="op">-&gt;</span> ActionReturn:</span>
-<span id="doctest-report-4"><a href="#doctest-report-4"></a>    lang_class <span class="op">=</span> elem.classes[<span class="dv">0</span>]</span>
-<span id="doctest-report-5"><a href="#doctest-report-5"></a></span>
-<span id="doctest-report-6"><a href="#doctest-report-6"></a>    <span class="op">&lt;&lt;</span>doctest<span class="op">-</span>content<span class="op">-</span>div<span class="op">&gt;&gt;</span></span>
-<span id="doctest-report-7"><a href="#doctest-report-7"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.ERROR:</span>
-<span id="doctest-report-8"><a href="#doctest-report-8"></a>        <span class="cf">return</span> content_div( Div( CodeBlock(<span class="bu">str</span>(t.error))</span>
-<span id="doctest-report-9"><a href="#doctest-report-9"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestError&quot;</span>] ) )</span>
-<span id="doctest-report-10"><a href="#doctest-report-10"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.FAIL:</span>
-<span id="doctest-report-11"><a href="#doctest-report-11"></a>        <span class="cf">return</span> content_div( Div( CodeBlock(<span class="bu">str</span>(t.result), classes<span class="op">=</span>[lang_class])</span>
-<span id="doctest-report-12"><a href="#doctest-report-12"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestResult&quot;</span>] )</span>
-<span id="doctest-report-13"><a href="#doctest-report-13"></a>                          , Div( CodeBlock(<span class="bu">str</span>(t.expect), classes<span class="op">=</span>[lang_class])</span>
-<span id="doctest-report-14"><a href="#doctest-report-14"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestExpect&quot;</span>] ) )</span>
-<span id="doctest-report-15"><a href="#doctest-report-15"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.SUCCESS:</span>
-<span id="doctest-report-16"><a href="#doctest-report-16"></a>        <span class="cf">return</span> content_div( Div( CodeBlock(<span class="bu">str</span>(t.result), classes<span class="op">=</span>[lang_class])</span>
-<span id="doctest-report-17"><a href="#doctest-report-17"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestResult&quot;</span>] ) )</span>
-<span id="doctest-report-18"><a href="#doctest-report-18"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.PENDING:</span>
-<span id="doctest-report-19"><a href="#doctest-report-19"></a>        <span class="cf">return</span> content_div()</span>
-<span id="doctest-report-20"><a href="#doctest-report-20"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.UNKNOWN:</span>
-<span id="doctest-report-21"><a href="#doctest-report-21"></a>        <span class="cf">return</span> content_div( Div( CodeBlock(<span class="bu">str</span>(t.result))</span>
-<span id="doctest-report-22"><a href="#doctest-report-22"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestUnknown&quot;</span>] ) )</span>
-<span id="doctest-report-23"><a href="#doctest-report-23"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+<span id="doctest-report-4"><a href="#doctest-report-4"></a>    <span class="op">&lt;&lt;</span>doctest<span class="op">-</span>content<span class="op">-</span>div<span class="op">&gt;&gt;</span></span>
+<span id="doctest-report-5"><a href="#doctest-report-5"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.ERROR:</span>
+<span id="doctest-report-6"><a href="#doctest-report-6"></a>        <span class="cf">return</span> content_div( Div( CodeBlock(<span class="bu">str</span>(t.error))</span>
+<span id="doctest-report-7"><a href="#doctest-report-7"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestError&quot;</span>] ) )</span>
+<span id="doctest-report-8"><a href="#doctest-report-8"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.FAIL:</span>
+<span id="doctest-report-9"><a href="#doctest-report-9"></a>        <span class="cf">return</span> content_div( Div( CodeBlock(<span class="bu">str</span>(t.result), classes<span class="op">=</span>[<span class="st">&quot;txt&quot;</span>])</span>
+<span id="doctest-report-10"><a href="#doctest-report-10"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestResult&quot;</span>] )</span>
+<span id="doctest-report-11"><a href="#doctest-report-11"></a>                          , Div( CodeBlock(<span class="bu">str</span>(t.expect), classes<span class="op">=</span>[<span class="st">&quot;txt&quot;</span>])</span>
+<span id="doctest-report-12"><a href="#doctest-report-12"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestExpect&quot;</span>] ) )</span>
+<span id="doctest-report-13"><a href="#doctest-report-13"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.SUCCESS:</span>
+<span id="doctest-report-14"><a href="#doctest-report-14"></a>        <span class="cf">return</span> content_div( Div( CodeBlock(<span class="bu">str</span>(t.result), classes<span class="op">=</span>[<span class="st">&quot;txt&quot;</span>])</span>
+<span id="doctest-report-15"><a href="#doctest-report-15"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestResult&quot;</span>] ) )</span>
+<span id="doctest-report-16"><a href="#doctest-report-16"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.PENDING:</span>
+<span id="doctest-report-17"><a href="#doctest-report-17"></a>        <span class="cf">return</span> content_div()</span>
+<span id="doctest-report-18"><a href="#doctest-report-18"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.UNKNOWN:</span>
+<span id="doctest-report-19"><a href="#doctest-report-19"></a>        <span class="cf">return</span> content_div( Div( CodeBlock(<span class="bu">str</span>(t.result))</span>
+<span id="doctest-report-20"><a href="#doctest-report-20"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestUnknown&quot;</span>] ) )</span>
+<span id="doctest-report-21"><a href="#doctest-report-21"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
 </div>
 <h2 id="main">Main</h2>
 <p>This module reuses most of the tangle module.</p>
@@ -1054,7 +1052,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 
 <footer class="py-4 bg-dark text-white-50 footer"><div class="container">
 Johan Hidding – <a href="https://esciencecenter.nl/">Netherlands eScience Center</a><br />
-2020-05-29 — version: 0.6.1 — license: <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2</a>
+2020-06-05 — version: 0.6.1 — license: <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2</a>
 </div></footer>
 
 

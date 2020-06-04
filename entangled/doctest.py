@@ -67,8 +67,6 @@ def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
 from panflute import Div
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
-    lang_class = elem.classes[0]
-
     # ~\~ begin <<lit/filters.md|doctest-content-div>>[0]
     def content_div(*output):
         status_attr = {"status": t.status.name}
@@ -82,12 +80,12 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
         return content_div( Div( CodeBlock(str(t.error))
                                , classes=["doctestError"] ) )
     if t.status is TestStatus.FAIL:
-        return content_div( Div( CodeBlock(str(t.result), classes=[lang_class])
+        return content_div( Div( CodeBlock(str(t.result), classes=["txt"])
                                , classes=["doctestResult"] )
-                          , Div( CodeBlock(str(t.expect), classes=[lang_class])
+                          , Div( CodeBlock(str(t.expect), classes=["txt"])
                                , classes=["doctestExpect"] ) )
     if t.status is TestStatus.SUCCESS:
-        return content_div( Div( CodeBlock(str(t.result), classes=[lang_class])
+        return content_div( Div( CodeBlock(str(t.result), classes=["txt"])
                                , classes=["doctestResult"] ) )
     if t.status is TestStatus.PENDING:
         return content_div()
