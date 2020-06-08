@@ -127,9 +127,15 @@ def run_suite(config: JSONType, s: Suite) -> None:
         # ~\~ begin <<lit/filters.md|jupyter-eval-test>>[1]
         def handle(test, msg_id, msg):
             from pampy import match, _
+            def print_unknown_msg(data):
+                import sys
+                print(data, file=sys.stderr)
+                return False
             # ~\~ begin <<lit/filters.md|jupyter-handlers>>[0]
             def execute_result_text(data):
-                test.result = data
+                test.result = test.result or ""
+                if data is not None:
+                    test.result += str(data)
                 if (test.expect is None) or test.result.strip() == test.expect.strip():
                     test.status = TestStatus.SUCCESS
                 else:
@@ -170,18 +176,24 @@ def run_suite(config: JSONType, s: Suite) -> None:
                 , stream_text
                 # ~\~ end
                 # ~\~ begin <<lit/filters.md|jupyter-match>>[2]
+                , { "msg_type": "display_data"
+                  , "parent_header": { "msg_id" : msg_id }
+                  , "content": { "data": { "text/plain": _ } } }
+                , stream_text
+                # ~\~ end
+                # ~\~ begin <<lit/filters.md|jupyter-match>>[3]
                 , { "msg_type": "status"
                   , "parent_header": { "msg_id" : msg_id }
                   , "content": { "execution_state": "idle" } }
                 , status_idle
                 # ~\~ end
-                # ~\~ begin <<lit/filters.md|jupyter-match>>[3]
+                # ~\~ begin <<lit/filters.md|jupyter-match>>[4]
                 , { "msg_type": "error"
                   , "parent_header": { "msg_id" : msg_id }
                   , "content": { "traceback": _ } }
                 , error_traceback
                 # ~\~ end
-                # ~\~ begin <<lit/filters.md|jupyter-match>>[4]
+                # ~\~ begin <<lit/filters.md|jupyter-match>>[5]
                 , _
                 , lambda x: False
                 # ~\~ end

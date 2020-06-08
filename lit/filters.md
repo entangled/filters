@@ -402,6 +402,10 @@ The `handle` function is a pattern matcher. Each pattern looks like a dictionary
 ``` {.python #jupyter-eval-test}
 def handle(test, msg_id, msg):
     from pampy import match, _
+    def print_unknown_msg(data):
+        import sys
+        print(data, file=sys.stderr)
+        return False
     <<jupyter-handlers>>
     return match(msg
         <<jupyter-match>>
@@ -420,7 +424,9 @@ A result is tested for equality with the expected result.
 
 ``` {.python #jupyter-handlers}
 def execute_result_text(data):
-    test.result = data
+    test.result = test.result or ""
+    if data is not None:
+        test.result += str(data)
     if (test.expect is None) or test.result.strip() == test.expect.strip():
         test.status = TestStatus.SUCCESS
     else:
@@ -442,6 +448,15 @@ def stream_text(data):
     test.result = test.result or ""
     test.result += data
     return False
+```
+
+#### display data
+
+``` {.python #jupyter-match}
+, { "msg_type": "display_data"
+  , "parent_header": { "msg_id" : msg_id }
+  , "content": { "data": { "text/plain": _ } } }
+, stream_text
 ```
 
 #### `status`

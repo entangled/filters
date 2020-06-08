@@ -195,7 +195,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="compute-pi"><pre class="sourceCode python eval"><code class="sourceCode python"><span id="compute-pi-1"><a href="#compute-pi-1"></a><span class="bu">print</span>(<span class="st">&quot;π ≈ </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(compute_pi(<span class="dv">1000000</span>)))</span></code></pre></div>
 </div>
 <div class="doctestResult">
-<div class="sourceCode" id="cb2"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ 3.142408</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ 3.142628</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -667,10 +667,14 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <p><span><em>«jupyter-eval-test»+</em></span></p>
 <div class="sourceCode" id="jupyter-eval-test"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-eval-test-1"><a href="#jupyter-eval-test-1"></a><span class="kw">def</span> handle(test, msg_id, msg):</span>
 <span id="jupyter-eval-test-2"><a href="#jupyter-eval-test-2"></a>    <span class="im">from</span> pampy <span class="im">import</span> match, _</span>
-<span id="jupyter-eval-test-3"><a href="#jupyter-eval-test-3"></a>    <span class="op">&lt;&lt;</span>jupyter<span class="op">-</span>handlers<span class="op">&gt;&gt;</span></span>
-<span id="jupyter-eval-test-4"><a href="#jupyter-eval-test-4"></a>    <span class="cf">return</span> match(msg</span>
-<span id="jupyter-eval-test-5"><a href="#jupyter-eval-test-5"></a>        <span class="op">&lt;&lt;</span>jupyter<span class="op">-</span>match<span class="op">&gt;&gt;</span></span>
-<span id="jupyter-eval-test-6"><a href="#jupyter-eval-test-6"></a>        )</span></code></pre></div>
+<span id="jupyter-eval-test-3"><a href="#jupyter-eval-test-3"></a>    <span class="kw">def</span> print_unknown_msg(data):</span>
+<span id="jupyter-eval-test-4"><a href="#jupyter-eval-test-4"></a>        <span class="im">import</span> sys</span>
+<span id="jupyter-eval-test-5"><a href="#jupyter-eval-test-5"></a>        <span class="bu">print</span>(data, <span class="bu">file</span><span class="op">=</span>sys.stderr)</span>
+<span id="jupyter-eval-test-6"><a href="#jupyter-eval-test-6"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="jupyter-eval-test-7"><a href="#jupyter-eval-test-7"></a>    <span class="op">&lt;&lt;</span>jupyter<span class="op">-</span>handlers<span class="op">&gt;&gt;</span></span>
+<span id="jupyter-eval-test-8"><a href="#jupyter-eval-test-8"></a>    <span class="cf">return</span> match(msg</span>
+<span id="jupyter-eval-test-9"><a href="#jupyter-eval-test-9"></a>        <span class="op">&lt;&lt;</span>jupyter<span class="op">-</span>match<span class="op">&gt;&gt;</span></span>
+<span id="jupyter-eval-test-10"><a href="#jupyter-eval-test-10"></a>        )</span></code></pre></div>
 </div>
 <h4 id="execute_result"><code>execute_result</code></h4>
 <p>A result is tested for equality with the expected result.</p>
@@ -684,12 +688,14 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <div class="annotated-code">
 <p><span><em>«jupyter-handlers»=</em></span></p>
 <div class="sourceCode" id="jupyter-handlers"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-handlers-1"><a href="#jupyter-handlers-1"></a><span class="kw">def</span> execute_result_text(data):</span>
-<span id="jupyter-handlers-2"><a href="#jupyter-handlers-2"></a>    test.result <span class="op">=</span> data</span>
-<span id="jupyter-handlers-3"><a href="#jupyter-handlers-3"></a>    <span class="cf">if</span> (test.expect <span class="kw">is</span> <span class="va">None</span>) <span class="kw">or</span> test.result.strip() <span class="op">==</span> test.expect.strip():</span>
-<span id="jupyter-handlers-4"><a href="#jupyter-handlers-4"></a>        test.status <span class="op">=</span> TestStatus.SUCCESS</span>
-<span id="jupyter-handlers-5"><a href="#jupyter-handlers-5"></a>    <span class="cf">else</span>:</span>
-<span id="jupyter-handlers-6"><a href="#jupyter-handlers-6"></a>        test.status <span class="op">=</span> TestStatus.FAIL</span>
-<span id="jupyter-handlers-7"><a href="#jupyter-handlers-7"></a>    <span class="cf">return</span> <span class="va">False</span></span></code></pre></div>
+<span id="jupyter-handlers-2"><a href="#jupyter-handlers-2"></a>    test.result <span class="op">=</span> test.result <span class="kw">or</span> <span class="st">&quot;&quot;</span></span>
+<span id="jupyter-handlers-3"><a href="#jupyter-handlers-3"></a>    <span class="cf">if</span> data <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="jupyter-handlers-4"><a href="#jupyter-handlers-4"></a>        test.result <span class="op">+=</span> <span class="bu">str</span>(data)</span>
+<span id="jupyter-handlers-5"><a href="#jupyter-handlers-5"></a>    <span class="cf">if</span> (test.expect <span class="kw">is</span> <span class="va">None</span>) <span class="kw">or</span> test.result.strip() <span class="op">==</span> test.expect.strip():</span>
+<span id="jupyter-handlers-6"><a href="#jupyter-handlers-6"></a>        test.status <span class="op">=</span> TestStatus.SUCCESS</span>
+<span id="jupyter-handlers-7"><a href="#jupyter-handlers-7"></a>    <span class="cf">else</span>:</span>
+<span id="jupyter-handlers-8"><a href="#jupyter-handlers-8"></a>        test.status <span class="op">=</span> TestStatus.FAIL</span>
+<span id="jupyter-handlers-9"><a href="#jupyter-handlers-9"></a>    <span class="cf">return</span> <span class="va">False</span></span></code></pre></div>
 </div>
 <h4 id="output-to-stdout-or-stderr">output to stdout or stderr</h4>
 <div class="annotated-code">
@@ -705,6 +711,14 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <span id="jupyter-handlers-2"><a href="#jupyter-handlers-2"></a>    test.result <span class="op">=</span> test.result <span class="kw">or</span> <span class="st">&quot;&quot;</span></span>
 <span id="jupyter-handlers-3"><a href="#jupyter-handlers-3"></a>    test.result <span class="op">+=</span> data</span>
 <span id="jupyter-handlers-4"><a href="#jupyter-handlers-4"></a>    <span class="cf">return</span> <span class="va">False</span></span></code></pre></div>
+</div>
+<h4 id="display-data">display data</h4>
+<div class="annotated-code">
+<p><span><em>«jupyter-match»+</em></span></p>
+<div class="sourceCode" id="jupyter-match"><pre class="sourceCode python"><code class="sourceCode python"><span id="jupyter-match-1"><a href="#jupyter-match-1"></a>, { <span class="st">&quot;msg_type&quot;</span>: <span class="st">&quot;display_data&quot;</span></span>
+<span id="jupyter-match-2"><a href="#jupyter-match-2"></a>  , <span class="st">&quot;parent_header&quot;</span>: { <span class="st">&quot;msg_id&quot;</span> : msg_id }</span>
+<span id="jupyter-match-3"><a href="#jupyter-match-3"></a>  , <span class="st">&quot;content&quot;</span>: { <span class="st">&quot;data&quot;</span>: { <span class="st">&quot;text/plain&quot;</span>: _ } } }</span>
+<span id="jupyter-match-4"><a href="#jupyter-match-4"></a>, stream_text</span></code></pre></div>
 </div>
 <h4 id="status"><code>status</code></h4>
 <p>If status <code>idle</code> is given, the computation is done, and we don’t need to wait for further messages.</p>
