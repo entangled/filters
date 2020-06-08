@@ -11,7 +11,7 @@ test_deps = [
 
 setup(
     name="entangled-filters",
-    version="0.6",
+    version="0.7",
     packages=find_packages(),
 
     install_requires=[
