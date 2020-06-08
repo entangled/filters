@@ -19,7 +19,7 @@ pandoc_args += --highlight-style tango
 static_files := $(shell find -L lit -type f -not -name '*.md')
 static_targets := $(static_files:lit/%=docs/%)
 
-input_files := lit/entangled-python.md README.md lit/filters.md
+input_files := lit/entangled-python.md README.md lit/filters.md lit/pymd.md
 
 .PHONY: site clean watch watch-pandoc watch-browser-sync
 

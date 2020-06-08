@@ -105,6 +105,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#code-block-annotation">Code block annotation</a></li>
 <li><a href="#doctesting">Doctesting</a></li>
 <li><a href="#bootstrap">Bootstrap</a></li>
+<li><a href="#mkdocs">MkDocs</a></li>
 </ul>
 </div>
 </nav>
@@ -167,7 +168,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <h2 id="version">Version</h2>
 <div class="annotated-code">
 <p><span><em>«entangled/__init__.py»=</em></span></p>
-<div class="sourceCode" id="cb1" data-file="entangled/__init__.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a>__version__ <span class="op">=</span> <span class="st">&quot;0.6.1&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb1" data-file="entangled/__init__.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a>__version__ <span class="op">=</span> <span class="st">&quot;0.7.0&quot;</span></span></code></pre></div>
 </div>
 <h2 id="demo">Demo</h2>
 <ul>
@@ -195,7 +196,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="compute-pi"><pre class="sourceCode python eval"><code class="sourceCode python"><span id="compute-pi-1"><a href="#compute-pi-1"></a><span class="bu">print</span>(<span class="st">&quot;π ≈ </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(compute_pi(<span class="dv">1000000</span>)))</span></code></pre></div>
 </div>
 <div class="doctestResult">
-<div class="sourceCode" id="cb2"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ 3.141208</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ 3.141492</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -1061,6 +1062,46 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <span id="bootstrap-fold-code-block-25"><a href="#bootstrap-fold-code-block-25"></a>            <span class="cf">return</span> annotate.action(elem, doc)</span>
 <span id="bootstrap-fold-code-block-26"><a href="#bootstrap-fold-code-block-26"></a></span>
 <span id="bootstrap-fold-code-block-27"><a href="#bootstrap-fold-code-block-27"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+</div>
+<h1 id="mkdocs">MkDocs</h1>
+<p>Python-markdown powers <code>MkDocs</code>. To pass Entangled style code blocks we need to help Python-Markdown along a bit. These routines are designed to be called by <code>pymdownx.superfences</code>. To use them, add the following block to <code>mkdocs.yml</code> and enable <code>highlight.js</code>.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb25-1"><a href="#cb25-1"></a><span class="fu">markdown_extensions</span><span class="kw">:</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">pymdownx.superfences</span><span class="kw">:</span></span>
+<span id="cb25-3"><a href="#cb25-3"></a><span class="at">            </span><span class="fu">custom_fences</span><span class="kw">:</span></span>
+<span id="cb25-4"><a href="#cb25-4"></a><span class="at">               </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;*&quot;</span></span>
+<span id="cb25-5"><a href="#cb25-5"></a><span class="at">                 </span><span class="fu">class</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;codehilite&quot;</span></span>
+<span id="cb25-6"><a href="#cb25-6"></a><span class="at">                 </span><span class="fu">format</span><span class="kw">:</span><span class="at"> </span><span class="ot">!!python/name:entangled.pymd.format</span></span>
+<span id="cb25-7"><a href="#cb25-7"></a><span class="at">                 </span><span class="fu">validator</span><span class="kw">:</span><span class="at"> </span><span class="ot">!!python/name:entangled.pymd.validator</span></span></code></pre></div>
+<p>TODO:</p>
+<ul>
+<li><input type="checkbox" disabled="" />
+implement validator</li>
+<li><input type="checkbox" disabled="" />
+find a way of testing this code</li>
+</ul>
+<div class="annotated-code">
+<p><span><em>«pymd»=</em></span></p>
+<div class="sourceCode" id="pymd" data-file="entangled/pymd/__init__.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="pymd-1"><a href="#pymd-1"></a>__all__ <span class="op">=</span> [<span class="st">&quot;format&quot;</span>, <span class="st">&quot;validator&quot;</span>]</span></code></pre></div>
+</div>
+<h2 id="filter">Filter</h2>
+<div class="annotated-code">
+<p><span><em>«pymd»+</em></span></p>
+<div class="sourceCode" id="pymd"><pre class="sourceCode python"><code class="sourceCode python"><span id="pymd-1"><a href="#pymd-1"></a><span class="kw">def</span> <span class="bu">format</span>(source, language, css_class, options, md, classes<span class="op">=</span><span class="va">None</span>, id_value<span class="op">=</span><span class="st">&#39;&#39;</span>, <span class="op">**</span>kwargs):</span>
+<span id="pymd-2"><a href="#pymd-2"></a>    code_block <span class="op">=</span> <span class="st">&quot;&lt;pre&gt;&lt;code class=</span><span class="sc">{}</span><span class="st">&gt;</span><span class="sc">{}</span><span class="st">&lt;/code&gt;&lt;/pre&gt;&quot;</span>.<span class="bu">format</span>(language, source)</span>
+<span id="pymd-3"><a href="#pymd-3"></a>    ann <span class="op">=</span> <span class="st">&quot;&lt;div class=</span><span class="ch">\&quot;</span><span class="st">lp-fragment</span><span class="ch">\&quot;</span><span class="st">&gt;&lt;div class=</span><span class="ch">\&quot;</span><span class="st">lp-ref</span><span class="ch">\&quot;</span><span class="st">&gt;</span><span class="sc">{}</span><span class="st">&lt;/div&gt;</span><span class="sc">{}</span><span class="st">&lt;/div&gt;&quot;</span></span>
+<span id="pymd-4"><a href="#pymd-4"></a>    <span class="cf">if</span> <span class="st">&quot;file&quot;</span> <span class="kw">in</span> options:</span>
+<span id="pymd-5"><a href="#pymd-5"></a>        name <span class="op">=</span> <span class="st">&quot;«file://</span><span class="sc">{}</span><span class="st">»&quot;</span>.<span class="bu">format</span>(options[<span class="st">&quot;file&quot;</span>])</span>
+<span id="pymd-6"><a href="#pymd-6"></a>        <span class="cf">return</span> ann.<span class="bu">format</span>(name, code_block)</span>
+<span id="pymd-7"><a href="#pymd-7"></a>    <span class="cf">elif</span> <span class="st">&quot;id&quot;</span> <span class="kw">in</span> options:</span>
+<span id="pymd-8"><a href="#pymd-8"></a>        name <span class="op">=</span> <span class="st">&quot;«</span><span class="sc">{}</span><span class="st">»&quot;</span>.<span class="bu">format</span>(options[<span class="st">&quot;id&quot;</span>])</span>
+<span id="pymd-9"><a href="#pymd-9"></a>        <span class="cf">return</span> ann.<span class="bu">format</span>(name, code_block)</span>
+<span id="pymd-10"><a href="#pymd-10"></a>    <span class="cf">return</span> code_block</span></code></pre></div>
+</div>
+<h2 id="validate">Validate</h2>
+<div class="annotated-code">
+<p><span><em>«pymd»+</em></span></p>
+<div class="sourceCode" id="pymd"><pre class="sourceCode python"><code class="sourceCode python"><span id="pymd-1"><a href="#pymd-1"></a><span class="kw">def</span> validator(language, options):</span>
+<span id="pymd-2"><a href="#pymd-2"></a>    <span class="cf">return</span> <span class="va">True</span></span></code></pre></div>
 </div>
 </div></main>
 

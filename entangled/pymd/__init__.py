@@ -4,8 +4,6 @@ __all__ = ["format", "validator"]
 # ~\~ end
 # ~\~ begin <<lit/pymd.md|pymd>>[1]
 def format(source, language, css_class, options, md, classes=None, id_value='', **kwargs):
-    import sys
-    print("{} {} {} {}".format(language, css_class, options, md), file=sys.stderr)
     code_block = "<pre><code class={}>{}</code></pre>".format(language, source)
     ann = "<div class=\"lp-fragment\"><div class=\"lp-ref\">{}</div>{}</div>"
     if "file" in options:
