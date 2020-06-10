@@ -24,7 +24,10 @@ __all__ = ["format", "validator"]
 
 ``` {.python #pymd}
 def format(source, language, css_class, options, md, classes=None, id_value='', **kwargs):
-    code_block = "<pre><code class={}>{}</code></pre>".format(language, source)
+    patched_source = source \
+        .replace("<", "&lt;") \
+        .replace(">", "&gt;")
+    code_block = "<pre><code class={}>{}</code></pre>".format(language, patched_source)
     ann = "<div class=\"lp-fragment\"><div class=\"lp-ref\">{}</div>{}</div>"
     if "file" in options:
         name = "«file://{}»".format(options["file"])

@@ -814,6 +814,8 @@ def bootstrap_fold_code(elem: Element, doc: Doc) -> Optional[Element]:
                        classes=["fold-block"])
 
         else:
+            if "annotated" in elem.attributes:
+                return None
             return annotate.action(elem, doc)
 
     return None

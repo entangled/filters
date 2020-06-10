@@ -106,6 +106,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="#doctesting">Doctesting</a></li>
 <li><a href="#bootstrap">Bootstrap</a></li>
 <li><a href="#mkdocs">MkDocs</a></li>
+<li><a href="#code-injection">Code injection</a></li>
 </ul>
 </div>
 </nav>
@@ -196,7 +197,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="compute-pi"><pre class="sourceCode python eval"><code class="sourceCode python"><span id="compute-pi-1"><a href="#compute-pi-1"></a><span class="bu">print</span>(<span class="st">&quot;π ≈ </span><span class="sc">{}</span><span class="st">&quot;</span>.<span class="bu">format</span>(compute_pi(<span class="dv">1000000</span>)))</span></code></pre></div>
 </div>
 <div class="doctestResult">
-<div class="sourceCode" id="cb2"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ 3.141492</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1"></a>π ≈ 3.14404</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -1059,9 +1060,11 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <span id="bootstrap-fold-code-block-22"><a href="#bootstrap-fold-code-block-22"></a>                       classes<span class="op">=</span>[<span class="st">&quot;fold-block&quot;</span>])</span>
 <span id="bootstrap-fold-code-block-23"><a href="#bootstrap-fold-code-block-23"></a></span>
 <span id="bootstrap-fold-code-block-24"><a href="#bootstrap-fold-code-block-24"></a>        <span class="cf">else</span>:</span>
-<span id="bootstrap-fold-code-block-25"><a href="#bootstrap-fold-code-block-25"></a>            <span class="cf">return</span> annotate.action(elem, doc)</span>
-<span id="bootstrap-fold-code-block-26"><a href="#bootstrap-fold-code-block-26"></a></span>
-<span id="bootstrap-fold-code-block-27"><a href="#bootstrap-fold-code-block-27"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+<span id="bootstrap-fold-code-block-25"><a href="#bootstrap-fold-code-block-25"></a>            <span class="cf">if</span> <span class="st">&quot;annotated&quot;</span> <span class="kw">in</span> elem.attributes:</span>
+<span id="bootstrap-fold-code-block-26"><a href="#bootstrap-fold-code-block-26"></a>                <span class="cf">return</span> <span class="va">None</span></span>
+<span id="bootstrap-fold-code-block-27"><a href="#bootstrap-fold-code-block-27"></a>            <span class="cf">return</span> annotate.action(elem, doc)</span>
+<span id="bootstrap-fold-code-block-28"><a href="#bootstrap-fold-code-block-28"></a></span>
+<span id="bootstrap-fold-code-block-29"><a href="#bootstrap-fold-code-block-29"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
 </div>
 <h1 id="mkdocs">MkDocs</h1>
 <p>Python-markdown powers <code>MkDocs</code>. To pass Entangled style code blocks we need to help Python-Markdown along a bit. These routines are designed to be called by <code>pymdownx.superfences</code>. To use them, add the following block to <code>mkdocs.yml</code> and enable <code>highlight.js</code>.</p>
@@ -1087,15 +1090,18 @@ find a way of testing this code</li>
 <div class="annotated-code">
 <p><span><em>«pymd»+</em></span></p>
 <div class="sourceCode" id="pymd"><pre class="sourceCode python"><code class="sourceCode python"><span id="pymd-1"><a href="#pymd-1"></a><span class="kw">def</span> <span class="bu">format</span>(source, language, css_class, options, md, classes<span class="op">=</span><span class="va">None</span>, id_value<span class="op">=</span><span class="st">&#39;&#39;</span>, <span class="op">**</span>kwargs):</span>
-<span id="pymd-2"><a href="#pymd-2"></a>    code_block <span class="op">=</span> <span class="st">&quot;&lt;pre&gt;&lt;code class=</span><span class="sc">{}</span><span class="st">&gt;</span><span class="sc">{}</span><span class="st">&lt;/code&gt;&lt;/pre&gt;&quot;</span>.<span class="bu">format</span>(language, source)</span>
-<span id="pymd-3"><a href="#pymd-3"></a>    ann <span class="op">=</span> <span class="st">&quot;&lt;div class=</span><span class="ch">\&quot;</span><span class="st">lp-fragment</span><span class="ch">\&quot;</span><span class="st">&gt;&lt;div class=</span><span class="ch">\&quot;</span><span class="st">lp-ref</span><span class="ch">\&quot;</span><span class="st">&gt;</span><span class="sc">{}</span><span class="st">&lt;/div&gt;</span><span class="sc">{}</span><span class="st">&lt;/div&gt;&quot;</span></span>
-<span id="pymd-4"><a href="#pymd-4"></a>    <span class="cf">if</span> <span class="st">&quot;file&quot;</span> <span class="kw">in</span> options:</span>
-<span id="pymd-5"><a href="#pymd-5"></a>        name <span class="op">=</span> <span class="st">&quot;«file://</span><span class="sc">{}</span><span class="st">»&quot;</span>.<span class="bu">format</span>(options[<span class="st">&quot;file&quot;</span>])</span>
-<span id="pymd-6"><a href="#pymd-6"></a>        <span class="cf">return</span> ann.<span class="bu">format</span>(name, code_block)</span>
-<span id="pymd-7"><a href="#pymd-7"></a>    <span class="cf">elif</span> <span class="st">&quot;id&quot;</span> <span class="kw">in</span> options:</span>
-<span id="pymd-8"><a href="#pymd-8"></a>        name <span class="op">=</span> <span class="st">&quot;«</span><span class="sc">{}</span><span class="st">»&quot;</span>.<span class="bu">format</span>(options[<span class="st">&quot;id&quot;</span>])</span>
+<span id="pymd-2"><a href="#pymd-2"></a>    patched_source <span class="op">=</span> source <span class="op">\</span></span>
+<span id="pymd-3"><a href="#pymd-3"></a>        .replace(<span class="st">&quot;&lt;&quot;</span>, <span class="st">&quot;&amp;lt;&quot;</span>) <span class="op">\</span></span>
+<span id="pymd-4"><a href="#pymd-4"></a>        .replace(<span class="st">&quot;&gt;&quot;</span>, <span class="st">&quot;&amp;gt;&quot;</span>)</span>
+<span id="pymd-5"><a href="#pymd-5"></a>    code_block <span class="op">=</span> <span class="st">&quot;&lt;pre&gt;&lt;code class=</span><span class="sc">{}</span><span class="st">&gt;</span><span class="sc">{}</span><span class="st">&lt;/code&gt;&lt;/pre&gt;&quot;</span>.<span class="bu">format</span>(language, patched_source)</span>
+<span id="pymd-6"><a href="#pymd-6"></a>    ann <span class="op">=</span> <span class="st">&quot;&lt;div class=</span><span class="ch">\&quot;</span><span class="st">lp-fragment</span><span class="ch">\&quot;</span><span class="st">&gt;&lt;div class=</span><span class="ch">\&quot;</span><span class="st">lp-ref</span><span class="ch">\&quot;</span><span class="st">&gt;</span><span class="sc">{}</span><span class="st">&lt;/div&gt;</span><span class="sc">{}</span><span class="st">&lt;/div&gt;&quot;</span></span>
+<span id="pymd-7"><a href="#pymd-7"></a>    <span class="cf">if</span> <span class="st">&quot;file&quot;</span> <span class="kw">in</span> options:</span>
+<span id="pymd-8"><a href="#pymd-8"></a>        name <span class="op">=</span> <span class="st">&quot;«file://</span><span class="sc">{}</span><span class="st">»&quot;</span>.<span class="bu">format</span>(options[<span class="st">&quot;file&quot;</span>])</span>
 <span id="pymd-9"><a href="#pymd-9"></a>        <span class="cf">return</span> ann.<span class="bu">format</span>(name, code_block)</span>
-<span id="pymd-10"><a href="#pymd-10"></a>    <span class="cf">return</span> code_block</span></code></pre></div>
+<span id="pymd-10"><a href="#pymd-10"></a>    <span class="cf">elif</span> <span class="st">&quot;id&quot;</span> <span class="kw">in</span> options:</span>
+<span id="pymd-11"><a href="#pymd-11"></a>        name <span class="op">=</span> <span class="st">&quot;«</span><span class="sc">{}</span><span class="st">»&quot;</span>.<span class="bu">format</span>(options[<span class="st">&quot;id&quot;</span>])</span>
+<span id="pymd-12"><a href="#pymd-12"></a>        <span class="cf">return</span> ann.<span class="bu">format</span>(name, code_block)</span>
+<span id="pymd-13"><a href="#pymd-13"></a>    <span class="cf">return</span> code_block</span></code></pre></div>
 </div>
 <h2 id="validate">Validate</h2>
 <div class="annotated-code">
@@ -1103,11 +1109,53 @@ find a way of testing this code</li>
 <div class="sourceCode" id="pymd"><pre class="sourceCode python"><code class="sourceCode python"><span id="pymd-1"><a href="#pymd-1"></a><span class="kw">def</span> validator(language, options):</span>
 <span id="pymd-2"><a href="#pymd-2"></a>    <span class="cf">return</span> <span class="va">True</span></span></code></pre></div>
 </div>
+<h1 id="code-injection">Code injection</h1>
+<p>This filter lets you inject code directly into the HTML, mainly meant for visualisation.</p>
+<div class="annotated-code">
+<p><span><em>«entangled/inject.py»=</em></span></p>
+<div class="sourceCode" id="cb26" data-file="entangled/inject.py"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a><span class="im">from</span> typing <span class="im">import</span> (Optional)</span>
+<span id="cb26-2"><a href="#cb26-2"></a><span class="im">from</span> panflute <span class="im">import</span> (Doc, CodeBlock, Div, Link, Str, Plain, RawBlock, Emph)</span>
+<span id="cb26-3"><a href="#cb26-3"></a><span class="im">from</span> . <span class="im">import</span> tangle</span>
+<span id="cb26-4"><a href="#cb26-4"></a></span>
+<span id="cb26-5"><a href="#cb26-5"></a><span class="kw">def</span> action(elem, doc):</span>
+<span id="cb26-6"><a href="#cb26-6"></a>    <span class="cf">if</span> <span class="bu">isinstance</span>(elem, CodeBlock) <span class="kw">and</span> <span class="st">&quot;inject&quot;</span> <span class="kw">in</span> elem.attributes:</span>
+<span id="cb26-7"><a href="#cb26-7"></a>        name <span class="op">=</span> elem.identifier</span>
+<span id="cb26-8"><a href="#cb26-8"></a>        label <span class="op">=</span> Emph(Str(<span class="ss">f&quot;«</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">»=&quot;</span>))</span>
+<span id="cb26-9"><a href="#cb26-9"></a>        itemNav <span class="op">=</span> Link(Str(<span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> output&quot;</span>), url<span class="op">=</span><span class="ss">f&quot;#</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">&quot;</span>, classes<span class="op">=</span>[<span class="st">&quot;nav-item&quot;</span>, <span class="st">&quot;nav-link&quot;</span>, <span class="st">&quot;active&quot;</span>],</span>
+<span id="cb26-10"><a href="#cb26-10"></a>                         identifier<span class="op">=</span><span class="st">&quot;nav-source-tab&quot;</span>, attributes<span class="op">=</span>{</span>
+<span id="cb26-11"><a href="#cb26-11"></a>                            <span class="st">&quot;data-toggle&quot;</span>: <span class="st">&quot;tab&quot;</span>, <span class="st">&quot;aria-controls&quot;</span>: <span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">&quot;</span>, <span class="st">&quot;aria-selected&quot;</span>: <span class="st">&quot;true&quot;</span>})</span>
+<span id="cb26-12"><a href="#cb26-12"></a>        sourceNav <span class="op">=</span> Link(label, url<span class="op">=</span><span class="st">&quot;#nav-source&quot;</span>, classes<span class="op">=</span>[<span class="st">&quot;nav-item&quot;</span>, <span class="st">&quot;nav-link&quot;</span>],</span>
+<span id="cb26-13"><a href="#cb26-13"></a>                         identifier<span class="op">=</span><span class="st">&quot;nav-source-tab&quot;</span>, attributes<span class="op">=</span>{</span>
+<span id="cb26-14"><a href="#cb26-14"></a>                            <span class="st">&quot;data-toggle&quot;</span>: <span class="st">&quot;tab&quot;</span>, <span class="st">&quot;aria-controls&quot;</span>: <span class="st">&quot;nav-source&quot;</span>, <span class="st">&quot;aria-selected&quot;</span>: <span class="st">&quot;false&quot;</span>})</span>
+<span id="cb26-15"><a href="#cb26-15"></a>        nav <span class="op">=</span> Div(Plain(itemNav, sourceNav), classes<span class="op">=</span>[<span class="st">&quot;nav&quot;</span>, <span class="st">&quot;nav-tabs&quot;</span>], identifier<span class="op">=</span><span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">-nav&quot;</span>)</span>
+<span id="cb26-16"><a href="#cb26-16"></a></span>
+<span id="cb26-17"><a href="#cb26-17"></a>        elem.identifier <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">-source&quot;</span></span>
+<span id="cb26-18"><a href="#cb26-18"></a>        elem.attributes[<span class="st">&quot;annotated&quot;</span>] <span class="op">=</span> <span class="st">&quot;true&quot;</span></span>
+<span id="cb26-19"><a href="#cb26-19"></a>        targetPane <span class="op">=</span> Div(classes<span class="op">=</span>[<span class="st">&quot;tab-pane&quot;</span>, <span class="st">&quot;fade&quot;</span>, <span class="st">&quot;show&quot;</span>, <span class="st">&quot;active&quot;</span>], identifier<span class="op">=</span>name)</span>
+<span id="cb26-20"><a href="#cb26-20"></a>        sourcePane <span class="op">=</span> Div(elem, classes<span class="op">=</span>[<span class="st">&quot;tab-pane&quot;</span>, <span class="st">&quot;fade&quot;</span>], identifier<span class="op">=</span><span class="st">&quot;nav-source&quot;</span>)</span>
+<span id="cb26-21"><a href="#cb26-21"></a>        content <span class="op">=</span> Div(targetPane, sourcePane, classes<span class="op">=</span>[<span class="st">&quot;tab-content&quot;</span>], identifier<span class="op">=</span><span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">-content&quot;</span>)</span>
+<span id="cb26-22"><a href="#cb26-22"></a>        expanded_source <span class="op">=</span> tangle.get_code(doc.code_map, name)</span>
+<span id="cb26-23"><a href="#cb26-23"></a>        script <span class="op">=</span> RawBlock(<span class="ss">f&quot;&lt;script&gt;</span><span class="ch">\n</span><span class="sc">{</span>expanded_source<span class="sc">}</span><span class="ch">\n</span><span class="ss">&lt;/script&gt;&quot;</span>)</span>
+<span id="cb26-24"><a href="#cb26-24"></a>        <span class="cf">return</span> Div(nav, content, script, classes<span class="op">=</span>[<span class="st">&quot;entangled-inject&quot;</span>])</span>
+<span id="cb26-25"><a href="#cb26-25"></a></span>
+<span id="cb26-26"><a href="#cb26-26"></a><span class="kw">def</span> main(doc: Optional[Doc] <span class="op">=</span> <span class="va">None</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb26-27"><a href="#cb26-27"></a>    <span class="im">import</span> sys</span>
+<span id="cb26-28"><a href="#cb26-28"></a>    <span class="im">import</span> io</span>
+<span id="cb26-29"><a href="#cb26-29"></a>    <span class="im">import</span> panflute</span>
+<span id="cb26-30"><a href="#cb26-30"></a></span>
+<span id="cb26-31"><a href="#cb26-31"></a>    json_input <span class="op">=</span> sys.stdin.read()</span>
+<span id="cb26-32"><a href="#cb26-32"></a>    json_stream <span class="op">=</span> io.StringIO(json_input)</span>
+<span id="cb26-33"><a href="#cb26-33"></a>    doc <span class="op">=</span> panflute.load(json_stream)</span>
+<span id="cb26-34"><a href="#cb26-34"></a>    tangle.prepare(doc)</span>
+<span id="cb26-35"><a href="#cb26-35"></a>    doc <span class="op">=</span> doc.walk(tangle.action)</span>
+<span id="cb26-36"><a href="#cb26-36"></a>    doc <span class="op">=</span> doc.walk(action)</span>
+<span id="cb26-37"><a href="#cb26-37"></a>    panflute.dump(doc)</span></code></pre></div>
+</div>
 </div></main>
 
 <footer class="py-4 bg-dark text-white-50 footer"><div class="container">
 Johan Hidding – <a href="https://esciencecenter.nl/">Netherlands eScience Center</a><br />
-2020-06-09 — version: 0.6.1 — license: <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2</a>
+2020-06-10 — version: 0.6.1 — license: <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2</a>
 </div></footer>
 
 
