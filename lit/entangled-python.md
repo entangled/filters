@@ -51,7 +51,7 @@ This module also acts as a test-bed and environment for rapid prototyping of fea
 ## Version
 
 ``` {.python file=entangled/__init__.py}
-__version__ = "0.7.0"
+__version__ = "0.8.1"
 ```
 
 ## Demo

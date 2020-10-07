@@ -11,13 +11,14 @@ test_deps = [
 
 setup(
     name="entangled-filters",
-    version="0.8.0",
+    version="0.8.1",
     packages=find_packages(),
 
     install_requires=[
           "jupyter_client>=5.3.4,<6"
         , "pampy>=0.3.0,<0.4"
         , "panflute==1.11.2"
+        , "ansi2html"
     ],
     tests_require=test_deps,
     extras_require={

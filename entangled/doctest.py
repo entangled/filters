@@ -1,6 +1,7 @@
 # ~\~ language=Python filename=entangled/doctest.py
 # ~\~ begin <<lit/filters.md|entangled/doctest.py>>[0]
 from panflute import (Doc, Element, CodeBlock)
+from ansi2html import Ansi2HTMLConverter
 from .typing import (ActionReturn, JSONType, CodeMap)
 from .tangle import (get_name, expand_code_block)
 from .config import get_language_info
@@ -64,9 +65,12 @@ def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
     return result
 # ~\~ end
 # ~\~ begin <<lit/filters.md|doctest-report>>[0]
-from panflute import Div
+from panflute import Div, RawBlock
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
+    conv = Ansi2HTMLConverter()
+    def to_raw(txt):
+        return Div(RawBlock(conv.convert(txt, full=False), format="html"), classes=["programOutput"])
     # ~\~ begin <<lit/filters.md|doctest-content-div>>[0]
     def content_div(*output):
         status_attr = {"status": t.status.name}
@@ -77,20 +81,20 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
         return Div(input_code, *output, classes=["doctest"], attributes=status_attr)
     # ~\~ end
     if t.status is TestStatus.ERROR:
-        return content_div( Div( CodeBlock(str(t.error))
+        return content_div( Div( to_raw(t.error)
                                , classes=["doctestError"] ) )
     if t.status is TestStatus.FAIL:
-        return content_div( Div( CodeBlock(str(t.result), classes=["txt"])
+        return content_div( Div( to_raw(t.result)
                                , classes=["doctestResult"] )
-                          , Div( CodeBlock(str(t.expect), classes=["txt"])
+                          , Div( to_raw(t.expect)
                                , classes=["doctestExpect"] ) )
     if t.status is TestStatus.SUCCESS:
-        return content_div( Div( CodeBlock(str(t.result), classes=["txt"])
+        return content_div( Div( to_raw(t.result)
                                , classes=["doctestResult"] ) )
     if t.status is TestStatus.PENDING:
         return content_div()
     if t.status is TestStatus.UNKNOWN:
-        return content_div( Div( CodeBlock(str(t.result))
+        return content_div( Div( to_raw(t.result)
                                , classes=["doctestUnknown"] ) )
     return None
 # ~\~ end

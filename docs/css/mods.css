@@ -60,6 +60,36 @@ pre.sourceCode {
         font-size: 1rem;
 }
 
+div.doctestResult {
+        padding: 0;
+        margin: 0em 2em 1em 2em;
+        border-radius: 0 0 5pt 5pt;
+        box-shadow: 1px 1px 3px 0px #ccc;
+}
+
+.programOutput {
+        font-family: monospace;
+        background: #fafafa;
+        color: inherit;
+        margin: 0;
+        border-radius: 0 0 5pt 5pt;
+        border-left: thick solid #888;
+        padding: 10pt 10pt 10pt 20pt;
+        font-size: 1rem;
+}
+
+.programOutput .ansi32 {
+        color: green;
+}
+
+.programOutput .ansi31 {
+        color: red;
+}
+
+.programOutput .ansi1 {
+        font-weight: bold;
+}
+
 .doctestResult pre.sourceCode {
         border-color: #484;
 }
@@ -77,6 +107,7 @@ pre.sourceCode {
 
 .doctest[data-status='FAIL'] .doctestResult div.sourceCode {
         border-radius: 0 0 0 0;
+        margin-bottom: 0;
 }
 
 .doctest[data-status='FAIL'] .doctestResult pre.sourceCode {

@@ -246,6 +246,7 @@ This Pandoc filter runs doc-tests from Python. If a cell is marked with a `.doct
 
 ``` {.python file=entangled/doctest.py}
 from panflute import (Doc, Element, CodeBlock)
+from ansi2html import Ansi2HTMLConverter
 from .typing import (ActionReturn, JSONType, CodeMap)
 from .tangle import (get_name, expand_code_block)
 from .config import get_language_info
@@ -528,25 +529,28 @@ def content_div(*output):
 Then the `generate_report` function transforms a `CodeBlock` as follows.
 
 ``` {.python #doctest-report}
-from panflute import Div
+from panflute import Div, RawBlock
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
+    conv = Ansi2HTMLConverter()
+    def to_raw(txt):
+        return Div(RawBlock(conv.convert(txt, full=False), format="html"), classes=["programOutput"])
     <<doctest-content-div>>
     if t.status is TestStatus.ERROR:
-        return content_div( Div( CodeBlock(str(t.error))
+        return content_div( Div( to_raw(t.error)
                                , classes=["doctestError"] ) )
     if t.status is TestStatus.FAIL:
-        return content_div( Div( CodeBlock(str(t.result), classes=["txt"])
+        return content_div( Div( to_raw(t.result)
                                , classes=["doctestResult"] )
-                          , Div( CodeBlock(str(t.expect), classes=["txt"])
+                          , Div( to_raw(t.expect)
                                , classes=["doctestExpect"] ) )
     if t.status is TestStatus.SUCCESS:
-        return content_div( Div( CodeBlock(str(t.result), classes=["txt"])
+        return content_div( Div( to_raw(t.result)
                                , classes=["doctestResult"] ) )
     if t.status is TestStatus.PENDING:
         return content_div()
     if t.status is TestStatus.UNKNOWN:
-        return content_div( Div( CodeBlock(str(t.result))
+        return content_div( Div( to_raw(t.result)
                                , classes=["doctestUnknown"] ) )
     return None
 ```
