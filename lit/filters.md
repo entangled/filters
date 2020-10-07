@@ -532,9 +532,14 @@ Then the `generate_report` function transforms a `CodeBlock` as follows.
 from panflute import Div, RawBlock
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
-    conv = Ansi2HTMLConverter()
+    conv = Ansi2HTMLConverter(inline=True)
     def to_raw(txt):
-        return Div(RawBlock(conv.convert(txt, full=False), format="html"), classes=["programOutput"])
+        return Div(
+            RawBlock(
+                '<pre class="ansi2html-content">'
+                + conv.convert(txt, full=False)
+                + '</pre>', format="html"),
+            classes=["programOutput"])
     <<doctest-content-div>>
     if t.status is TestStatus.ERROR:
         return content_div( Div( to_raw(t.error)

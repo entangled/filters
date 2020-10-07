@@ -198,8 +198,8 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div class="doctestResult">
 <div class="programOutput">
-π ≈ 3.1397
-
+<pre class="ansi2html-content">π ≈ 3.139972
+</pre>
 </div>
 </div>
 </div>
@@ -790,27 +790,32 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="doctest-report"><pre class="sourceCode python"><code class="sourceCode python"><span id="doctest-report-1"><a href="#doctest-report-1"></a><span class="im">from</span> panflute <span class="im">import</span> Div, RawBlock</span>
 <span id="doctest-report-2"><a href="#doctest-report-2"></a></span>
 <span id="doctest-report-3"><a href="#doctest-report-3"></a><span class="kw">def</span> generate_report(elem: CodeBlock, t: Test) <span class="op">-&gt;</span> ActionReturn:</span>
-<span id="doctest-report-4"><a href="#doctest-report-4"></a>    conv <span class="op">=</span> Ansi2HTMLConverter()</span>
+<span id="doctest-report-4"><a href="#doctest-report-4"></a>    conv <span class="op">=</span> Ansi2HTMLConverter(inline<span class="op">=</span><span class="va">True</span>)</span>
 <span id="doctest-report-5"><a href="#doctest-report-5"></a>    <span class="kw">def</span> to_raw(txt):</span>
-<span id="doctest-report-6"><a href="#doctest-report-6"></a>        <span class="cf">return</span> Div(RawBlock(conv.convert(txt, full<span class="op">=</span><span class="va">False</span>), <span class="bu">format</span><span class="op">=</span><span class="st">&quot;html&quot;</span>), classes<span class="op">=</span>[<span class="st">&quot;programOutput&quot;</span>])</span>
-<span id="doctest-report-7"><a href="#doctest-report-7"></a>    <span class="op">&lt;&lt;</span>doctest<span class="op">-</span>content<span class="op">-</span>div<span class="op">&gt;&gt;</span></span>
-<span id="doctest-report-8"><a href="#doctest-report-8"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.ERROR:</span>
-<span id="doctest-report-9"><a href="#doctest-report-9"></a>        <span class="cf">return</span> content_div( Div( to_raw(t.error)</span>
-<span id="doctest-report-10"><a href="#doctest-report-10"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestError&quot;</span>] ) )</span>
-<span id="doctest-report-11"><a href="#doctest-report-11"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.FAIL:</span>
-<span id="doctest-report-12"><a href="#doctest-report-12"></a>        <span class="cf">return</span> content_div( Div( to_raw(t.result)</span>
-<span id="doctest-report-13"><a href="#doctest-report-13"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestResult&quot;</span>] )</span>
-<span id="doctest-report-14"><a href="#doctest-report-14"></a>                          , Div( to_raw(t.expect)</span>
-<span id="doctest-report-15"><a href="#doctest-report-15"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestExpect&quot;</span>] ) )</span>
-<span id="doctest-report-16"><a href="#doctest-report-16"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.SUCCESS:</span>
+<span id="doctest-report-6"><a href="#doctest-report-6"></a>        <span class="cf">return</span> Div(</span>
+<span id="doctest-report-7"><a href="#doctest-report-7"></a>            RawBlock(</span>
+<span id="doctest-report-8"><a href="#doctest-report-8"></a>                <span class="st">&#39;&lt;pre class=&quot;ansi2html-content&quot;&gt;&#39;</span></span>
+<span id="doctest-report-9"><a href="#doctest-report-9"></a>                <span class="op">+</span> conv.convert(txt, full<span class="op">=</span><span class="va">False</span>)</span>
+<span id="doctest-report-10"><a href="#doctest-report-10"></a>                <span class="op">+</span> <span class="st">&#39;&lt;/pre&gt;&#39;</span>, <span class="bu">format</span><span class="op">=</span><span class="st">&quot;html&quot;</span>),</span>
+<span id="doctest-report-11"><a href="#doctest-report-11"></a>            classes<span class="op">=</span>[<span class="st">&quot;programOutput&quot;</span>])</span>
+<span id="doctest-report-12"><a href="#doctest-report-12"></a>    <span class="op">&lt;&lt;</span>doctest<span class="op">-</span>content<span class="op">-</span>div<span class="op">&gt;&gt;</span></span>
+<span id="doctest-report-13"><a href="#doctest-report-13"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.ERROR:</span>
+<span id="doctest-report-14"><a href="#doctest-report-14"></a>        <span class="cf">return</span> content_div( Div( to_raw(t.error)</span>
+<span id="doctest-report-15"><a href="#doctest-report-15"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestError&quot;</span>] ) )</span>
+<span id="doctest-report-16"><a href="#doctest-report-16"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.FAIL:</span>
 <span id="doctest-report-17"><a href="#doctest-report-17"></a>        <span class="cf">return</span> content_div( Div( to_raw(t.result)</span>
-<span id="doctest-report-18"><a href="#doctest-report-18"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestResult&quot;</span>] ) )</span>
-<span id="doctest-report-19"><a href="#doctest-report-19"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.PENDING:</span>
-<span id="doctest-report-20"><a href="#doctest-report-20"></a>        <span class="cf">return</span> content_div()</span>
-<span id="doctest-report-21"><a href="#doctest-report-21"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.UNKNOWN:</span>
+<span id="doctest-report-18"><a href="#doctest-report-18"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestResult&quot;</span>] )</span>
+<span id="doctest-report-19"><a href="#doctest-report-19"></a>                          , Div( to_raw(t.expect)</span>
+<span id="doctest-report-20"><a href="#doctest-report-20"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestExpect&quot;</span>] ) )</span>
+<span id="doctest-report-21"><a href="#doctest-report-21"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.SUCCESS:</span>
 <span id="doctest-report-22"><a href="#doctest-report-22"></a>        <span class="cf">return</span> content_div( Div( to_raw(t.result)</span>
-<span id="doctest-report-23"><a href="#doctest-report-23"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestUnknown&quot;</span>] ) )</span>
-<span id="doctest-report-24"><a href="#doctest-report-24"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+<span id="doctest-report-23"><a href="#doctest-report-23"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestResult&quot;</span>] ) )</span>
+<span id="doctest-report-24"><a href="#doctest-report-24"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.PENDING:</span>
+<span id="doctest-report-25"><a href="#doctest-report-25"></a>        <span class="cf">return</span> content_div()</span>
+<span id="doctest-report-26"><a href="#doctest-report-26"></a>    <span class="cf">if</span> t.status <span class="kw">is</span> TestStatus.UNKNOWN:</span>
+<span id="doctest-report-27"><a href="#doctest-report-27"></a>        <span class="cf">return</span> content_div( Div( to_raw(t.result)</span>
+<span id="doctest-report-28"><a href="#doctest-report-28"></a>                               , classes<span class="op">=</span>[<span class="st">&quot;doctestUnknown&quot;</span>] ) )</span>
+<span id="doctest-report-29"><a href="#doctest-report-29"></a>    <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
 </div>
 <h2 id="main">Main</h2>
 <p>This module reuses most of the tangle module.</p>

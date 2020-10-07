@@ -68,9 +68,14 @@ def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
 from panflute import Div, RawBlock
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
-    conv = Ansi2HTMLConverter()
+    conv = Ansi2HTMLConverter(inline=True)
     def to_raw(txt):
-        return Div(RawBlock(conv.convert(txt, full=False), format="html"), classes=["programOutput"])
+        return Div(
+            RawBlock(
+                '<pre class="ansi2html-content">'
+                + conv.convert(txt, full=False)
+                + '</pre>', format="html"),
+            classes=["programOutput"])
     # ~\~ begin <<lit/filters.md|doctest-content-div>>[0]
     def content_div(*output):
         status_attr = {"status": t.status.name}
