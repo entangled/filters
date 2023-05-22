@@ -24,7 +24,7 @@ in [ Card :: { title = "Literate Programming"
 
 
 def test_dhall_parser():
-    from entangled.bootstrap import parse_dhall, data_path
+    from pandoc_entangled.bootstrap import parse_dhall, data_path
     x = parse_dhall(card_deck_sample, cwd=data_path)
     assert isinstance(x, list)
     assert all(isinstance(i, dict) for i in x)
