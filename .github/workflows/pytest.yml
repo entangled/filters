@@ -31,12 +31,12 @@ jobs:
       run: |
         pytest
         coverage xml
-    - name: Upload coverage
-      if: ${{ matrix.python-version == "3.11" }}
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }} #required
-        file: ./coverage.xml #optional
-        flags: unittests #optional
-        name: codecov-umbrella #optional
-        yml: ./codecov.yml #optional
+#     - name: Upload coverage
+#       if: matrix.python-version == "3.11"
+#       uses: codecov/codecov-action@v1
+#       with:
+#         token: ${{ secrets.CODECOV_TOKEN }} #required
+#         file: ./coverage.xml #optional
+#         flags: unittests #optional
+#         name: codecov-umbrella #optional
+#         yml: ./codecov.yml #optional
