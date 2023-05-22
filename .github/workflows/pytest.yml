@@ -9,7 +9,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7, 3.8]
+        python-version: [3.7, 3.8, 3.9, 3.10, 3.11]
 
     steps:
     - uses: actions/checkout@v1
@@ -24,7 +24,7 @@ jobs:
       run: |
         wget https://github.com/dhall-lang/dhall-haskell/releases/download/1.31.1/dhall-json-1.6.3-x86_64-linux.tar.bz2
         tar xvf dhall-json-1.6.3-x86_64-linux.tar.bz2
-        echo "::add-path::${GITHUB_WORKSPACE}/bin"
+        echo "${GITHUB_WORKSPACE}/bin" >> $GITHUB_PATH
         python -m pip install --upgrade pip
         pip install -e .[test]
     - name: Lint with Flake8
