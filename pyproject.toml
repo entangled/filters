@@ -8,7 +8,7 @@ readme = "README.md"
 packages = [{include = "pandoc_entangled"}]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 panflute = "^2.3.0"
 jupyter-client = "^8.2.0"
 ansi2html = "^1.8.0"

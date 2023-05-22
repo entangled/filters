@@ -9,4 +9,5 @@ htmlcov
 coverage.xml
 dist
 .entangled
+.poetry.lock
 
