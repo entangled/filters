@@ -16,7 +16,7 @@ TODO:
 - [ ] implement validator
 - [ ] find a way of testing this code
 
-``` {.python file=entangled/pymd/__init__.py #pymd}
+``` {.python file=pandoc_entangled/pymd/__init__.py #pymd}
 __all__ = ["format", "validator"]
 ```
 

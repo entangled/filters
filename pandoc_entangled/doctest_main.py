@@ -1,5 +1,5 @@
-# ~\~ language=Python filename=entangled/doctest_main.py
-# ~\~ begin <<lit/filters.md|entangled/doctest_main.py>>[0]
+# ~\~ language=Python filename=pandoc_entangled/doctest_main.py
+# ~\~ begin <<lit/filters.md|pandoc_entangled/doctest_main.py>>[init]
 import panflute
 
 from . import tangle
@@ -10,7 +10,7 @@ from .config import read_config
 
 
 def main() -> None:
-    # ~\~ begin <<lit/filters.md|load-document>>[0]
+    # ~\~ begin <<lit/filters.md|load-document>>[init]
     import io
     import sys
 

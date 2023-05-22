@@ -78,6 +78,10 @@ div.doctestResult {
         font-size: 1rem;
 }
 
+pre.ansi2html-content {
+        margin-bottom: 0;
+}
+
 .programOutput .ansi32 {
         color: green;
 }

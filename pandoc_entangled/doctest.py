@@ -1,5 +1,5 @@
-# ~\~ language=Python filename=entangled/doctest.py
-# ~\~ begin <<lit/filters.md|entangled/doctest.py>>[0]
+# ~\~ language=Python filename=pandoc_entangled/doctest.py
+# ~\~ begin <<lit/filters.md|pandoc_entangled/doctest.py>>[init]
 from panflute import (Doc, Element, CodeBlock)
 from ansi2html import Ansi2HTMLConverter
 from .typing import (ActionReturn, JSONType, CodeMap)
@@ -9,7 +9,7 @@ from collections import defaultdict
 
 import sys
 
-# ~\~ begin <<lit/filters.md|doctest-suite>>[0]
+# ~\~ begin <<lit/filters.md|doctest-suite>>[init]
 from dataclasses import dataclass
 from typing import (Optional, List, Dict)
 from enum import Enum
@@ -37,7 +37,7 @@ class Suite:
     code_blocks: List[Test]
     language: str
 # ~\~ end
-# ~\~ begin <<lit/filters.md|get-doc-tests>>[0]
+# ~\~ begin <<lit/filters.md|get-doc-tests>>[init]
 def get_language(c: CodeBlock) -> str:
     if not c.classes:
         raise ValueError(f"Code block `{c.name}` has no language specified.")
@@ -64,7 +64,7 @@ def get_doc_tests(code_map: CodeMap) -> Dict[str, Suite]:
 
     return result
 # ~\~ end
-# ~\~ begin <<lit/filters.md|doctest-report>>[0]
+# ~\~ begin <<lit/filters.md|doctest-report>>[init]
 from panflute import Div, RawBlock
 
 def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
@@ -76,7 +76,7 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
                 + conv.convert(txt, full=False)
                 + '</pre>', format="html"),
             classes=["programOutput"])
-    # ~\~ begin <<lit/filters.md|doctest-content-div>>[0]
+    # ~\~ begin <<lit/filters.md|doctest-content-div>>[init]
     def content_div(*output):
         status_attr = {"status": t.status.name}
         code = elem.text.split("\n---\n")
@@ -103,12 +103,12 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
                                , classes=["doctestUnknown"] ) )
     return None
 # ~\~ end
-# ~\~ begin <<lit/filters.md|doctest-run-suite>>[0]
+# ~\~ begin <<lit/filters.md|doctest-run-suite>>[init]
 import jupyter_client
 import queue
 
 def run_suite(config: JSONType, s: Suite) -> None:
-    # ~\~ begin <<lit/filters.md|jupyter-get-kernel-name>>[0]
+    # ~\~ begin <<lit/filters.md|jupyter-get-kernel-name>>[init]
     info = get_language_info(config, s.language)
     kernel_name = info["jupyter"] if "jupyter" in info else None
     if not kernel_name:
@@ -119,7 +119,7 @@ def run_suite(config: JSONType, s: Suite) -> None:
     # ~\~ end
     with jupyter_client.run_kernel(kernel_name=kernel_name) as kc:
         print(f"Kernel `{kernel_name}` running ...", file=sys.stderr)
-        # ~\~ begin <<lit/filters.md|jupyter-eval-test>>[0]
+        # ~\~ begin <<lit/filters.md|jupyter-eval-test>>[init]
         def jupyter_eval(test: Test):
             msg_id = kc.execute(test.code)
             while True:
@@ -140,7 +140,7 @@ def run_suite(config: JSONType, s: Suite) -> None:
                 import sys
                 print(data, file=sys.stderr)
                 return False
-            # ~\~ begin <<lit/filters.md|jupyter-handlers>>[0]
+            # ~\~ begin <<lit/filters.md|jupyter-handlers>>[init]
             def execute_result_text(data):
                 test.result = test.result or ""
                 if data is not None:
@@ -172,7 +172,7 @@ def run_suite(config: JSONType, s: Suite) -> None:
                 return True
             # ~\~ end
             return match(msg
-                # ~\~ begin <<lit/filters.md|jupyter-match>>[0]
+                # ~\~ begin <<lit/filters.md|jupyter-match>>[init]
                 , { "msg_type": "execute_result"
                   , "parent_header": { "msg_id" : msg_id }
                   , "content": { "data" : { "text/plain": _ } } }

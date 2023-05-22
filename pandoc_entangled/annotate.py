@@ -1,5 +1,5 @@
-# ~\~ language=Python filename=entangled/annotate.py
-# ~\~ begin <<lit/filters.md|entangled/annotate.py>>[0]
+# ~\~ language=Python filename=pandoc_entangled/annotate.py
+# ~\~ begin <<lit/filters.md|pandoc_entangled/annotate.py>>[init]
 from collections import defaultdict
 from .tangle import get_name
 from panflute import (Span, Str, Para, CodeBlock, Div, Emph, Doc, run_filter)

@@ -1,5 +1,5 @@
-# ~\~ language=Python filename=entangled/typing.py
-# ~\~ begin <<lit/filters.md|entangled/typing.py>>[0]
+# ~\~ language=Python filename=pandoc_entangled/typing.py
+# ~\~ begin <<lit/filters.md|pandoc_entangled/typing.py>>[init]
 from typing import (Union, List, Dict, Callable, Any)
 from panflute import (Element, Doc, CodeBlock)
 

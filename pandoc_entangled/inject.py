@@ -1,5 +1,5 @@
-# ~\~ language=Python filename=entangled/inject.py
-# ~\~ begin <<lit/inject.md|entangled/inject.py>>[0]
+# ~\~ language=Python filename=pandoc_entangled/inject.py
+# ~\~ begin <<lit/inject.md|pandoc_entangled/inject.py>>[init]
 from typing import (Optional)
 from panflute import (Doc, CodeBlock, Div, Link, Str, Plain, RawBlock, Emph)
 from . import tangle

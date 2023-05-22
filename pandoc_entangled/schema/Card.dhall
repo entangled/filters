@@ -1,5 +1,5 @@
--- ~\~ language=Dhall filename=entangled/schema/Card.dhall
--- ~\~ begin <<lit/filters.md|entangled/schema/Card.dhall>>[0]
+-- ~\~ language=Dhall filename=pandoc_entangled/schema/Card.dhall
+-- ~\~ begin <<lit/filters.md|pandoc_entangled/schema/Card.dhall>>[init]
 let Link =
     { href : Text
     , content : Text

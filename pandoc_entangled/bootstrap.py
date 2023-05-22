@@ -1,5 +1,5 @@
-# ~\~ language=Python filename=entangled/bootstrap.py
-# ~\~ begin <<lit/filters.md|entangled/bootstrap.py>>[0]
+# ~\~ language=Python filename=pandoc_entangled/bootstrap.py
+# ~\~ begin <<lit/filters.md|pandoc_entangled/bootstrap.py>>[init]
 from panflute import (Element, Doc, Plain, CodeBlock, Div, Str, Image, Header,
                       Link, convert_text, run_filters, RawBlock, Space, LineBreak, MetaInlines)
 from typing import (Optional)
@@ -24,7 +24,7 @@ def parse_dhall(content: str, cwd: Optional[Path] = None) -> JSONType:
         stderr=subprocess.PIPE, encoding="utf-8", check=True)
     return json.loads(result.stdout)
 
-# ~\~ begin <<lit/filters.md|bootstrap-card-deck>>[0]
+# ~\~ begin <<lit/filters.md|bootstrap-card-deck>>[init]
 def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
     def outer_container(*elements: Element):
         return Div(Div(*elements, classes=["card-deck"]), classes=["container-fluid", "my-4"])
@@ -91,7 +91,7 @@ def bootstrap_card_deck(elem: Element, doc: Doc) -> Optional[Element]:
 
     return None
 # ~\~ end
-# ~\~ begin <<lit/filters.md|bootstrap-fold-code-block>>[0]
+# ~\~ begin <<lit/filters.md|bootstrap-fold-code-block>>[init]
 def fix_name(name: str) -> str:
     return name.replace(".", "-dot-").replace("/", "-slash-")
 

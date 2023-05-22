@@ -1,7 +1,7 @@
 # Code injection
 This filter lets you inject code directly into the HTML, mainly meant for visualisation.
 
-``` {.python file=entangled/inject.py}
+``` {.python file=pandoc_entangled/inject.py}
 from typing import (Optional)
 from panflute import (Doc, CodeBlock, Div, Link, Str, Plain, RawBlock, Emph)
 from . import tangle

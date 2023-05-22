@@ -3,7 +3,7 @@ Configuration of the `entangled` module is done through a file that should sit i
 
 As a configuration format we use [**Dhall**](https://dhall-lang.org/), with a fall-back to JSON. The file should be named either `entangled.dhall` or `entangled.json`. For the Dhall based configuration to work, you need to have the `dhall-to-json` executable installed.
 
-``` {.python file=entangled/config.py}
+``` {.python file=pandoc_entangled/config.py}
 from .typing import (JSONType)
 import subprocess
 import json
@@ -45,7 +45,7 @@ Panflute reads JSON from standard input, lets you apply filters to an intermedia
 
 These are some types that we can use for type annotations.
 
-``` {.python file=entangled/typing.py}
+``` {.python file=pandoc_entangled/typing.py}
 from typing import (Union, List, Dict, Callable, Any)
 from panflute import (Element, Doc, CodeBlock)
 
@@ -59,7 +59,7 @@ JSONType = Any
 
 The global structure of a filter in `panflute` runs `run_filter` from a `main` function. We'll keep a global registry of all code-blocks entered. In `panflute` a global variable is passed on top of the `doc` parameter that is passed to all involved functions.
 
-``` {.python file=entangled/tangle.py}
+``` {.python file=pandoc_entangled/tangle.py}
 from panflute import (run_filter, Doc, Element, CodeBlock)
 from typing import (Optional, Dict, Callable)
 from .typing import (CodeMap)
@@ -216,7 +216,7 @@ def finalize(doc: Doc) -> None:
 # Code block annotation
 This adds the name of a code block to the output.
 
-``` {.python file=entangled/annotate.py}
+``` {.python file=pandoc_entangled/annotate.py}
 from collections import defaultdict
 from .tangle import get_name
 from panflute import (Span, Str, Para, CodeBlock, Div, Emph, Doc, run_filter)
@@ -244,7 +244,7 @@ def main(doc: Optional[Doc] = None) -> None:
 # Doctesting
 This Pandoc filter runs doc-tests from Python. If a cell is marked with a `.doctest` class, the output is checked against the given output. We use Jupyter kernels to evaluate the input.
 
-``` {.python file=entangled/doctest.py}
+``` {.python file=pandoc_entangled/doctest.py}
 from panflute import (Doc, Element, CodeBlock)
 from ansi2html import Ansi2HTMLConverter
 from .typing import (ActionReturn, JSONType, CodeMap)
@@ -563,7 +563,7 @@ def generate_report(elem: CodeBlock, t: Test) -> ActionReturn:
 ## Main
 This module reuses most of the tangle module.
 
-``` {.python file=entangled/doctest_main.py}
+``` {.python file=pandoc_entangled/doctest_main.py}
 import panflute
 
 from . import tangle
@@ -610,7 +610,7 @@ The `pandoc-bootstrap` filter enables content generation for Bootstrap 4. This h
 
 ## Card deck
 
-``` {.dhall file=entangled/schema/Card.dhall}
+``` {.dhall file=pandoc_entangled/schema/Card.dhall}
 let Link =
     { href : Text
     , content : Text
@@ -663,7 +663,7 @@ Should generate something like:
 </div></div>
 ```
 
-``` {.python file=entangled/bootstrap.py}
+``` {.python file=pandoc_entangled/bootstrap.py}
 from panflute import (Element, Doc, Plain, CodeBlock, Div, Str, Image, Header,
                       Link, convert_text, run_filters, RawBlock, Space, LineBreak, MetaInlines)
 from typing import (Optional)

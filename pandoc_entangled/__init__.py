@@ -1,4 +1,5 @@
-# ~\~ language=Python filename=entangled/__init__.py
-# ~\~ begin <<lit/entangled-python.md|entangled/__init__.py>>[0]
-__version__ = "0.8.1"
+# ~\~ language=Python filename=pandoc_entangled/__init__.py
+# ~\~ begin <<lit/entangled-python.md|pandoc_entangled/__init__.py>>[init]
+from importlib import metadata
+__version__ = metadata.version("pandoc-entangled")
 # ~\~ end

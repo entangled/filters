@@ -50,8 +50,9 @@ This module also acts as a test-bed and environment for rapid prototyping of fea
 
 ## Version
 
-``` {.python file=entangled/__init__.py}
-__version__ = "0.8.1"
+``` {.python file=pandoc_entangled/__init__.py}
+from importlib import metadata
+__version__ = metadata.version("pandoc-entangled")
 ```
 
 ## Demo

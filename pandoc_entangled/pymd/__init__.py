@@ -1,5 +1,5 @@
-# ~\~ language=Python filename=entangled/pymd/__init__.py
-# ~\~ begin <<lit/pymd.md|pymd>>[0]
+# ~\~ language=Python filename=pandoc_entangled/pymd/__init__.py
+# ~\~ begin <<lit/pymd.md|pymd>>[init]
 __all__ = ["format", "validator"]
 # ~\~ end
 # ~\~ begin <<lit/pymd.md|pymd>>[1]
