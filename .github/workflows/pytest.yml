@@ -26,17 +26,18 @@ jobs:
         tar xvf dhall-json-1.6.3-x86_64-linux.tar.bz2
         echo "${GITHUB_WORKSPACE}/bin" >> $GITHUB_PATH
         python -m pip install --upgrade pip
-        pip install -e .[test]
+        pip install poetry
+        poetry install
     - name: Test with pytest
       run: |
-        pytest
+        poetry run pytest
         coverage xml
-    - name: Upload coverage
-      if: ${{ matrix.python-version }} == "3.11"
-      uses: codecov/codecov-action@v1
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }} #required
-        file: ./coverage.xml #optional
-        flags: unittests #optional
-        name: codecov-umbrella #optional
-        yml: ./codecov.yml #optional
+#     - name: Upload coverage
+#       if: matrix.python-version == "3.11"
+#       uses: codecov/codecov-action@v1
+#       with:
+#         token: ${{ secrets.CODECOV_TOKEN }} #required
+#         file: ./coverage.xml #optional
+#         flags: unittests #optional
+#         name: codecov-umbrella #optional
+#         yml: ./codecov.yml #optional
