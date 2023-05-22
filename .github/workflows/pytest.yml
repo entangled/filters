@@ -21,6 +21,7 @@ jobs:
       run: |
         wget https://github.com/jgm/pandoc/releases/download/3.1.2/pandoc-3.1.2-linux-amd64.tar.gz
         tar xvf pandoc-3.1.2-linux-amd64.tar.gz
+        echo "${GITHUB_WORKSPACE}/pandoc-3.1.2/bin" >> $GITHUB_PATH
         wget https://github.com/dhall-lang/dhall-haskell/releases/download/1.31.1/dhall-json-1.6.3-x86_64-linux.tar.bz2
         tar xvf dhall-json-1.6.3-x86_64-linux.tar.bz2
         echo "${GITHUB_WORKSPACE}/bin" >> $GITHUB_PATH
